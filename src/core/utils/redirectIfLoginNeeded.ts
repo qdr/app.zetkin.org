@@ -25,6 +25,6 @@ export default async function redirectIfLoginNeeded(
 
   if (shouldRedirectToLogin) {
     const path = headersList.get('x-requested-path');
-    redirect(`/login?redirect=${path}`);
+    redirect(`/login?level=${requiredAuthLevel}&redirect=${path}`);
   }
 }

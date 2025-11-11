@@ -133,13 +133,14 @@ export const scaffold =
       if (authLevel < options.authLevelRequired) {
         // Store the URL that the user tried to access, so that they
         // can be redirected back here after logging in
-        session.redirAfterLogin = stripParams(ctx.resolvedUrl, ctx.params);
+        const redirectPath = stripParams(ctx.resolvedUrl, ctx.params);
+        session.redirAfterLogin = redirectPath;
 
         await session.save();
 
         return {
           redirect: {
-            destination: `/login?level=${options.authLevelRequired}`,
+            destination: `/login?level=${options.authLevelRequired}&redirect=${encodeURIComponent(redirectPath)}`,
             permanent: false,
           },
         };
