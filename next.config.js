@@ -14,9 +14,37 @@ module.exports = {
    */
   allowedDevOrigins: [],
 
+  // Performance optimizations
+  compiler: {
+    // Remove console logs in production for better performance
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+
+  // Optimize imports for Material-UI and other large libraries
+  modularizeImports: {
+    '@mui/material': {
+      transform: '@mui/material/{{member}}',
+    },
+    '@mui/icons-material': {
+      transform: '@mui/icons-material/{{member}}',
+    },
+    '@mui/lab': {
+      transform: '@mui/lab/{{member}}',
+    },
+    lodash: {
+      transform: 'lodash/{{member}}',
+    },
+  },
+
+  // Enable SWC minification (faster than Terser)
+  swcMinify: true,
+
   experimental: {
     esmExternals: "loose",
     serverComponentsExternalPackages: ["mjml", "mongoose"],
+
+    // Optimize package imports (reduces bundle size and improves HMR)
+    optimizePackageImports: ['@mui/material', '@mui/icons-material', 'lodash'],
   },
   images: {
     domains: [
