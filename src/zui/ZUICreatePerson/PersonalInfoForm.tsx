@@ -1,3 +1,5 @@
+'use client';
+
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { ExpandMore } from '@mui/icons-material';
 import utc from 'dayjs/plugin/utc';

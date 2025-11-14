@@ -108,7 +108,7 @@ const Calendar = () => {
         marginTop={2}
         overflow="auto"
       >
-        <Suspense>
+        <Suspense fallback={null}>
           {timeScale === TimeScale.DAY && (
             <CalendarDayView
               focusDate={focusDate}

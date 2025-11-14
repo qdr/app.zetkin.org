@@ -1,6 +1,8 @@
+'use client';
+
 import { isEqual } from 'lodash';
 import { ParsedUrlQuery } from 'querystring';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import {
   DataGridProProps,
   GridFilterModel,

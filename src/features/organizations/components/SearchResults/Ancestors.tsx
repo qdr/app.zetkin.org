@@ -1,3 +1,5 @@
+'use client';
+
 import { ChevronRight } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
 import { FC, useRef, useState } from 'react';

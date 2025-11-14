@@ -5,7 +5,7 @@ import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
 import { IntlProvider } from 'react-intl';
 import { Provider as ReduxProvider } from 'react-redux';
-import { FC, ReactNode, Suspense, useRef } from 'react';
+import { FC, ReactNode, useEffect, useRef } from 'react';
 import {
   StyledEngineProvider,
   Theme,
@@ -13,12 +13,13 @@ import {
 } from '@mui/material/styles';
 import { LicenseInfo, LocalizationProvider } from '@mui/x-date-pickers-pro';
 import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+import { useRouter } from 'next/navigation';
 
 import BrowserApiClient from 'core/api/client/BrowserApiClient';
 import Environment, { EnvVars } from 'core/env/Environment';
 import { EnvProvider } from 'core/env/EnvContext';
 import { MessageList } from 'utils/locale';
-import createStore, { Store } from 'core/store';
+import createStore, { setClientRouter, Store } from 'core/store';
 import { oldThemeWithLocale } from '../../theme';
 import { UserProvider } from './UserContext';
 import { ZetkinUser } from 'utils/types/zetkin';
@@ -49,11 +50,18 @@ const ClientContext: FC<ClientContextProps> = ({
   user,
 }) => {
   const onServer = typeof window == 'undefined';
+  const router = useRouter();
   const storeRef = useRef<Store | null>(null);
 
+  // Initialize store once
   if (!storeRef.current) {
     storeRef.current = createStore();
   }
+
+  // Set up router for Redux middleware (client-only)
+  useEffect(() => {
+    setClientRouter(router);
+  }, [router]);
 
   const apiClient = onServer
     ? new BackendApiClient(headers)
@@ -88,7 +96,7 @@ const ClientContext: FC<ClientContextProps> = ({
                       >
                         <ZUIConfirmDialogProvider>
                           <CssBaseline />
-                          <Suspense>{children}</Suspense>
+                          {children}
                         </ZUIConfirmDialogProvider>
                       </IntlProvider>
                     </ZUISnackbarProvider>

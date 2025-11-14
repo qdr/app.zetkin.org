@@ -103,7 +103,7 @@ export const PublicEventPage: FC<Props> = ({ eventId, orgId }) => {
   };
 
   return (
-    <Suspense>
+    <Suspense fallback={null}>
       {event && (
         <Box
           sx={{

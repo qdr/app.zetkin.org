@@ -16,6 +16,12 @@ export async function GET() {
     {
       cookieName: 'zsid',
       password: requiredEnvVar('SESSION_PASSWORD'),
+      cookieOptions: {
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+      },
     }
   );
 

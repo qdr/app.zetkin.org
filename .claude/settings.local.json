@@ -2,7 +2,18 @@
   "permissions": {
     "allow": [
       "Bash(find:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(node migrate-all.js:*)",
+      "Bash(rm:*)",
+      "Bash(node cleanup-simple.js:*)",
+      "Bash(for file in src/core/env/EnvContext.tsx src/core/env/UserContext.tsx src/utils/panes/index.tsx src/zui/ZUIConfirmDialogProvider.tsx src/zui/ZUISnackbarContext.tsx)",
+      "Bash(do if ! grep -q \"''use client''\" \"$file\")",
+      "Bash(then echo \"Missing: $file\")",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(node add-use-client.js:*)",
+      "Bash(for file in app/call/page.tsx app/organize/[orgId]/suborgOverview/page.tsx features/areaAssignments/components/AreaSelect.tsx features/home/pages/AllEventsPage.tsx features/home/pages/HomePage.tsx)",
+      "Bash(do echo \"=== $file ===\" grep -A 2 \"<Suspense\" \"$file\")"
     ],
     "deny": [],
     "ask": []

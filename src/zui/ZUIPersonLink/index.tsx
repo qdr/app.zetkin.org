@@ -1,6 +1,8 @@
+'use client';
+
 import { Link } from '@mui/material';
 import NextLink from 'next/link';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 import { ZetkinPerson } from 'utils/types/zetkin';
 import ZUIPersonHoverCard from '../ZUIPersonHoverCard';

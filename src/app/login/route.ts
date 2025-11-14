@@ -43,11 +43,14 @@ export async function GET(request: NextRequest) {
   const level = searchParams.get('level');
   const redirectParam = searchParams.get('redirect');
 
+  console.log('[Login Route] Level:', level, 'Redirect:', redirectParam);
+
   let scopes;
   if (level) {
     const levelNum = parseInt(level);
     if (levelNum > 1) {
       scopes = [`level${levelNum}`];
+      console.log('[Login Route] Requesting scopes:', scopes);
     }
   }
 
@@ -62,12 +65,19 @@ export async function GET(request: NextRequest) {
     const session = await getIronSession<AppSession>(cookieStore as any, {
       cookieName: 'zsid',
       password: requiredEnvVar('SESSION_PASSWORD'),
+      cookieOptions: {
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+      },
     });
 
     session.redirAfterLogin = destinationPath;
     await session.save();
   }
 
-  const loginUrl = z.getLoginUrl(`${baseUrl}/`, scopes);
+  const loginUrl = z.getLoginUrl(`${baseUrl}/api/auth/callback`, scopes);
+  console.log('[Login Route] Generated login URL:', loginUrl);
   redirect(loginUrl);
 }

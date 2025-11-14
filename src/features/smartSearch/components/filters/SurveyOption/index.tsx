@@ -1,3 +1,5 @@
+'use client';
+
 import { DoneAll } from '@mui/icons-material';
 import { Box, Chip, MenuItem, Tooltip } from '@mui/material';
 import { FormEvent, useEffect } from 'react';

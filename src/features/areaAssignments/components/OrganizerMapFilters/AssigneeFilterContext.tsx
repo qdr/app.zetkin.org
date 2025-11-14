@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, FC, PropsWithChildren, useState } from 'react';
 
 type AssigneesFilter = 'assigned' | 'unassigned';

@@ -1,4 +1,3 @@
-import Router from 'next/router';
 import {
   configureStore,
   ConfigureStoreOptions,
@@ -113,11 +112,19 @@ const reducer = {
 
 const listenerMiddleware = createListenerMiddleware();
 
+// Navigation helper for App Router
+// This will be set by ClientContext after mount
+let clientRouter: { push: (url: string) => void } | null = null;
+
+export function setClientRouter(router: { push: (url: string) => void }) {
+  clientRouter = router;
+}
+
 listenerMiddleware.startListening({
   actionCreator: areaAssignmentCreated,
   effect: (action) => {
     const { organization_id, project_id, id } = action.payload;
-    Router.push(
+    clientRouter?.push(
       `/organize/${organization_id}/projects/${project_id}/areaassignments/${id}`
     );
   },
@@ -127,7 +134,7 @@ listenerMiddleware.startListening({
   actionCreator: campaignDeleted,
   effect: (action) => {
     const orgId = action.payload[0];
-    Router.push(`/organize/${orgId}/projects`);
+    clientRouter?.push(`/organize/${orgId}/projects`);
   },
 });
 
@@ -135,7 +142,7 @@ listenerMiddleware.startListening({
   actionCreator: campaignCreated,
   effect: (action) => {
     const campaign = action.payload;
-    Router.push(
+    clientRouter?.push(
       `/organize/${campaign.organization?.id}/projects/${campaign.id}`
     );
   },
@@ -145,7 +152,7 @@ listenerMiddleware.startListening({
   actionCreator: emailCreated,
   effect: (action) => {
     const email = action.payload;
-    Router.push(
+    clientRouter?.push(
       `/organize/${email.organization.id}/projects/${
         email.campaign?.id ?? 'standalone'
       }/emails/${email.id}`
@@ -157,7 +164,7 @@ listenerMiddleware.startListening({
   actionCreator: callAssignmentCreated,
   effect: (action) => {
     const [callAssignment, campId] = action.payload;
-    Router.push(
+    clientRouter?.push(
       `/organize/${callAssignment.organization?.id}/projects/${campId}/callassignments/${callAssignment.id}`
     );
   },
@@ -167,7 +174,7 @@ listenerMiddleware.startListening({
   actionCreator: surveyCreated,
   effect: (action) => {
     const survey = action.payload;
-    Router.push(
+    clientRouter?.push(
       `/organize/${survey.organization.id}/projects/${
         survey.campaign?.id ?? 'standalone'
       }/surveys/${survey.id}`
@@ -179,7 +186,7 @@ listenerMiddleware.startListening({
   actionCreator: journeyInstanceCreated,
   effect: (action) => {
     const journeyInstance = action.payload;
-    Router.push(
+    clientRouter?.push(
       `/organize/${journeyInstance.organization.id}/journeys/${journeyInstance.journey.id}/${journeyInstance.id}`
     );
   },

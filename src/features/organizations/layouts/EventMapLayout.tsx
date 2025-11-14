@@ -156,7 +156,7 @@ const EventMapLayout: FC<Props> = ({
         {!showMapMobile && mobileMapVisible && <ZUIPublicFooter />}
       </Box>
       {!isMobile && (
-        <Suspense>
+        <Suspense fallback={null}>
           <Box
             sx={{
               [theme.breakpoints.down('md')]: {

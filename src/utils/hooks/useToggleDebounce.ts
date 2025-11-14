@@ -1,3 +1,5 @@
+'use client';
+
 import { MouseEvent, useRef } from 'react';
 
 // Close will be called after a delay, which is cancelled if open is called
