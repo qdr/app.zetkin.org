@@ -18,7 +18,7 @@ export default function useBreadcrumbElements() {
     (state) => state.breadcrumbs.crumbsByPath[pathWithoutQueryString]
   );
 
-  const query = getPathParameters(pathname, params);
+  const query = getPathParameters(pathname, params || {});
 
   const future = loadItemIfNecessary(crumbsItem, dispatch, {
     actionOnLoad: () => crumbsLoad(pathWithoutQueryString),
@@ -40,12 +40,11 @@ const getPathParameters = function (
   pathname: string | null,
   params: Record<string, string | string[]>
 ): string {
-  // Only use parameters that are part of the path (e.g. [personId])
-  // and not ones that are part of the actual querystring (e.g. ?filter_*)
+  // Extract all dynamic route parameters
+  // In App Router, params contains the actual route params (e.g., { orgId: '1' })
   if (!pathname || !params) return '';
 
   return Object.entries(params)
-    .filter(([key]) => pathname.includes(`[${key}]`))
     .map(([key, val]) => {
       const value = Array.isArray(val) ? val[0] : val;
       return `${key}=${value}`;

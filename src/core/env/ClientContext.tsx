@@ -3,6 +3,8 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import { IntlProvider } from 'react-intl';
 import { Provider as ReduxProvider } from 'react-redux';
 import { FC, ReactNode, useEffect, useRef } from 'react';
@@ -88,18 +90,20 @@ const ClientContext: FC<ClientContextProps> = ({
                     locale={lang}
                     messages={messages}
                   >
-                    <ZUISnackbarProvider>
-                      <IntlProvider
-                        defaultLocale="en"
-                        locale={lang}
-                        messages={messages}
-                      >
-                        <ZUIConfirmDialogProvider>
-                          <CssBaseline />
-                          {children}
-                        </ZUIConfirmDialogProvider>
-                      </IntlProvider>
-                    </ZUISnackbarProvider>
+                    <DndProvider backend={HTML5Backend}>
+                      <ZUISnackbarProvider>
+                        <IntlProvider
+                          defaultLocale="en"
+                          locale={lang}
+                          messages={messages}
+                        >
+                          <ZUIConfirmDialogProvider>
+                            <CssBaseline />
+                            {children}
+                          </ZUIConfirmDialogProvider>
+                        </IntlProvider>
+                      </ZUISnackbarProvider>
+                    </DndProvider>
                   </IntlProvider>
                 </LocalizationProvider>
               </UserProvider>

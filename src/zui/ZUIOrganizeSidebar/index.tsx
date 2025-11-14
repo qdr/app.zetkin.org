@@ -3,7 +3,7 @@
 import makeStyles from '@mui/styles/makeStyles';
 import NextLink from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Architecture,
   Close,
@@ -96,11 +96,16 @@ const ZUIOrganizeSidebar = (): JSX.Element => {
 
   const [checked, setChecked] = useState(false);
   const [lastOpen, setLastOpen] = useLocalStorage('orgSidebarOpen', true);
-  const [open, setOpen] = useState(lastOpen);
+  const [open, setOpen] = useState(true); // Will be synced with lastOpen in useEffect
   const [searchString, setSearchString] = useState('');
   const organizationFuture = useOrganization(orgId);
   const hasAreas = useFeature(AREAS, orgId);
   const hasSettings = useFeature(OFFICIALS, orgId);
+
+  // Sync open state with localStorage value after mount
+  useEffect(() => {
+    setOpen(lastOpen);
+  }, [lastOpen]);
 
   const handleExpansion = () => {
     setChecked(!checked);
