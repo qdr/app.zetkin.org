@@ -3,7 +3,6 @@
 import { useParams } from 'next/navigation';
 
 import messageIds from 'features/views/l10n/messageIds';
-import PeopleLayout from 'features/views/layout/PeopleLayout';
 import { useMessages } from 'core/i18n';
 import useServerSide from 'core/useServerSide';
 import ViewBrowser from 'features/views/components/ViewBrowser';
@@ -18,9 +17,5 @@ export default function PeopleViewsPage() {
     return null;
   }
 
-  return (
-    <PeopleLayout>
-      <ViewBrowser basePath={`/organize/${orgId}/people`} />
-    </PeopleLayout>
-  );
+  return <ViewBrowser basePath={`/organize/${orgId}/people`} />;
 }
