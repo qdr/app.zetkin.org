@@ -19,7 +19,7 @@ const JourneysLayout: React.FunctionComponent<JourneysLayoutProps> = ({
   return (
     <TabbedLayout
       baseHref={`/organize/${orgId}/journeys`}
-      defaultTab="/overview"
+      defaultTab="/"
       ellipsisMenuItems={[
         {
           label: messages.journeys.menu.downloadCsv(),
@@ -36,7 +36,7 @@ const JourneysLayout: React.FunctionComponent<JourneysLayoutProps> = ({
       ]}
       tabs={[
         {
-          href: `/overview`,
+          href: `/`,
           label: messages.journeys.tabs.overview(),
         },
       ]}

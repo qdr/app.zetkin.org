@@ -14,7 +14,7 @@ const OpenJourneyInstancesPage = () => {
 
   return (
     <>
-            <ZUIFuture future={journeyInstancesFuture}>
+      <ZUIFuture future={journeyInstancesFuture}>
         {(data) => {
           const openJourneyInstances = data.journeyInstances.filter(
             (journeyInstance) => journeyInstance.closed == null

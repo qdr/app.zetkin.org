@@ -17,8 +17,7 @@ const AllJourneysOverviewPage = () => {
   const journeysFuture = useJourneys(orgId);
 
   return (
-    <>
-            <ZUISection title={messages.journeys.overview.overviewTitle()}>
+    <ZUISection title={messages.journeys.overview.overviewTitle()}>
         <Grid container spacing={2}>
           {journeysFuture.data?.map((journey: ZetkinJourney) => (
             <Grid key={journey.id} size={{ lg: 4, md: 6, xl: 3, xs: 12 }}>
@@ -27,7 +26,6 @@ const AllJourneysOverviewPage = () => {
           ))}
         </Grid>
       </ZUISection>
-    </>
   );
 };
 
