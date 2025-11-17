@@ -53,9 +53,8 @@ async function loadMessages(): Promise<MessageDB> {
       const dotPath = pathElems.join('.');
       const lang = fileName.replace('.yml', '');
 
-      // @ts-expect-error - Turbopack: dynamic file reading is intentional for locale files
+      // Dynamic file reading is intentional: loading locale files at build time
       const content = await fs.readFile(fullPath, 'utf8');
-
       const data = yaml.parse(content);
       const flattened = flattenObject(data, dotPath);
 
