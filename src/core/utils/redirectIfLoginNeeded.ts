@@ -16,15 +16,19 @@ export default async function redirectIfLoginNeeded(
 
   try {
     const session = await apiClient.get<ZetkinSession>('/api/session');
+    console.log('[redirectIfLoginNeeded] Session level:', session.level, 'Required:', requiredAuthLevel);
     if (session.level < requiredAuthLevel) {
       shouldRedirectToLogin = true;
     }
   } catch (err) {
+    console.log('[redirectIfLoginNeeded] Session check failed:', err);
     shouldRedirectToLogin = true;
   }
 
   if (shouldRedirectToLogin) {
     const path = headersList.get('x-requested-path');
-    redirect(`/login?redirect=${path}`);
+    const encodedPath = path ? encodeURIComponent(path) : '';
+    console.log('[redirectIfLoginNeeded] Redirecting to login. Path:', path);
+    redirect(`/login?level=${requiredAuthLevel}&redirect=${encodedPath}`);
   }
 }

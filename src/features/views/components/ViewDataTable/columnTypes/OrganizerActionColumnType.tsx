@@ -1,5 +1,7 @@
+'use client';
+
 import { makeStyles } from '@mui/styles';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import {
   Box,
   Button,

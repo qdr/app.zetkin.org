@@ -1,6 +1,8 @@
+'use client';
+
 import { FC } from 'react';
 import { Person } from '@mui/icons-material';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { Avatar, Box, SxProps, Tooltip } from '@mui/material';
 
 import { ZetkinPerson } from 'utils/types/zetkin';

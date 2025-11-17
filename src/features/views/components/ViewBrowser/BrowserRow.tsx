@@ -1,3 +1,5 @@
+'use client';
+
 import { useDrop } from 'react-dnd';
 import { Box, useTheme } from '@mui/material';
 import { createContext, FC } from 'react';

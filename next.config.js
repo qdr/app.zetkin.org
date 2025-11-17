@@ -14,9 +14,40 @@ module.exports = {
    */
   allowedDevOrigins: [],
 
+  // Performance optimizations
+  // Note: compiler.removeConsole is not compatible with Turbopack
+  // Use a babel plugin or eslint rule to remove console logs if needed
+
+  // Optimize imports for Material-UI and other large libraries
+  // Note: modularizeImports can cause issues with re-exported utilities
+  // Using optimizePackageImports in experimental section instead
+  modularizeImports: {
+    lodash: {
+      transform: 'lodash/{{member}}',
+    },
+  },
+
+  // Enable SWC minification (faster than Terser)
+  swcMinify: true,
+
   experimental: {
-    esmExternals: "loose",
+    // Note: esmExternals is not compatible with Turbopack
+    // If you need to disable Turbopack, uncomment the line below:
+    // esmExternals: "loose",
     serverComponentsExternalPackages: ["mjml", "mongoose"],
+
+    // Optimize package imports (reduces bundle size and improves HMR)
+    optimizePackageImports: ['@mui/material', '@mui/icons-material', 'lodash'],
+
+    // Turbopack-specific optimizations
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
   },
   images: {
     domains: [

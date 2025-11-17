@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, FC, ReactNode } from 'react';
 
 import { ZetkinUser } from 'utils/types/zetkin';

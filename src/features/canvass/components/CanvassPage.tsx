@@ -149,7 +149,7 @@ const CanvassPage: FC<CanvassPageProps> = ({ areaAssId, areaId }) => {
   }
 
   return (
-    <Suspense>
+    <Suspense fallback={null}>
       <Page areaId={areaId} assignment={assignment} />
     </Suspense>
   );

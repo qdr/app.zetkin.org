@@ -1,3 +1,5 @@
+'use client';
+
 import Fuse from 'fuse.js';
 import { Box, List, ListItem, TextField, Typography } from '@mui/material';
 import { Close, Search } from '@mui/icons-material';

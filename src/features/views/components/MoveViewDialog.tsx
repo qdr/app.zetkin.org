@@ -1,3 +1,5 @@
+'use client';
+
 import { FunctionComponent, useState } from 'react';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import {

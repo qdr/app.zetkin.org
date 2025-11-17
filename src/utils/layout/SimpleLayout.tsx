@@ -1,3 +1,5 @@
+'use client';
+
 import makeStyles from '@mui/styles/makeStyles';
 import { Box, Theme } from '@mui/material';
 import { FunctionComponent, ReactElement, useState } from 'react';

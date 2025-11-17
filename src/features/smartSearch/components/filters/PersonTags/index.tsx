@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Chip, MenuItem } from '@mui/material';
 import { FormEvent, useState } from 'react';
 
