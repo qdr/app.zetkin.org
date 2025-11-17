@@ -2,14 +2,12 @@
 
 import JoinFormList from 'features/joinForms/components/JoinFormList';
 import JoinFormPane from 'features/joinForms/panes/JoinFormPane';
-import PeopleLayout from 'features/views/layout/PeopleLayout';
 import useJoinForms from 'features/joinForms/hooks/useJoinForms';
+import { useNumericRouteParams } from 'core/hooks';
 import { usePanes } from 'utils/panes';
-import { useParams } from 'next/navigation';
 
-export default function JoinFormsPage() {
-  const params = useParams();
-  const orgId = parseInt(params.orgId as string);
+const JoinFormsPage = () => {
+  const { orgId } = useNumericRouteParams();
   const { data: joinForms } = useJoinForms(orgId);
   const { openPane } = usePanes();
 
@@ -22,18 +20,18 @@ export default function JoinFormsPage() {
   );
 
   return (
-    <PeopleLayout>
-      <JoinFormList
-        forms={ownJoinForms}
-        onItemClick={(form) => {
-          openPane({
-            render: () => (
-              <JoinFormPane formId={form.id} orgId={form.organization.id} />
-            ),
-            width: 500,
-          });
-        }}
-      />
-    </PeopleLayout>
+    <JoinFormList
+      forms={ownJoinForms}
+      onItemClick={(form) => {
+        openPane({
+          render: () => (
+            <JoinFormPane formId={form.id} orgId={form.organization.id} />
+          ),
+          width: 500,
+        });
+      }}
+    />
   );
-}
+};
+
+export default JoinFormsPage;

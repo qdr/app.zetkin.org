@@ -1,34 +1,63 @@
-import { headers } from 'next/headers';
-import { notFound } from 'next/navigation';
+'use client';
 
-import AllCampaignsLayout from 'features/campaigns/layout/AllCampaignsLayout';
-import BackendApiClient from 'core/api/client/BackendApiClient';
-import ProjectsClient from './ProjectsClient';
+import { Suspense } from 'react';
+import { Box, Grid, Typography } from '@mui/material';
 
-export const metadata = {
-  title: 'Projects - Zetkin',
-};
+import ActivitiesOverview from 'features/campaigns/components/ActivitiesOverview';
+import CampaignCard from 'features/campaigns/components/CampaignCard';
+import messageIds from 'features/campaigns/l10n/messageIds';
+import SharedCard from 'features/campaigns/components/SharedCard';
+import useCampaigns from 'features/campaigns/hooks/useCampaigns';
+import { useNumericRouteParams } from 'core/hooks';
+import useServerSide from 'core/useServerSide';
+import useSurveys from 'features/surveys/hooks/useSurveys';
+import { Msg, useMessages } from 'core/i18n';
 
-export default async function ProjectsPage({
-  params,
-}: {
-  params: { orgId: string };
-}) {
-  const { orgId } = params;
+const AllCampaignsSummaryPage = () => {
+  const messages = useMessages(messageIds);
+  const { orgId } = useNumericRouteParams();
+  const { data: campaigns } = useCampaigns(orgId);
+  campaigns?.reverse();
 
-  const headersList = headers();
-  const headersObject = Object.fromEntries(headersList.entries());
-  const apiClient = new BackendApiClient(headersObject);
+  const onServer = useServerSide();
+  const surveys = useSurveys(orgId).data ?? [];
 
-  try {
-    await apiClient.get(`/api/orgs/${orgId}`);
-  } catch {
-    notFound();
+  if (onServer) {
+    return null;
   }
+  //The shared card is currently only visible when there are shared surveys, but there will be more shared activities in the future.
+  const sharedSurveys = surveys.filter(
+    (survey) =>
+      survey.org_access === 'suborgs' && survey.organization.id != orgId
+  );
 
   return (
-    <AllCampaignsLayout>
-      <ProjectsClient orgId={orgId} />
-    </AllCampaignsLayout>
+    <>
+            <Suspense>
+        <ActivitiesOverview orgId={orgId} />
+      </Suspense>
+      <Box mt={4}>
+        <Typography mb={2} variant="h4">
+          <Msg id={messageIds.all.heading} />
+        </Typography>
+
+        <Grid container spacing={2}>
+          {sharedSurveys.length > 0 && (
+            <Grid size={{ lg: 3, md: 4, xs: 12 }}>
+              <SharedCard />
+            </Grid>
+          )}
+          {campaigns?.map((campaign) => {
+            return (
+              <Grid key={campaign.id} size={{ lg: 3, md: 4, xs: 12 }}>
+                <CampaignCard campaign={campaign} />
+              </Grid>
+            );
+          })}
+        </Grid>
+      </Box>
+    </>
   );
-}
+};
+
+export default AllCampaignsSummaryPage;

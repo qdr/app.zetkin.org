@@ -1,15 +1,22 @@
 'use client';
 
-
-import SimpleLayout from 'utils/layout/SimpleLayout';
 import useAreas from 'features/areas/hooks/useAreas';
-import { useParams } from 'next/navigation';
+import { useNumericRouteParams } from 'core/hooks';
 import ZUIFuture from 'zui/ZUIFuture';
-import { AREAS } from 'utils/featureFlags';
-import { Msg, useMessages } from 'core/i18n';
+import { useMessages } from 'core/i18n';
 import messageIds from 'features/areas/l10n/messageIds';
 import GLGeographyMap from 'features/geography/components/GLGeographyMap';
 
+const GeographyPage = () => {
+  const { orgId } = useNumericRouteParams();
+  const messages = useMessages(messageIds);
+  const areasFuture = useAreas(orgId);
 
+  return (
+    <ZUIFuture future={areasFuture}>
+      {(areas) => <GLGeographyMap areas={areas} orgId={orgId} />}
+    </ZUIFuture>
+  );
+};
 
 export default GeographyPage;

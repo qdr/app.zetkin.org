@@ -14,15 +14,15 @@ import {
 import { Assignment, Event, Phone } from '@mui/icons-material';
 
 import useServerSide from 'core/useServerSide';
-import SuborgOverviewLayout from 'features/organizations/layouts/SuborgOverviewLayout';
 import { Msg } from 'core/i18n';
 import messageIds from 'features/organizations/l10n/messageIds';
 import SuborgsList, {
   isError,
 } from 'features/organizations/components/SuborgsList';
 import useSuborgWithFullStats from 'features/organizations/hooks/useSuborgWithFullStats';
+import { useNumericRouteParams } from 'core/hooks';
 
-=> {
+export const SuborgCard: FC<{ orgId: number }> = ({ orgId }) => {
   const suborgWithFullStats = useSuborgWithFullStats(orgId);
 
   if (isError(suborgWithFullStats)) {
@@ -285,12 +285,8 @@ import useSuborgWithFullStats from 'features/organizations/hooks/useSuborgWithFu
   );
 };
 
-interface Props {
-  orgId: string;
-}
-
-const SuborgsPage<Props> = ({ orgId }) => {
-  const parsedOrgId = parseInt(orgId);
+const SuborgsPage = () => {
+  const { orgId } = useNumericRouteParams();
   const onServer = useServerSide();
   const [selectedSuborgId, setSelectedSuborgId] = useState<number | null>(null);
 
@@ -300,8 +296,7 @@ const SuborgsPage<Props> = ({ orgId }) => {
 
   return (
     <>
-      
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Box sx={{ display: 'flex', gap: 2 }}>
           <Box sx={{ flex: 1 }}>
             <Suspense
@@ -320,7 +315,7 @@ const SuborgsPage<Props> = ({ orgId }) => {
                 onSelectSuborg={(suborgId: number) =>
                   setSelectedSuborgId(suborgId)
                 }
-                orgId={parsedOrgId}
+                orgId={orgId}
               />
             </Suspense>
           </Box>
@@ -348,6 +343,5 @@ const SuborgsPage<Props> = ({ orgId }) => {
     </>
   );
 };
-
 
 export default SuborgsPage;

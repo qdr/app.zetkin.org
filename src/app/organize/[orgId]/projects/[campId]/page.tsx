@@ -4,30 +4,38 @@ import { Box, Grid, Typography } from '@mui/material';
 import { Suspense } from 'react';
 
 import ActivitiesOverview from 'features/campaigns/components/ActivitiesOverview';
-import BackendApiClient from 'core/api/client/BackendApiClient';
-import SingleCampaignLayout from 'features/campaigns/layout/SingleCampaignLayout';
 import useCampaign from 'features/campaigns/hooks/useCampaign';
-import { useParams } from 'next/navigation';
+import { useNumericRouteParams } from 'core/hooks';
 import useServerSide from 'core/useServerSide';
-import { ZetkinCampaign } from 'utils/types/zetkin';
 
-export default function CampaignSummaryPage() {
-  const onServer = useServerSide();
-  const params = useParams();
-  const orgId = parseInt(params.orgId as string);
-  const campId = parseInt(params.campId as string);
+const CampaignSummaryPage = () => {
+  const isOnServer = useServerSide();
+  const { orgId, campId } = useNumericRouteParams();
+  const { campaignFuture } = useCampaign(orgId, campId);
+  const campaign = campaignFuture.data;
 
-  if (onServer) {
+  if (isOnServer) {
     return null;
   }
 
   return (
-    <SingleCampaignLayout>
-      <Box sx={{ padding: 2 }}>
-        <Suspense fallback={null}>
-          <ActivitiesOverview orgId={orgId} campId={campId} />
+    <>
+            <>
+        <Box mb={campaign?.info_text || campaign?.manager ? 2 : 0}>
+          <Grid container spacing={2}>
+            {campaign?.info_text && (
+              <Grid size={{ lg: 6, md: 12, xs: 12 }}>
+                <Typography variant="body1">{campaign?.info_text}</Typography>
+              </Grid>
+            )}
+          </Grid>
+        </Box>
+        <Suspense>
+          <ActivitiesOverview campaignId={campId} orgId={orgId} />
         </Suspense>
-      </Box>
-    </SingleCampaignLayout>
+      </>
+    </>
   );
-}
+};
+
+export default CampaignSummaryPage;

@@ -1,23 +1,20 @@
 'use client';
 
-import { Box, Grid } from '@mui/material';
-import { useRef, useState } from 'react';
+import { Grid } from '@mui/material';
 
-import AddPersonButton from 'features/events/components/AddPersonButton';
-import EventContactCard from 'features/events/components/EventContactCard';
-import EventLayout from 'features/events/layout/EventLayout';
-import EventParticipantsFilter from 'features/events/components/EventParticipantsFilter';
-import EventParticipantsList from 'features/events/components/EventParticipantsList';
-import ParticipantSummaryCard from 'features/events/components/ParticipantSummaryCard';
+import EventOverviewCard from 'features/events/components/EventOverviewCard';
+import EventParticipantsCard from 'features/events/components/EventParticipantsCard';
+import EventRelatedCard from 'features/events/components/EventRelatedCard';
+import EventURLCard from 'features/events/components/EventURLCard';
 import useEvent from 'features/events/hooks/useEvent';
+import { useNumericRouteParams } from 'core/hooks';
 import ZUIFuture from 'zui/ZUIFuture';
 
-=> {
-  const [filterString, setFilterString] = useState<string>('');
-  const listRef = useRef<HTMLDivElement>();
-  const eventFuture = useEvent(parseInt(orgId), parseInt(eventId));
+const EventPage = () => {
+  const { orgId, eventId } = useNumericRouteParams();
+  const eventFuture = useEvent(orgId, eventId);
 
-  if (!eventFuture) {
+  if (!eventFuture || !eventFuture.data) {
     return null;
   }
 
@@ -25,51 +22,27 @@ import ZUIFuture from 'zui/ZUIFuture';
     <ZUIFuture future={eventFuture}>
       {(data) => {
         return (
-          <Box sx={{ overflowY: 'auto' }}>
-            <Grid container spacing={2}>
-              <Grid size={{ md: 8, xs: 12 }}>
-                <ParticipantSummaryCard
-                  eventId={parseInt(eventId)}
-                  onClickRecord={() => {
-                    if (listRef.current) {
-                      listRef.current.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
-                  orgId={parseInt(orgId)}
-                />
-              </Grid>
-              <Grid size={{ md: 4, xs: 12 }}>
-                <EventContactCard data={data} orgId={parseInt(orgId)} />
-              </Grid>
+          <Grid container spacing={2}>
+            <Grid size={{ md: 8, xs: 12 }}>
+              <EventOverviewCard data={data} orgId={orgId} />
             </Grid>
-            <Grid
-              container
-              justifyContent="flex-end"
-              size={{ md: 12 }}
-              sx={{ marginBottom: '40px', marginTop: '30px' }}
-            >
-              <EventParticipantsFilter
-                onFilterChange={(value) => {
-                  setFilterString(value);
-                  if (listRef.current) {
-                    listRef.current.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
+            <Grid size={{ md: 4, xs: 6 }}>
+              <EventParticipantsCard
+                eventId={eventId}
+                orgId={orgId}
               />
-              <AddPersonButton eventId={data.id} orgId={parseInt(orgId)} />
+              <EventRelatedCard data={data} orgId={orgId} />
+              <EventURLCard
+                eventId={eventId}
+                isOpen={data.published != null}
+                orgId={orgId}
+              />
             </Grid>
-            <EventParticipantsList
-              ref={listRef}
-              data={data}
-              filterString={filterString}
-              orgId={parseInt(orgId)}
-            />
-          </Box>
+          </Grid>
         );
       }}
     </ZUIFuture>
   );
 };
 
-
-export default ParticipantsPage;
+export default EventPage;

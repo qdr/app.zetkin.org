@@ -1,33 +1,32 @@
 'use client';
 
-import { useParams, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { Box, CircularProgress, Pagination, Typography } from '@mui/material';
 
 import DuplicateCard from 'features/duplicates/components/DuplicateCard';
 import messageIds from 'features/duplicates/l10n/messageIds';
-import PeopleLayout from 'features/views/layout/PeopleLayout';
 import oldTheme from 'theme';
 import useDuplicates from 'features/duplicates/hooks/useDuplicates';
 import { useMessages } from 'core/i18n';
+import { useNumericRouteParams } from 'core/hooks';
 import useServerSide from 'core/useServerSide';
 
-export default function DuplicatesPage() {
+const DuplicatesPage = () => {
   const onServer = useServerSide();
-  const params = useParams();
-  const searchParams = useSearchParams();
-  const orgId = parseInt(params.orgId as string);
+  const { orgId } = useNumericRouteParams();
   const list = useDuplicates(orgId);
   const messages = useMessages(messageIds);
+  const router = useRouter();
   const [page, setPage] = useState(
-    searchParams.get('page') ? Number(searchParams.get('page')) : 1
+    router.query.page !== undefined ? Number(router.query.page) : 1
   );
   const pageSize = 100;
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const url = `${window.location.protocol}//${window.location.host}${
-      window.location.pathname
+      router.asPath.split('?')[0]
     }?page=${page}`;
     window.history.replaceState({}, '', url);
   }, [page]);
@@ -47,7 +46,7 @@ export default function DuplicatesPage() {
   );
 
   return (
-    <PeopleLayout>
+    <>
       {list.isLoading && (
         <Box display="flex" justifyContent="center" m={2}>
           <CircularProgress />
@@ -97,6 +96,8 @@ export default function DuplicatesPage() {
           </Box>
         </Box>
       )}
-    </PeopleLayout>
+    </>
   );
-}
+};
+
+export default DuplicatesPage;

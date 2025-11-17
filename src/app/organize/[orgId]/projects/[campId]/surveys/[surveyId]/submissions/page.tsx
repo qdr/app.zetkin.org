@@ -1,33 +1,32 @@
 'use client';
 
 import { Grid } from '@mui/material';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { getSurveyCampId } from 'features/surveys/utils/getSurveyUrl';
 import SubmissionWarningAlert from 'features/surveys/components/SubmissionWarningAlert';
-import SurveyLayout from 'features/surveys/layouts/SurveyLayout';
 import SurveySubmissionsList from 'features/surveys/components/SurveySubmissionsList';
 import SurveySuborgsCard from 'features/surveys/components/SurveySuborgsCard';
+import { useNumericRouteParams } from 'core/hooks';
 import useSurvey from 'features/surveys/hooks/useSurvey';
 import useSurveySubmissions from 'features/surveys/hooks/useSurveySubmissions';
 import ZUIFuture from 'zui/ZUIFuture';
 
-=> {
-  const parsedOrg = parseInt(orgId);
-  const surveyFuture = useSurvey(parsedOrg, parseInt(surveyId));
-  const submissionsFuture = useSurveySubmissions(parsedOrg, parseInt(surveyId));
-
-  const campaignId =
-    getSurveyCampId(surveyFuture?.data, parsedOrg) || 'standalone';
-
-  const params = useParams();
+const SubmissionsPage = () => {
+  const { orgId, campId, surveyId } = useNumericRouteParams();
   const searchParams = useSearchParams();
+  const showUnlinkedOnly = searchParams.get('filter') === 'true';
+  const surveyFuture = useSurvey(orgId, surveyId);
+  const submissionsFuture = useSurveySubmissions(orgId, surveyId);
+
+  const campaignId = getSurveyCampId(surveyFuture?.data, orgId) || 'standalone';
+
+  const router = useRouter();
   const isShared = campaignId === 'shared';
 
   return (
     <>
-      
-      <Grid container spacing={2}>
+            <Grid container spacing={2}>
         <Grid size={{ md: isShared ? 12 : 8, sm: 12, xs: 12 }}>
           <ZUIFuture future={submissionsFuture} ignoreDataWhileLoading>
             {(data) => {
@@ -51,22 +50,18 @@ import ZUIFuture from 'zui/ZUIFuture';
         <Grid size={{ md: 4, sm: 12, xs: 12 }}>
           <SubmissionWarningAlert
             campId={campaignId}
-            orgId={parseInt(orgId)}
+            orgId={orgId}
             showUnlinkedOnly={showUnlinkedOnly}
-            surveyId={parseInt(surveyId)}
+            surveyId={surveyId}
           />
 
           {!isShared && (
-            <SurveySuborgsCard
-              orgId={parseInt(orgId)}
-              surveyId={parseInt(surveyId)}
-            />
+            <SurveySuborgsCard orgId={orgId} surveyId={surveyId} />
           )}
         </Grid>
       </Grid>
     </>
   );
 };
-
 
 export default SubmissionsPage;

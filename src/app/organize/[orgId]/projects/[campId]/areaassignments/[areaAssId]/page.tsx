@@ -1,532 +1,192 @@
 'use client';
 
-import {
-  Close,
-  Delete,
-  Edit,
-  LinearScale,
-  SwitchLeft,
-} from '@mui/icons-material';
-import { useContext, useState } from 'react';
-import {
-  alpha,
-  Badge,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Dialog,
-  Divider,
-  FormControl,
-  FormControlLabel,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Select,
-  SelectChangeEvent,
-  Tooltip,
-  Typography,
-  useMediaQuery,
-  useTheme,
-  Grid,
-} from '@mui/material';
-import { omit } from 'lodash';
+import { Box, Button, Card, Divider, Grid, Typography } from '@mui/material';
+import { Edit } from '@mui/icons-material';
+import { useRouter } from 'next/router';
 
-import { AREAS } from 'utils/featureFlags';
-import AreaAssignmentLayout from 'features/areaAssignments/layouts/AreaAssignmentLayout';
-import messagesIds from 'features/areaAssignments/l10n/messageIds';
-import MetricCard from 'features/areaAssignments/components/MetricCard';
+import AreaCard from 'features/areaAssignments/components/AreaCard';
+import NumberCard from 'features/areaAssignments/components/NumberCard';
 import useAreaAssignment from 'features/areaAssignments/hooks/useAreaAssignment';
-import useAreaAssignmentMutations from 'features/areaAssignments/hooks/useAreaAssignmentMutations';
 import useAreaAssignmentStats from 'features/areaAssignments/hooks/useAreaAssignmentStats';
-import ZUICard from 'zui/ZUICard';
-import { ZUIConfirmDialogContext } from 'zui/ZUIConfirmDialogProvider';
-import ZUIFuture from 'zui/ZUIFuture';
+import ZUIFutures from 'zui/ZUIFutures';
+import useAssignmentAreaStats from 'features/areaAssignments/hooks/useAssignmentAreaStats';
+import useAssignmentAreaGraph from 'features/areaAssignments/hooks/useAssignmentAreaGraph';
+import { ZetkinAssignmentAreaStatsItem } from 'features/areaAssignments/types';
 import { Msg, useMessages } from 'core/i18n';
-import {
-  ZetkinAreaAssignment,
-  ZetkinMetric,
-} from 'features/areaAssignments/types';
-import useAreaAssignmentMetrics from 'features/areaAssignments/hooks/useAreaAssignmentMetrics';
-import ZUILockCard from 'zui/ZUILockCard';
-import sortMetrics from 'features/canvass/utils/sortMetrics';
+import messageIds from 'features/areaAssignments/l10n/messageIds';
+import useAreaAssignees from 'features/areaAssignments/hooks/useAreaAssignees';
+import { useNumericRouteParams } from 'core/hooks';
 
-=> {
-  const theme = useTheme();
-  const { addMetric, deleteMetric, updateAreaAssignment, updateMetric } =
-    useAreaAssignmentMutations(parseInt(orgId), areaAssId);
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const areaAssignmentFuture = useAreaAssignment(parseInt(orgId), areaAssId);
-  const areaAssignmentStats = useAreaAssignmentStats(
-    parseInt(orgId),
-    areaAssId
-  ).data;
-  const messages = useMessages(messagesIds);
-  const { showConfirmDialog } = useContext(ZUIConfirmDialogContext);
-  const metricsList = useAreaAssignmentMetrics(parseInt(orgId), areaAssId);
-  const metrics = sortMetrics(metricsList);
+const AreaAssignmentPage = () => {
+  const { orgId, areaAssId } = useNumericRouteParams();
+  const messages = useMessages(messageIds);
+  const sessionsFuture = useAreaAssignees(orgId, areaAssId);
+  const assignmentFuture = useAreaAssignment(orgId, areaAssId);
+  const statsFuture = useAreaAssignmentStats(orgId, areaAssId);
+  const areasStats = useAssignmentAreaStats(orgId, areaAssId);
+  const dataGraph = useAssignmentAreaGraph(orgId, areaAssId);
+  const router = useRouter();
 
-  const [metricBeingCreated, setMetricBeingCreated] =
-    useState<Partial<ZetkinMetric> | null>(null);
-  const [metricBeingEdited, setMetricBeingEdited] =
-    useState<ZetkinMetric | null>(null);
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [metricBeingDeleted, setMetricBeingDeleted] =
-    useState<ZetkinMetric | null>(null);
-
-  const handleSaveMetric = async (metric: Partial<ZetkinMetric>) => {
-    if (metric.id) {
-      updateMetric(metric.id, omit(metric, 'id'));
-    } else {
-      addMetric(metric);
-    }
-    setMetricBeingEdited(null);
-    setMetricBeingCreated(null);
-  };
-
-  const handleDeleteMetric = async (id: number) => {
-    if (areaAssignmentFuture.data) {
-      await deleteMetric(id);
-    }
-    setMetricBeingEdited(null);
-  };
-
-  const handleAddNewMetric = (type: 'bool' | 'scale5') => {
-    setMetricBeingCreated({
-      defines_success: false,
-      question: '',
-      type: type,
-    });
-  };
-
-  const [unlocked, setUnlocked] = useState(false);
-  const isReportEditable = !areaAssignmentFuture.data?.start_date || unlocked;
+  const numAreas = new Set(
+    sessionsFuture.data?.map((session) => session.area_id) ?? []
+  ).size;
 
   return (
     <>
-      
-      <ZUIFuture future={areaAssignmentFuture}>
-        {(assignment: ZetkinAreaAssignment) => (
-          <Grid
-            container
-            direction={isMobile ? 'column-reverse' : 'row'}
-            spacing={2}
-          >
-            <Grid size={{ md: 8, xs: 12 }}>
-              <Box>
-                {metrics.map((metric) => (
-                  <Card key={metric.id} sx={{ mb: 2 }}>
-                    <CardContent>
-                      <Box display="flex">
-                        <Box
-                          display="flex"
-                          flexDirection="column"
-                          flexGrow={1}
-                          gap={1}
-                        >
-                          <Box
-                            alignItems="flex-start"
-                            display="flex"
-                            justifyContent="space-between"
-                          >
-                            <Box alignItems="center" display="flex">
-                              <Typography
-                                display="flex"
-                                gutterBottom
-                                mr={1}
-                                variant="h6"
-                              >
-                                {metric.type == 'bool' ? (
-                                  <Typography color="secondary" mr={1}>
-                                    <SwitchLeft />
-                                  </Typography>
-                                ) : (
-                                  <Typography color="secondary" mr={1}>
-                                    <LinearScale />
-                                  </Typography>
-                                )}
-                                {metric.question ||
-                                  messages.report.card.question()}
-                              </Typography>
-                            </Box>
-                            <Box alignItems="center" display="flex">
-                              {metric.defines_success &&
-                                metric.type === 'bool' && (
-                                  <Box
-                                    bgcolor={alpha(
-                                      theme.palette.success.light,
-                                      0.5
-                                    )}
-                                    borderRadius={2}
-                                    display="flex"
-                                    mr={1}
-                                    p={0.5}
-                                  >
-                                    <Typography px={1}>
-                                      <Msg
-                                        id={
-                                          messagesIds.report.card.definesSuccess
-                                        }
-                                      />
-                                    </Typography>
-                                  </Box>
-                                )}
-                              {isReportEditable && (
-                                <IconButton
-                                  color="secondary"
-                                  onClick={() => setMetricBeingEdited(metric)}
-                                >
-                                  <Edit />
-                                </IconButton>
-                              )}
-                              {isReportEditable &&
-                                (metric.type === 'scale5' ||
-                                  (metric.type === 'bool' &&
-                                    metrics.filter((m) => m.type === 'bool')
-                                      .length > 1)) && (
-                                  <IconButton
-                                    color="secondary"
-                                    onClick={(ev) => {
-                                      if (metric.defines_success) {
-                                        setMetricBeingDeleted(metric);
-                                        setAnchorEl(ev.currentTarget);
-                                      } else {
-                                        showConfirmDialog({
-                                          onCancel: () => {
-                                            setMetricBeingDeleted(null);
-                                            setAnchorEl(null);
-                                          },
-                                          onSubmit: () => {
-                                            handleDeleteMetric(metric.id);
-                                            setAnchorEl(null);
-                                            setMetricBeingDeleted(null);
-                                          },
-                                          title: `${
-                                            messages.report.card.delete() +
-                                            ' ' +
-                                            metric.question
-                                          }`,
-                                          warningText:
-                                            messages.report.delete.dialog(),
-                                        });
-                                      }
-                                    }}
-                                  >
-                                    <Delete />
-                                  </IconButton>
-                                )}
-                              {isReportEditable &&
-                                metrics.filter(
-                                  (metric) => metric.type === 'bool'
-                                ).length <= 1 &&
-                                metric.type == 'bool' && (
-                                  <Tooltip
-                                    title={messages.report.card.tooltip()}
-                                  >
-                                    <Delete color="disabled" sx={{ mx: 1 }} />
-                                  </Tooltip>
-                                )}
-                            </Box>
-                          </Box>
-                          <Typography color="secondary" ml={4}>
-                            {metric.description ||
-                              messages.report.card.description()}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                ))}
-              </Box>
-              {metricBeingCreated && (
-                <Box mb={2} mt={2}>
-                  <MetricCard
-                    metric={metricBeingCreated}
-                    onClose={() => setMetricBeingCreated(null)}
-                    onSave={handleSaveMetric}
-                  />
-                </Box>
-              )}
-              {metricBeingEdited && (
-                <Dialog
-                  onClose={() => setMetricBeingEdited(null)}
-                  open={metricBeingEdited ? true : false}
-                  sx={{
-                    alignItems: 'center',
-                    display: 'flex',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <MetricCard
-                    metric={metricBeingEdited}
-                    onClose={() => setMetricBeingEdited(null)}
-                    onSave={handleSaveMetric}
-                  />
-                </Dialog>
-              )}
-              <Box>
-                {isReportEditable && (
-                  <Card
-                    sx={{
-                      backgroundColor: theme.palette.grey[200],
-                      border: 'none',
-                      marginTop: 2,
-                      padding: 2,
-                    }}
-                  >
-                    <Typography color="secondary">
-                      <Msg id={messagesIds.report.toolBar.title} />
+            <ZUIFutures
+        futures={{
+          assignment: assignmentFuture,
+          stats: statsFuture,
+        }}
+      >
+        {({ data: { assignment, stats } }) => {
+          const planUrl = `/organize/${orgId}/projects/${assignment.project_id}/areaassignments/${assignment.id}/map`;
+          return (
+            <Box display="flex" flexDirection="column" gap={2}>
+              {numAreas == 0 && (
+                <Card>
+                  <Box p={10} sx={{ textAlign: ' center' }}>
+                    <Typography>
+                      <Msg id={messageIds.overview.empty.description} />
                     </Typography>
-                    <Box alignItems="center" display="flex" mt={2}>
+                    <Box pt={4}>
                       <Button
-                        onClick={() => handleAddNewMetric('bool')}
-                        startIcon={<SwitchLeft />}
-                        sx={{ marginRight: 1 }}
-                        variant="outlined"
+                        onClick={() => router.push(planUrl)}
+                        startIcon={<Edit />}
+                        variant="contained"
                       >
-                        <Msg id={messagesIds.report.metricCard.choice} />
-                      </Button>
-                      <Button
-                        onClick={() => handleAddNewMetric('scale5')}
-                        startIcon={<LinearScale />}
-                        variant="outlined"
-                      >
-                        <Msg id={messagesIds.report.metricCard.scale} />
-                      </Button>
-                    </Box>
-                  </Card>
-                )}
-                <Dialog onClose={() => setAnchorEl(null)} open={!!anchorEl}>
-                  <Box
-                    display="flex"
-                    flexDirection="column"
-                    gap={1}
-                    padding={2}
-                  >
-                    <Box
-                      alignItems="center"
-                      display="flex"
-                      justifyContent="space-between"
-                    >
-                      <Typography variant="h6">
-                        {`${
-                          messages.report.card.delete() +
-                            ' ' +
-                            metrics.find(
-                              (metric) => metric.id === metricBeingDeleted?.id
-                            )?.question || messages.report.card.question()
-                        }`}
-                      </Typography>
-                      <IconButton
-                        onClick={() => {
-                          setMetricBeingDeleted(null);
-                          setAnchorEl(null);
-                        }}
-                      >
-                        <Close />
-                      </IconButton>
-                    </Box>
-                    <Box display="flex" flexDirection="column" gap={1}>
-                      <Typography>
                         <Msg
-                          id={messagesIds.report.delete.deleteWarningText}
-                          values={{
-                            title:
-                              metricBeingDeleted?.question ||
-                              messages.report.card.question(),
-                          }}
+                          id={messageIds.overview.empty.startPlanningButton}
                         />
-                      </Typography>
-                      {metrics
-                        .filter(
-                          (metric) =>
-                            metric.type == 'bool' &&
-                            metric.id != metricBeingDeleted?.id
-                        )
-                        .map((metric) => (
-                          <Box
-                            key={metric.question}
-                            alignItems="center"
-                            display="flex"
-                            gap={1}
-                            justifyContent="space-between"
-                            width="100%"
-                          >
-                            {metric.question || messages.report.card.question()}
-                            <Button
-                              onClick={async () => {
-                                if (metricBeingDeleted?.defines_success) {
-                                  await deleteMetric(metricBeingDeleted.id);
-                                  await updateMetric(metric.id, {
-                                    defines_success: true,
-                                  });
-                                }
-                                setAnchorEl(null);
-                                setMetricBeingDeleted(null);
-                              }}
-                              variant="outlined"
-                            >
-                              <Msg id={messagesIds.report.delete.select} />
-                            </Button>
-                          </Box>
-                        ))}
+                      </Button>
                     </Box>
                   </Box>
-                </Dialog>
-              </Box>
-            </Grid>
-            <Grid size={{ md: 4, xs: 12 }}>
-              {assignment.start_date && (
-                <ZUILockCard
-                  isActive={unlocked}
-                  lockedHeader={messages.report.lockCard.header()}
-                  lockedSubheader={messages.report.lockCard.description()}
-                  onToggle={setUnlocked}
-                  tips={{
-                    safe: {
-                      bullets: [
-                        messages.report.lockCard.fix(),
-                        messages.report.lockCard.add(),
-                      ],
-                      header: messages.report.lockCard.safe(),
-                      iconType: 'check',
-                    },
-                    unsafe: {
-                      bullets: [
-                        messages.report.lockCard.rename(),
-                        messages.report.lockCard.change(),
-                      ],
-                      header: messages.report.lockCard.unsafe(),
-                      iconType: 'close',
-                    },
-                  }}
-                  unlockedHeader={messages.report.lockCard.headerUnlock()}
-                  unlockedSubheader={messages.report.lockCard.descriptionUnlock()}
-                />
+                </Card>
               )}
-              <ZUICard
-                header={messages.report.successCard.header()}
-                subheader={messages.report.successCard.subheader()}
-                sx={{ mb: 2 }}
-              >
-                <Divider />
-                <FormControl fullWidth sx={{ mt: 2 }}>
-                  <InputLabel>
-                    {messages.report.card.definesSuccess()}
-                  </InputLabel>
-                  <Select
-                    disabled={
-                      !isReportEditable ||
-                      metrics.filter(
-                        (metric) =>
-                          metric.type === 'bool' && !metric.defines_success
-                      ).length < 1
-                    }
-                    label={messages.report.card.definesSuccess()}
-                    onChange={async (ev: SelectChangeEvent) => {
-                      const prevSuccessMetric = metrics.find(
-                        (metric) => metric.defines_success
-                      );
-                      if (prevSuccessMetric) {
-                        await updateMetric(prevSuccessMetric.id, {
-                          defines_success: false,
-                        });
-                      }
+              {numAreas > 0 && (
+                <>
+                  <Card>
+                    <Box
+                      display="flex"
+                      justifyContent="space-between"
+                      marginLeft={1}
+                      maxHeight={40}
+                      p={1}
+                    >
+                      <Typography variant="h5">
+                        <Msg id={messageIds.overview.progress.statsTitle} />
+                      </Typography>
+                    </Box>
+                    <Divider />
+                    <Box display="flex" width="100%">
+                      <NumberCard
+                        firstNumber={stats.num_successful_visits}
+                        message={messages.overview.progress.headers.successful()}
+                        secondNumber={stats.num_visits}
+                      />
+                      {stats.num_households_visited != null && (
+                        <>
+                          <Divider flexItem orientation="vertical" />
+                          <NumberCard
+                            firstNumber={stats.num_households_visited}
+                            message={messages.overview.progress.headers.households()}
+                            secondNumber={stats.num_households}
+                          />
+                        </>
+                      )}
+                      <Divider flexItem orientation="vertical" />
+                      <NumberCard
+                        firstNumber={stats.num_locations_visited}
+                        message={messages.overview.progress.headers.locations()}
+                        secondNumber={stats.num_locations}
+                      />
+                    </Box>
+                  </Card>
+                  <Grid container spacing={2}>
+                    <ZUIFutures futures={{ areasStats, dataGraph }}>
+                      {({ data: { areasStats, dataGraph } }) => {
+                        const filteredAreas = dataGraph
+                          .map((area) => {
+                            return areasStats.stats.filter(
+                              (item) => item.area_id === area.area_id
+                            );
+                          })
+                          .flat();
 
-                      await updateMetric(parseInt(ev.target.value), {
-                        defines_success: true,
-                      });
-                    }}
-                    value={
-                      metrics
-                        .find((metric) => metric.defines_success)
-                        ?.id.toString() || ''
-                    }
-                  >
-                    {metrics.map((metric) =>
-                      metric.type === 'bool' ? (
-                        <MenuItem key={metric.id} value={metric.id}>
-                          {metric.question}
-                        </MenuItem>
-                      ) : null
-                    )}
-                  </Select>
-                </FormControl>
-              </ZUICard>
-              <ZUICard
-                header={messages.report.dataCard.header()}
-                subheader={messages.report.dataCard.subheader()}
-                sx={{ mb: 2 }}
-              >
-                <Divider />
-                <FormControl fullWidth>
-                  <RadioGroup
-                    onChange={(ev) => {
-                      const value = ev.target.value;
-                      if (value === 'household' || value === 'location') {
-                        updateAreaAssignment({
-                          reporting_level: value,
-                        });
-                      }
-                    }}
-                    sx={{ mr: 2 }}
-                    value={assignment.reporting_level}
-                  >
-                    <Typography mt={1}>
-                      <Msg id={messagesIds.report.dataCard.info} />
-                    </Typography>
-                    <Box
-                      alignItems="center"
-                      display="flex"
-                      justifyContent="space-between"
-                    >
-                      <FormControlLabel
-                        control={<Radio disabled={!isReportEditable} />}
-                        label={messages.report.dataCard.household()}
-                        sx={{ ml: 1 }}
-                        value="household"
-                      />
-                      {unlocked && (
-                        <Badge
-                          badgeContent={
-                            areaAssignmentStats?.num_households_visited
-                          }
-                          color="secondary"
-                        />
-                      )}
-                    </Box>
-                    <Box
-                      alignItems="center"
-                      display="flex"
-                      justifyContent="space-between"
-                    >
-                      <FormControlLabel
-                        control={<Radio disabled={!isReportEditable} />}
-                        label={messages.report.dataCard.location()}
-                        sx={{ ml: 1 }}
-                        value="location"
-                      />
-                      {unlocked && (
-                        <Badge
-                          badgeContent={
-                            areaAssignmentStats?.num_locations_visited
-                          }
-                          color="secondary"
-                        />
-                      )}
-                    </Box>
-                  </RadioGroup>
-                </FormControl>
-              </ZUICard>
-            </Grid>
-          </Grid>
-        )}
-      </ZUIFuture>
+                        const sortedAreas = filteredAreas
+                          .map((area) => {
+                            const successfulVisitsTotal =
+                              dataGraph
+                                .find((graph) => graph.area_id === area.area_id)
+                                ?.data.reduce(
+                                  (sum, item) => sum + item.successfulVisits,
+                                  0
+                                ) || 0;
+
+                            return {
+                              area,
+                              successfulVisitsTotal,
+                            };
+                          })
+                          .sort(
+                            (a, b) =>
+                              b.successfulVisitsTotal - a.successfulVisitsTotal
+                          )
+                          .map(({ area }) => area);
+
+                        const maxHouseholdVisits = Math.max(
+                          ...dataGraph.flatMap((areaCard) =>
+                            areaCard.data.map(
+                              (graphData) => graphData.householdVisits
+                            )
+                          )
+                        );
+
+                        const noAreaData = dataGraph.find(
+                          (graph) => !graph.area_id
+                        );
+                        if (noAreaData && noAreaData.data.length > 0) {
+                          const latestEntry = [...noAreaData.data].sort(
+                            (a, b) =>
+                              new Date(b.date).getTime() -
+                              new Date(a.date).getTime()
+                          )[0];
+
+                          const num_successful_visited_households =
+                            latestEntry.successfulVisits;
+
+                          const num_visited_households =
+                            latestEntry.householdVisits;
+
+                          const noArea: ZetkinAssignmentAreaStatsItem = {
+                            area_id: null,
+                            num_households: 0,
+                            num_locations: 0,
+                            num_successful_visited_households,
+                            num_visited_households,
+                            num_visited_locations: 0,
+                          };
+                          sortedAreas.push(noArea);
+                        }
+                        return (
+                          <AreaCard
+                            areas={sortedAreas}
+                            assignment={assignment}
+                            data={dataGraph}
+                            maxVisitedHouseholds={maxHouseholdVisits}
+                          />
+                        );
+                      }}
+                    </ZUIFutures>
+                  </Grid>
+                </>
+              )}
+            </Box>
+          );
+        }}
+      </ZUIFutures>
     </>
   );
 };
 
-
-export default AreaAssignmentReportPage;
+export default AreaAssignmentPage;

@@ -1,27 +1,23 @@
 'use client';
 
-import BackendApiClient from 'core/api/client/BackendApiClient';
 import Calendar from 'features/calendar/components';
-import { useParams } from 'next/navigation';
+import messageIds from 'features/campaigns/l10n/messageIds';
+import { useMessages } from 'core/i18n';
 import useServerSide from 'core/useServerSide';
 
-export const metadata = {
-  title: 'Calendar - Zetkin',
-};
+const AllCampaignsCalendarPage = () => {
+  const messages = useMessages(messageIds);
 
-export default function ProjectsCalendarPage() {
-  const onServer = useServerSide();
-  const params = useParams();
-  const orgId = parseInt(params.orgId as string);
-
-  if (onServer) {
+  const isOnServer = useServerSide();
+  if (isOnServer) {
     return null;
   }
 
   return (
-    <Calendar
-      apiClient={new BackendApiClient()}
-      orgId={orgId}
-    />
+    <>
+            <Calendar />
+    </>
   );
-}
+};
+
+export default AllCampaignsCalendarPage;

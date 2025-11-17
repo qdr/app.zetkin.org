@@ -1,30 +1,43 @@
 'use client';
 
 import EmailEditor from 'features/emails/components/EmailEditor';
-import EmailLayout from 'features/emails/layout/EmailLayout';
+import useDebounce from 'utils/hooks/useDebounce';
 import useEmail from 'features/emails/hooks/useEmail';
-import { useParams } from 'next/navigation';
+import { useNumericRouteParams } from 'core/hooks';
 import useServerSide from 'core/useServerSide';
-import ZUIFuture from 'zui/ZUIFuture';
+import { ZetkinEmail } from 'utils/types/zetkin';
 
-export const metadata = {
-  title: 'Compose Email - Zetkin',
-};
-
-export default function EmailComposePage() {
-  const onServer = useServerSide();
-  const params = useParams();
-  const orgId = parseInt(params.orgId as string);
-  const emailId = parseInt(params.emailId as string);
+const EmailPage = () => {
+  const { orgId, emailId } = useNumericRouteParams();
   const { data: email, updateEmail } = useEmail(orgId, emailId);
+  const onServer = useServerSide();
 
-  if (onServer || !email) {
+  const debouncedUpdateEmail = useDebounce(
+    async (email: Partial<ZetkinEmail>) => {
+      updateEmail({
+        ...email,
+        locked: undefined,
+      });
+    },
+    400
+  );
+
+  if (onServer) {
+    return null;
+  }
+
+  if (!email) {
     return null;
   }
 
   return (
-    <EmailLayout fixedHeight>
-      <EmailEditor email={email} onSave={updateEmail} />
-    </EmailLayout>
+    <EmailEditor
+      email={email}
+      onSave={(email) => {
+        debouncedUpdateEmail(email);
+      }}
+    />
   );
-}
+};
+
+export default EmailPage;
