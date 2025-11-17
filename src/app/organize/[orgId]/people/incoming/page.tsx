@@ -25,8 +25,10 @@ import ZUIFuture from 'zui/ZUIFuture';
 
 type FilterByStatusType = 'all' | 'pending' | 'accepted';
 
-export default function IncomingClient({ orgId }: { orgId: string }) {
-  type FilterByStatusType = 'all' | 'pending' | 'accepted';
+export default function IncomingPage() {
+  const { orgId } = useNumericRouteParams();
+  const joinSubmissions = useJoinSubmissions(orgId);
+  const messages = useMessages(messageIds);
 
   const [filterByStatus, setFilterByStatus] =
     useState<FilterByStatusType>('all');
@@ -142,4 +144,3 @@ export default function IncomingClient({ orgId }: { orgId: string }) {
     </>
   );
 }
-export default IncomingPage;
