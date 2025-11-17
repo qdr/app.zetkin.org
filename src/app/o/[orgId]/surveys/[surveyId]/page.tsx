@@ -18,7 +18,7 @@ type Props = {
 
 // @ts-expect-error https://nextjs.org/docs/app/building-your-application/configuring/typescript#async-server-component-typescript-error
 const Page: FC<Props> = async ({ params }) => {
-  const headersList = headers();
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);

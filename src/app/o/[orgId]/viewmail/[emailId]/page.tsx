@@ -22,7 +22,7 @@ export default async function Page({ params }: PageProps) {
   const lang = getBrowserLanguage(headers().get('accept-language') || '');
   const messages = await getServerMessages(lang, messageIds);
 
-  const headersList = headers();
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);

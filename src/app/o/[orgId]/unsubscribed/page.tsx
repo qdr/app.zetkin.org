@@ -12,7 +12,7 @@ type PageProps = {
 };
 
 export default async function Page({ params }: PageProps) {
-  const headersList = headers();
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);
