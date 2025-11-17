@@ -20,7 +20,7 @@ export default async function HomePage({
 
   if (code) {
     // OAuth callback handling
-    const headersList = headers();
+    const headersList = await headers();
     const protocol = process.env.ZETKIN_APP_PROTOCOL || 'http';
     const host = headersList.get('host') || process.env.ZETKIN_APP_HOST || 'localhost:3000';
 
@@ -36,7 +36,7 @@ export default async function HomePage({
 
       await z.authenticate(`${protocol}://${host}/?code=${code}`);
 
-      const cookieStore = cookies();
+      const cookieStore = await cookies();
       const session = await getIronSession<AppSession>(
         cookieStore as any,
         {

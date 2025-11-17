@@ -19,7 +19,7 @@ export async function GET(
   _: Request,
   { params }: { params: { orgId: number } }
 ) {
-  const headersList = headers();
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);
