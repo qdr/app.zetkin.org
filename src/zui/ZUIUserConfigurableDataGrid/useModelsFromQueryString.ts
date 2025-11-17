@@ -1,6 +1,6 @@
+'use client';
 import { isEqual } from 'lodash';
-import { ParsedUrlQuery } from 'querystring';
-import { useRouter } from 'next/router';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   DataGridProProps,
   GridFilterModel,
@@ -24,21 +24,34 @@ interface UseModelsFromQueryString {
 
 export default function useModelsFromQueryString(): UseModelsFromQueryString {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Convert searchParams to object for parsing
+  const queryObject: Record<string, string | string[]> = {};
+  searchParams.forEach((value, key) => {
+    if (queryObject[key]) {
+      // If key already exists, convert to array
+      if (Array.isArray(queryObject[key])) {
+        (queryObject[key] as string[]).push(value);
+      } else {
+        queryObject[key] = [queryObject[key] as string, value];
+      }
+    } else {
+      queryObject[key] = value;
+    }
+  });
 
   const [filterModel, setFilterModel] = useState<GridFilterModel>(
-    parseFilterModelFromQuery(router.query)
+    parseFilterModelFromQuery(queryObject)
   );
 
   const [sortModel, setSortModel] = useState<GridSortModel>(
-    parseSortModelFromQuery(router.query)
+    parseSortModelFromQuery(queryObject)
   );
 
   // Update router URL when model changes
   useEffect(() => {
-    const pathWithoutQuery = router.asPath.includes('?')
-      ? router.asPath.slice(0, router.asPath.indexOf('?'))
-      : router.asPath;
-
     const qs = [
       serializeFilterQueryString(filterModel),
       serializeSortQueryString(sortModel),
@@ -46,21 +59,20 @@ export default function useModelsFromQueryString(): UseModelsFromQueryString {
       .filter((item) => !!item.length)
       .join('&');
 
-    const modelPath = [pathWithoutQuery, qs]
-      .filter((elem) => elem.length)
-      .join('?');
+    const modelPath = qs ? `${pathname}?${qs}` : pathname;
+    const currentPath = searchParams.toString()
+      ? `${pathname}?${searchParams.toString()}`
+      : pathname;
 
-    if (modelPath != router.asPath) {
-      router.push(modelPath, modelPath, {
-        shallow: true,
-      });
+    if (modelPath !== currentPath) {
+      router.push(modelPath, { scroll: false });
     }
-  }, [filterModel, sortModel]);
+  }, [filterModel, sortModel, pathname]);
 
   // Update model when router URL changes
   useEffect(() => {
-    const routerFilterModel = parseFilterModelFromQuery(router.query);
-    const routerSortModel = parseSortModelFromQuery(router.query);
+    const routerFilterModel = parseFilterModelFromQuery(queryObject);
+    const routerSortModel = parseSortModelFromQuery(queryObject);
 
     if (!isEqual(routerFilterModel, filterModel)) {
       setFilterModel(routerFilterModel);
@@ -69,7 +81,7 @@ export default function useModelsFromQueryString(): UseModelsFromQueryString {
     if (!isEqual(routerSortModel, sortModel)) {
       setSortModel(routerSortModel);
     }
-  }, [router.query]);
+  }, [searchParams]);
 
   return {
     filterModel,
@@ -93,7 +105,9 @@ export default function useModelsFromQueryString(): UseModelsFromQueryString {
   };
 }
 
-function parseFilterModelFromQuery(query: ParsedUrlQuery): GridFilterModel {
+function parseFilterModelFromQuery(
+  query: Record<string, string | string[]>
+): GridFilterModel {
   const items = Object.entries(query)
     .filter(([param]) => param.startsWith('filter_'))
     .flatMap(([param, val], idx) => {
@@ -130,7 +144,9 @@ function parseFilterModelFromQuery(query: ParsedUrlQuery): GridFilterModel {
   };
 }
 
-function parseSortModelFromQuery(query: ParsedUrlQuery): GridSortModel {
+function parseSortModelFromQuery(
+  query: Record<string, string | string[]>
+): GridSortModel {
   const sort = Array.isArray(query.sort) ? query.sort[0] : query.sort;
   if (sort) {
     return sort.split(',').map((sortStr) => {

@@ -1,9 +1,10 @@
+'use client';
 import { FC } from 'react';
 import { InfoOutlined } from '@mui/icons-material';
 import { linearGradientDef } from '@nivo/core';
 import MapIcon from '@mui/icons-material/Map';
 import { ResponsiveLine } from '@nivo/line';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import {
   Box,
   Card,
@@ -75,12 +76,7 @@ const AreaCard: FC<AreaCardProps> = ({
 
   const navigateToArea = (areaId: number) => {
     router.replace(
-      {
-        pathname: `/organize/${orgId}/projects/${assignment.project_id}/areaassignments/${assignment.id}/map`,
-        query: { navigateToAreaId: areaId },
-      },
-      undefined,
-      { shallow: true }
+      `/organize/${orgId}/projects/${assignment.project_id}/areaassignments/${assignment.id}/map?navigateToAreaId=${areaId}`
     );
   };
 

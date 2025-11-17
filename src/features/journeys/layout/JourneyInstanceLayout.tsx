@@ -1,7 +1,8 @@
+'use client';
 import { FormattedDate } from 'react-intl';
 import { Forward, Delete } from '@mui/icons-material';
 import ScheduleIcon from '@mui/icons-material/Schedule';
-import { useRouter } from 'next/router';
+import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { useContext } from 'react';
@@ -33,6 +34,7 @@ const JourneyInstanceLayout: React.FunctionComponent<
   const { orgId, journeyId, instanceId } = useNumericRouteParams();
   const { showConfirmDialog } = useContext(ZUIConfirmDialogContext);
   const router = useRouter();
+  const pathname = usePathname();
   const [isLoading, setIsLoading] = useState(false);
 
   const journeyInstanceFuture = useJourneyInstance(orgId, instanceId);
@@ -56,7 +58,7 @@ const JourneyInstanceLayout: React.FunctionComponent<
         label: journey.singular_label,
         onSelect: async () => {
           //redirect to equivalent page but new journey id
-          const redirectUrl = router.pathname
+          const redirectUrl = pathname
             .replace('[orgId]', orgId.toString())
             .replace('[journeyId]', journey.id.toString())
             .replace('[instanceId]', instanceId.toString());

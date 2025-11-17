@@ -1,3 +1,4 @@
+'use client';
 import { AssignmentTurnedInOutlined } from '@mui/icons-material';
 import { Box } from '@mui/material';
 import { FC } from 'react';
@@ -6,7 +7,7 @@ import {
   GridRenderCellParams,
   GridValueGetterParams,
 } from '@mui/x-data-grid-pro';
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 
 import { IColumnType } from '.';
 import SurveySubmissionPane from 'features/surveys/panes/SurveySubmissionPane';
@@ -50,7 +51,8 @@ export default class SurveySubmittedColumnType
 }
 
 const Cell: FC<{ cell: SurveySubmittedViewCell | undefined }> = ({ cell }) => {
-  const { orgId } = useRouter().query;
+  const params = useParams();
+  const orgId = params.orgId as string;
   const { openPane } = usePanes();
 
   if (!cell?.length) {

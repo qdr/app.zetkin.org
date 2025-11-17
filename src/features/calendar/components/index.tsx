@@ -1,6 +1,7 @@
+'use client';
 import { Box } from '@mui/system';
 import dayjs from 'dayjs';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import utc from 'dayjs/plugin/utc';
 
@@ -33,16 +34,17 @@ function getDateFromString(focusDateStr: string) {
 
 const Calendar = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const orgId = router.query.orgId;
-  const campId = router.query.campId;
+  const orgId = searchParams.get('orgId');
+  const campId = searchParams.get('campId');
 
-  const focusDateStr = router.query.focusDate as string;
+  const focusDateStr = searchParams.get('focusDate') || '';
   const [focusDate, setFocusDate] = useState(getDateFromString(focusDateStr));
   const { nextActivityDay, prevActivityDay } = useDayCalendarNav(focusDate);
 
   const { setPersistentTimeScale, timeScale } = useTimeScale(
-    router.query.timeScale
+    searchParams.get('timeScale')
   );
 
   useEffect(() => {
@@ -51,20 +53,14 @@ const Calendar = () => {
 
   useEffect(() => {
     const focusedDate = dayjs.utc(focusDate).format('YYYY-MM-DD');
-    router.replace(
-      {
-        pathname: undefined,
-        query: {
-          ...(campId && { campId: campId }),
-          focusDate: focusedDate,
-          orgId: orgId,
-          timeScale: timeScale,
-        },
-      },
-      undefined,
-      { shallow: true }
-    );
-  }, [focusDate, timeScale]);
+    const params = new URLSearchParams();
+    if (campId) params.set('campId', campId);
+    params.set('focusDate', focusedDate);
+    if (orgId) params.set('orgId', orgId);
+    params.set('timeScale', timeScale);
+
+    router.replace(`?${params.toString()}`);
+  }, [focusDate, timeScale, orgId, campId, router]);
 
   function navigateTo(timeScale: TimeScale, date: Date) {
     setPersistentTimeScale(timeScale);

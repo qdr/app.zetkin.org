@@ -1,6 +1,7 @@
+'use client';
 import { Link } from '@mui/material';
 import NextLink from 'next/link';
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 
 import { ZetkinPerson } from 'utils/types/zetkin';
 import ZUIPersonHoverCard from '../ZUIPersonHoverCard';
@@ -9,7 +10,7 @@ interface ZUIPersonLinkProps {
   person: Pick<ZetkinPerson, 'id' | 'first_name' | 'last_name'>;
 }
 const ZUIPersonLink: React.FC<ZUIPersonLinkProps> = ({ person }) => {
-  const { orgId } = useRouter().query;
+  const { orgId } = useParams();
 
   return (
     <ZUIPersonHoverCard

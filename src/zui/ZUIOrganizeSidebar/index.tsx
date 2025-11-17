@@ -1,6 +1,7 @@
+'use client';
 import makeStyles from '@mui/styles/makeStyles';
 import NextLink from 'next/link';
-import { useRouter } from 'next/router';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import {
   Architecture,

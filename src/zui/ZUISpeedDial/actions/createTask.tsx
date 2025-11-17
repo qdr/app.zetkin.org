@@ -1,5 +1,6 @@
+'use client';
 import { CheckBox } from '@mui/icons-material';
-import { useRouter } from 'next/router';
+import { useParams, useRouter } from 'next/navigation';
 
 import TaskDetailsForm from 'features/tasks/components/TaskDetailsForm';
 import { ZetkinTaskRequestBody } from 'features/tasks/components/types';
@@ -10,10 +11,12 @@ import useCreateTask from 'features/tasks/hooks/useCreateTask';
 const DialogContent: React.FunctionComponent<DialogContentBaseProps> = ({
   closeDialog,
 }) => {
+  const params = useParams();
   const router = useRouter();
-  const { campId, orgId } = router.query as { campId: string; orgId: string };
+  const campId = params.campId as string;
+  const orgId = params.orgId as string;
 
-  const createTask = useCreateTask(parseInt(orgId as string));
+  const createTask = useCreateTask(parseInt(orgId));
   //createTask function in hook async,
   const handleFormSubmit = async (task: ZetkinTaskRequestBody) => {
     // Set defaults for config and target_filters

@@ -1,5 +1,6 @@
+'use client';
 import { makeStyles } from '@mui/styles';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { Box, Dialog } from '@mui/material';
 import { useEffect, useState } from 'react';
 
@@ -51,12 +52,14 @@ const SearchDialog: React.FunctionComponent<{
     };
   });
 
-  useEffect(() => {
-    router.events.on('routeChangeStart', handleRouteChange);
-    return () => {
-      router.events.off('routeChangeStart', handleRouteChange);
-    };
-  }, [router]);
+  // Note: App Router doesn't have router.events
+  // Navigation handling would need to be implemented differently
+  // useEffect(() => {
+  //   router.events.on('routeChangeStart', handleRouteChange);
+  //   return () => {
+  //     router.events.off('routeChangeStart', handleRouteChange);
+  //   };
+  // }, [router]);
 
   return (
     <>

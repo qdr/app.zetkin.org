@@ -1,7 +1,8 @@
+'use client';
 import { Add } from '@mui/icons-material';
 import { Fab } from '@mui/material';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 import makeStyles from '@mui/styles/makeStyles';
 
 import oldTheme from 'theme';
@@ -16,7 +17,7 @@ const useStyles = makeStyles(() => ({
 
 const JourneyInstanceCreateFab: React.FunctionComponent = () => {
   const classes = useStyles();
-  const { orgId, journeyId } = useRouter().query;
+  const { orgId, journeyId } = useParams();
 
   return (
     <Link

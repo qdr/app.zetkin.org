@@ -1,3 +1,4 @@
+'use client';
 import { Add } from '@mui/icons-material';
 import {
   Collapse,
@@ -8,7 +9,7 @@ import {
   ListItemText,
 } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 import OrganizationSelect from './OrganizationSelect';
 import { OrganizationsTree } from './OrganizationsTree';

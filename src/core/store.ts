@@ -1,9 +1,20 @@
-import Router from 'next/router';
+// NOTE: This file uses programmatic navigation in Redux middleware
+// In App Router, static Router.push is not available from next/navigation
+// This may need architectural changes to handle navigation differently
+// (e.g., dispatching actions that components respond to, or using a navigation context)
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import {
   configureStore,
   ConfigureStoreOptions,
   createListenerMiddleware,
 } from '@reduxjs/toolkit';
+
+// Temporary global to hold router instance - will be set by app
+// This is a workaround until proper architecture is implemented
+let appRouter: AppRouterInstance | null = null;
+export const setAppRouter = (router: AppRouterInstance) => {
+  appRouter = router;
+};
 
 import breadcrumbsSlice, {
   BreadcrumbsStoreSlice,
@@ -117,7 +128,7 @@ listenerMiddleware.startListening({
   actionCreator: areaAssignmentCreated,
   effect: (action) => {
     const { organization_id, project_id, id } = action.payload;
-    Router.push(
+    appRouter?.push(
       `/organize/${organization_id}/projects/${project_id}/areaassignments/${id}`
     );
   },
@@ -127,7 +138,7 @@ listenerMiddleware.startListening({
   actionCreator: campaignDeleted,
   effect: (action) => {
     const orgId = action.payload[0];
-    Router.push(`/organize/${orgId}/projects`);
+    appRouter?.push(`/organize/${orgId}/projects`);
   },
 });
 
@@ -135,7 +146,7 @@ listenerMiddleware.startListening({
   actionCreator: campaignCreated,
   effect: (action) => {
     const campaign = action.payload;
-    Router.push(
+    appRouter?.push(
       `/organize/${campaign.organization?.id}/projects/${campaign.id}`
     );
   },
@@ -145,7 +156,7 @@ listenerMiddleware.startListening({
   actionCreator: emailCreated,
   effect: (action) => {
     const email = action.payload;
-    Router.push(
+    appRouter?.push(
       `/organize/${email.organization.id}/projects/${
         email.campaign?.id ?? 'standalone'
       }/emails/${email.id}`
@@ -157,7 +168,7 @@ listenerMiddleware.startListening({
   actionCreator: callAssignmentCreated,
   effect: (action) => {
     const [callAssignment, campId] = action.payload;
-    Router.push(
+    appRouter?.push(
       `/organize/${callAssignment.organization?.id}/projects/${campId}/callassignments/${callAssignment.id}`
     );
   },
@@ -167,7 +178,7 @@ listenerMiddleware.startListening({
   actionCreator: surveyCreated,
   effect: (action) => {
     const survey = action.payload;
-    Router.push(
+    appRouter?.push(
       `/organize/${survey.organization.id}/projects/${
         survey.campaign?.id ?? 'standalone'
       }/surveys/${survey.id}`
@@ -179,7 +190,7 @@ listenerMiddleware.startListening({
   actionCreator: journeyInstanceCreated,
   effect: (action) => {
     const journeyInstance = action.payload;
-    Router.push(
+    appRouter?.push(
       `/organize/${journeyInstance.organization.id}/journeys/${journeyInstance.journey.id}/${journeyInstance.id}`
     );
   },

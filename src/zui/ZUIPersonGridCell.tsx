@@ -1,6 +1,7 @@
+'use client';
 import { FC } from 'react';
 import { Person } from '@mui/icons-material';
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 import { Avatar, Box, SxProps, Tooltip } from '@mui/material';
 
 import { ZetkinPerson } from 'utils/types/zetkin';
@@ -12,8 +13,8 @@ const ZUIPersonGridCell: FC<{
   sx?: SxProps;
   tooltip?: boolean;
 }> = ({ person, onClick, sx, tooltip = true }) => {
-  const query = useRouter().query;
-  const orgId = parseInt(query.orgId as string);
+  const params = useParams();
+  const orgId = parseInt(params.orgId as string);
 
   // If no person provided
   if (!person) {
