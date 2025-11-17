@@ -131,7 +131,7 @@ const ZUIOrganizeSidebar = (): JSX.Element => {
   const showOrgSwitcher = checked && open;
 
   return (
-    <Box data-testid="organize-sidebar">
+    <Box data-testid="organize-sidebar" flexShrink={0}>
       <Drawer
         classes={{
           paper:
