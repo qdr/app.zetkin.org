@@ -15,11 +15,7 @@ import uniqBy from 'lodash/uniqBy';
 import JoinFormSelect from 'features/joinForms/components/JoinFormSelect';
 import JoinSubmissionPane from 'features/joinForms/panes/JoinSubmissionPane';
 import JoinSubmissionTable from 'features/joinForms/components/JoinSubmissionTable';
-<<<<<<< HEAD:src/app/organize/[orgId]/people/incoming/IncomingClient.tsx
-import messageIds from 'features/joinForms/l10n/messageIds';
-=======
 import messageIds from '../../../../../features/joinForms/l10n/messageIds';
->>>>>>> ada0ef533e53ebc258434ef2390f9b62a3d30d74:src/app/organize/[orgId]/people/incoming/page.tsx
 import useJoinSubmissions from 'features/joinForms/hooks/useJoinSubmissions';
 import { useMessages } from 'core/i18n';
 import { useNumericRouteParams } from 'core/hooks';
@@ -27,23 +23,14 @@ import { usePanes } from 'utils/panes';
 import ZUIEmptyState from 'zui/ZUIEmptyState';
 import ZUIFuture from 'zui/ZUIFuture';
 
-<<<<<<< HEAD:src/app/organize/[orgId]/people/incoming/IncomingClient.tsx
 type FilterByStatusType = 'all' | 'pending' | 'accepted';
 
 export default function IncomingClient({ orgId }: { orgId: string }) {
-  const joinSubmissions = useJoinSubmissions(parseInt(orgId));
-=======
-const IncomingPage = () => {
-  const { orgId } = useNumericRouteParams();
-  const joinSubmissions = useJoinSubmissions(orgId);
-
   type FilterByStatusType = 'all' | 'pending' | 'accepted';
 
->>>>>>> ada0ef533e53ebc258434ef2390f9b62a3d30d74:src/app/organize/[orgId]/people/incoming/page.tsx
   const [filterByStatus, setFilterByStatus] =
     useState<FilterByStatusType>('all');
   const [filterByForm, setFilterByForm] = useState<number | undefined>();
-  const messages = useMessages(messageIds);
   const { openPane } = usePanes();
 
   return (
@@ -154,10 +141,5 @@ const IncomingPage = () => {
       </ZUIFuture>
     </>
   );
-<<<<<<< HEAD:src/app/organize/[orgId]/people/incoming/IncomingClient.tsx
 }
-=======
-};
-
 export default IncomingPage;
->>>>>>> ada0ef533e53ebc258434ef2390f9b62a3d30d74:src/app/organize/[orgId]/people/incoming/page.tsx
