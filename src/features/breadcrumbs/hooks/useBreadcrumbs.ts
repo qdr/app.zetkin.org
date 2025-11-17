@@ -1,7 +1,7 @@
 'use client';
 import { usePathname, useParams } from 'next/navigation';
 
-import { BreadcrumbElement } from 'pages/api/breadcrumbs';
+import { BreadcrumbElement } from 'app/api/breadcrumbs/route';
 import { loadItemIfNecessary } from 'core/caching/cacheUtils';
 import { crumbsLoad, crumbsLoaded } from '../store';
 import { useApiClient, useAppDispatch, useAppSelector } from 'core/hooks';
@@ -22,8 +22,9 @@ export default function useBreadcrumbElements() {
     actionOnLoad: () => crumbsLoad(pathWithoutQueryString),
     actionOnSuccess: (item) => crumbsLoaded([pathWithoutQueryString, item]),
     loader: async () => {
+      const queryString = query ? `&${query}` : '';
       const elements = await apiClient.get<BreadcrumbElement[]>(
-        `/api/breadcrumbs?pathname=${pathname}&${query}`
+        `/api/breadcrumbs?pathname=${pathname}${queryString}`
       );
 
       return { elements, id: pathWithoutQueryString };
