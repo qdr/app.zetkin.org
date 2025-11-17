@@ -54,9 +54,13 @@ const JourneyInstancesDataTable: FunctionComponent<JourneysDataTableProps> = ({
     };
   });
 
+  const empty = rows.length === 0;
+
   return (
     <DataGridPro
+      autoHeight={empty}
       checkboxSelection
+      columnBuffer={3}
       columns={columnsWithHeaderTitles}
       columnVisibilityModel={visibleColumns}
       disableRowSelectionOnClick={true}
@@ -70,7 +74,9 @@ const JourneyInstancesDataTable: FunctionComponent<JourneysDataTableProps> = ({
         setColumnWidth(params.colDef.field, params.width);
       }}
       onColumnVisibilityModelChange={(newModel) => setVisibleColumns(newModel)}
+      rowBuffer={5}
       rows={rows}
+      rowThreshold={5}
       slotProps={{
         toolbar: {
           gridColumns: columnsWithHeaderTitles,
@@ -80,6 +86,12 @@ const JourneyInstancesDataTable: FunctionComponent<JourneysDataTableProps> = ({
         },
       }}
       slots={{ toolbar: Toolbar }}
+      style={{
+        ...(!empty && {
+          height: 'calc(100vh - 280px)',
+          minHeight: 400,
+        }),
+      }}
       {...modelGridProps}
       {...dataGridProps}
     />

@@ -263,12 +263,15 @@ const ViewBrowser: FC<ViewBrowserProps> = ({
           return 0;
         });
 
+        const empty = rows.length === 0;
+
         return (
           <>
             {enableDragAndDrop && <BrowserDragLayer />}
             <DataGridPro
               apiRef={gridApiRef}
-              autoHeight={autoHeight}
+              autoHeight={empty}
+              columnBuffer={3}
               columns={colDefs}
               disableRowSelectionOnClick
               hideFooter
@@ -280,7 +283,9 @@ const ViewBrowser: FC<ViewBrowserProps> = ({
                 }
                 return item;
               }}
+              rowBuffer={5}
               rows={rows}
+              rowThreshold={5}
               slots={{
                 row: (props: GridRowProps) => {
                   const item = props.row as ViewBrowserItem;
@@ -288,7 +293,13 @@ const ViewBrowser: FC<ViewBrowserProps> = ({
                 },
               }}
               sortingMode="server"
-              sx={{ borderWidth: 0 }}
+              sx={{
+                borderWidth: 0,
+                ...(!empty && {
+                  height: 'calc(100vh - 280px)',
+                  minHeight: 400,
+                }),
+              }}
             />
             {itemToBeMoved && (
               <MoveViewDialog

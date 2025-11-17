@@ -390,6 +390,11 @@ const ParticipantListSection: FC<ParticipantListSectionListProps> = ({
     },
   ];
 
+  const filteredRows = filterString
+    ? filterParticipants(rows, filterString)
+    : rows ?? [];
+  const empty = filteredRows.length === 0;
+
   return (
     <>
       <Box
@@ -411,17 +416,22 @@ const ParticipantListSection: FC<ParticipantListSectionListProps> = ({
         {description}
       </Typography>
       <DataGridPro
-        autoHeight
+        autoHeight={empty}
         checkboxSelection={false}
+        columnBuffer={3}
         columns={columns}
-        rows={
-          filterString ? filterParticipants(rows, filterString) : rows ?? []
-        }
+        rowBuffer={5}
+        rows={filteredRows}
+        rowThreshold={5}
         sx={{
           '& .MuiDataGrid-row:hover': {
             '&:hover svg': { display: 'inline-block' },
             cursor: 'pointer',
           },
+          ...(!empty && {
+            height: 'calc(100vh - 400px)',
+            minHeight: 400,
+          }),
         }}
       />
     </>

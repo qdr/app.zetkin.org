@@ -138,9 +138,12 @@ const CallAssignmentCallersList = ({
     },
   ];
 
+  const empty = callers.length === 0;
+
   return (
     <DataGridPro
-      autoHeight
+      autoHeight={empty}
+      columnBuffer={3}
       columns={columns}
       disableColumnFilter
       disableColumnMenu
@@ -148,9 +151,15 @@ const CallAssignmentCallersList = ({
       disableColumnResize
       disableRowSelectionOnClick
       hideFooter
+      rowBuffer={5}
       rows={callers}
+      rowThreshold={5}
       style={{
         border: 'none',
+        ...(!empty && {
+          height: 'calc(100vh - 280px)',
+          minHeight: 400,
+        }),
       }}
     />
   );
