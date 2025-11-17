@@ -1,7 +1,6 @@
 'use client';
-
 import makeStyles from '@mui/styles/makeStyles';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   Alert,
   Badge,
@@ -78,9 +77,9 @@ const TabbedLayout: FunctionComponent<TabbedLayoutProps> = ({
   const pathname = usePathname();
 
   const currentTab =
-    pathname?.split('?')[0] === baseHref
+    pathname === baseHref
       ? defaultTab
-      : `/${pathname?.split('/').pop() || ''}`;
+      : `/${pathname.split('/').pop()}`;
 
   const selectTab = (selected: string): void => {
     const href = tabs.find((tab) => tab.href === selected)?.href;

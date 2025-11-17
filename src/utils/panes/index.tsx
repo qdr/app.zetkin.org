@@ -1,5 +1,4 @@
 'use client';
-
 import { makeStyles } from '@mui/styles';
 import { usePathname } from 'next/navigation';
 import { Box, Paper, Slide } from '@mui/material';
@@ -66,7 +65,6 @@ export const PaneProvider: FC<PaneProviderProps> = ({
   const { paneContainerRef, slideRef, updatePaneHeight } =
     useResizablePane(fixedHeight);
 
-  // Close pane when route changes
   useEffect(() => {
     setOpen(false);
   }, [pathname]);

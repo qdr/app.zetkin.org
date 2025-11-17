@@ -1,5 +1,6 @@
+'use client';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import {
   Avatar,
   ListItem,
@@ -15,8 +16,8 @@ import { Msg } from 'core/i18n';
 const PersonListItem: React.FunctionComponent<{ person: ZetkinPerson }> = ({
   person,
 }) => {
-  const router = useRouter();
-  const { orgId } = router.query as { orgId: string };
+  const params = useParams();
+  const orgId = params.orgId as string;
   return (
     <Link href={`/organize/${orgId}/people/${person.id}`}>
       <ListItem data-testid="SearchDialog-resultsListItem">

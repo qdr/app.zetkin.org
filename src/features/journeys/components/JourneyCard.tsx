@@ -1,3 +1,4 @@
+'use client';
 import NextLink from 'next/link';
 import { useParams } from 'next/navigation';
 import { Box, Card, CardActionArea, Link, Typography } from '@mui/material';
@@ -11,7 +12,7 @@ interface JourneyCardProps {
 }
 
 const JourneyCard = ({ journey }: JourneyCardProps): JSX.Element => {
-  const { orgId } = useParams().query;
+  const { orgId } = useParams();
   const { id, title, stats } = journey;
 
   return (

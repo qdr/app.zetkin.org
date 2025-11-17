@@ -2,7 +2,7 @@
 
 import { Box, Button, Card, Divider, Grid, Typography } from '@mui/material';
 import { Edit } from '@mui/icons-material';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 import AreaCard from 'features/areaAssignments/components/AreaCard';
 import NumberCard from 'features/areaAssignments/components/NumberCard';

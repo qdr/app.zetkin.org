@@ -1,16 +1,10 @@
-'use client';
-
 import { useParams } from 'next/navigation';
 
 export default function useNumericRouteParams(): Record<string, number> {
-  const params = useParams();
+  const input = useParams();
   const output: Record<string, number> = {};
-
-  if (!params) return output;
-
-  Object.keys(params).forEach((key: string) => {
-    const paramValue = params[key];
-    const value = parseInt(Array.isArray(paramValue) ? paramValue[0] : paramValue);
+  Object.keys(input).forEach((key: string) => {
+    const value = parseInt(input[key] as string);
     if (!isNaN(value)) {
       output[key] = value;
     }

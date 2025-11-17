@@ -1,5 +1,4 @@
 'use client';
-
 import { AssignmentTurnedInOutlined } from '@mui/icons-material';
 import { Box } from '@mui/material';
 import { FC } from 'react';
@@ -52,7 +51,8 @@ export default class SurveySubmittedColumnType
 }
 
 const Cell: FC<{ cell: SurveySubmittedViewCell | undefined }> = ({ cell }) => {
-  const { orgId } = useParams().query;
+  const params = useParams();
+  const orgId = params.orgId as string;
   const { openPane } = usePanes();
 
   if (!cell?.length) {

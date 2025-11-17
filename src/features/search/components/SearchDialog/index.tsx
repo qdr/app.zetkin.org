@@ -1,7 +1,6 @@
 'use client';
-
 import { makeStyles } from '@mui/styles';
-import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Box, Dialog } from '@mui/material';
 import { useEffect, useState } from 'react';
 
@@ -27,10 +26,15 @@ const SearchDialog: React.FunctionComponent<{
   const [isTyping, setIsTyping] = useState(false);
 
   const classes = useStyles();
-  const pathname = usePathname();
+  const router = useRouter();
   const { orgId } = useNumericRouteParams();
 
   const { error, results, isLoading, setQuery, queryString } = useSearch(orgId);
+
+  const handleRouteChange = () => {
+    // Close dialog when clicking an item
+    setOpen(false);
+  };
 
   const handleKeydown = (e: KeyboardEvent) => {
     if (!isUserTyping(e)) {
@@ -48,10 +52,14 @@ const SearchDialog: React.FunctionComponent<{
     };
   });
 
-  // Close dialog when route changes
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+  // Note: App Router doesn't have router.events
+  // Navigation handling would need to be implemented differently
+  // useEffect(() => {
+  //   router.events.on('routeChangeStart', handleRouteChange);
+  //   return () => {
+  //     router.events.off('routeChangeStart', handleRouteChange);
+  //   };
+  // }, [router]);
 
   return (
     <>

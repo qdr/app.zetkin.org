@@ -1,3 +1,4 @@
+'use client';
 import { FunctionComponent } from 'react';
 import { useParams } from 'next/navigation';
 

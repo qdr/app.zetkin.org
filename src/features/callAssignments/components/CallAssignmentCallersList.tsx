@@ -1,3 +1,4 @@
+'use client';
 import { useParams } from 'next/navigation';
 import { Avatar, Box, Button, Tooltip } from '@mui/material';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';

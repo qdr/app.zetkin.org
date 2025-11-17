@@ -1,3 +1,4 @@
+'use client';
 import { Box } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { ArrowForward, Delete, Settings } from '@mui/icons-material';

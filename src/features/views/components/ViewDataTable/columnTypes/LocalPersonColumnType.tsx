@@ -1,5 +1,4 @@
 'use client';
-
 import { FC } from 'react';
 import { useParams } from 'next/navigation';
 import {
@@ -90,11 +89,13 @@ const EditCell: FC<{
   row: ZetkinViewRow;
 }> = ({ cell, column, row }) => {
   const api = useGridApiContext();
-  const { orgId, viewId } = useParams().query;
+  const params = useParams();
+  const orgId = params.orgId as string;
+  const viewId = params.viewId as string;
 
   const { columnsFuture, rowsFuture, setCellValue } = useViewGrid(
-    parseInt(orgId as string),
-    parseInt(viewId as string)
+    parseInt(orgId),
+    parseInt(viewId)
   );
   const messages = useMessages(messageIds);
 

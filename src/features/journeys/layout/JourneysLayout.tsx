@@ -1,3 +1,5 @@
+'use client';
+
 import { useParams } from 'next/navigation';
 
 import { useMessages } from 'core/i18n';

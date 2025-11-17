@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { Box, CircularProgress, Pagination, Typography } from '@mui/material';
 
@@ -17,19 +17,18 @@ const DuplicatesPage = () => {
   const { orgId } = useNumericRouteParams();
   const list = useDuplicates(orgId);
   const messages = useMessages(messageIds);
-  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [page, setPage] = useState(
-    router.query.page !== undefined ? Number(router.query.page) : 1
+    searchParams.get('page') !== null ? Number(searchParams.get('page')) : 1
   );
   const pageSize = 100;
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const url = `${window.location.protocol}//${window.location.host}${
-      router.asPath.split('?')[0]
-    }?page=${page}`;
+    const url = `${window.location.protocol}//${window.location.host}${pathname}?page=${page}`;
     window.history.replaceState({}, '', url);
-  }, [page]);
+  }, [page, pathname]);
 
   if (onServer) {
     return null;

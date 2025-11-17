@@ -1,3 +1,4 @@
+'use client';
 import { FC } from 'react';
 import { InfoOutlined } from '@mui/icons-material';
 import { linearGradientDef } from '@nivo/core';
@@ -74,8 +75,9 @@ const AreaCard: FC<AreaCardProps> = ({
   };
 
   const navigateToArea = (areaId: number) => {
-    const url = `/organize/${orgId}/projects/${assignment.project_id}/areaassignments/${assignment.id}/map?navigateToAreaId=${areaId}`;
-    router.replace(url);
+    router.replace(
+      `/organize/${orgId}/projects/${assignment.project_id}/areaassignments/${assignment.id}/map?navigateToAreaId=${areaId}`
+    );
   };
 
   return (

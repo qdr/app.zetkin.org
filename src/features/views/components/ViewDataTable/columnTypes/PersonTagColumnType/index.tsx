@@ -1,5 +1,4 @@
 'use client';
-
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'next/navigation';
 import { Box, lighten, TextField, TextFieldProps } from '@mui/material';
@@ -238,8 +237,8 @@ const BasicTagCell: FC<{
   tagId: number;
 }> = ({ cell, personId, tagId }) => {
   // TODO: Find a way to share a model between cells in a column
-  const query = useParams().query;
-  const orgId = parseInt(query.orgId as string);
+  const params = useParams();
+  const orgId = parseInt(params.orgId as string);
   const { tagFuture } = useTag(orgId, tagId);
   const { assignToPerson, removeFromPerson } = useTagging(orgId);
 

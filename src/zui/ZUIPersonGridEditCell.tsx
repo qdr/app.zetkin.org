@@ -1,8 +1,7 @@
 'use client';
-
 import { Close, PersonAdd } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import {
   Box,
   Button,

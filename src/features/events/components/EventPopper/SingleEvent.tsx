@@ -1,3 +1,4 @@
+'use client';
 import { makeStyles } from '@mui/styles';
 import NextLink from 'next/link';
 import {
@@ -14,7 +15,7 @@ import {
 } from '@mui/icons-material';
 import { Box, Button, Link, Typography } from '@mui/material';
 import React, { FC, useContext, useState } from 'react';
-import router from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { useMessages } from 'core/i18n';
 import { eventsDeselected } from 'features/events/store';
@@ -64,6 +65,7 @@ const SingleEvent: FC<SingleEventProps> = ({ event, onClickAway }) => {
   const messages = useMessages(messageIds);
   const classes = useStyles();
   const orgId = event.organization.id;
+  const router = useRouter();
   const { participantsFuture, respondentsFuture } = useEventParticipants(
     event.organization.id,
     event.id

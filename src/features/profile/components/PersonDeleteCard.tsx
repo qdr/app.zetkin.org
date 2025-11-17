@@ -1,3 +1,4 @@
+'use client';
 import { NewReleases } from '@mui/icons-material';
 import { useContext } from 'react';
 import { useRouter } from 'next/navigation';
