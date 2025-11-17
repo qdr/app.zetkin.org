@@ -37,12 +37,12 @@ const DefaultLayout: FunctionComponent<DefaultLayoutProps> = ({
       <Box
         ref={(div: HTMLDivElement) => setContainer(div)}
         display="flex"
+        flex={1}
         flexDirection="column"
         height="100vh"
         onScroll={onScroll}
         overflow="auto"
         position="relative"
-        width={1}
       >
         <PageContainerContext.Provider value={{ container }}>
           {children}
