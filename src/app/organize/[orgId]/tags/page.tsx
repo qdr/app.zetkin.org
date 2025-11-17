@@ -39,8 +39,7 @@ const TagsPage = () => {
   }
 
   return (
-    <>
-            <Box display="flex" flexDirection="column" gap={2}>
+    <Box display="flex" flexDirection="column" gap={2}>
         {groupedTags.length === 0 && (
           <Typography>
             <Msg id={messageIds.tagsPage.noTags} />
@@ -105,7 +104,6 @@ const TagsPage = () => {
           tag={tagToEdit}
         />
       </Box>
-    </>
   );
 };
 
