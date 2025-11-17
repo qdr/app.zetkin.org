@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { ArrowForward, Delete, Headset, People } from '@mui/icons-material';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 import CallAssignmentStatusChip from '../components/CallAssignmentStatusChip';
 import getCallAssignmentUrl from '../utils/getCallAssignmentUrl';

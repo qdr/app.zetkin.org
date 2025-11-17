@@ -1,6 +1,6 @@
 import { NewReleases } from '@mui/icons-material';
 import { useContext } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { Box, Button, Typography } from '@mui/material';
 
 import PersonCard from './PersonCard';

@@ -3,7 +3,7 @@
 import { ExpandMore } from '@mui/icons-material';
 import Link from 'next/link';
 import useAutocomplete from '@mui/material/useAutocomplete';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import {
   Box,
   IconButton,

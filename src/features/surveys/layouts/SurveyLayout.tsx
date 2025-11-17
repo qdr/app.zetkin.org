@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { Box, Button } from '@mui/material';
 import {
   ArrowForward,

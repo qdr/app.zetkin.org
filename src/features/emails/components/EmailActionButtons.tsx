@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { ArrowForward, ContentCopy, Delete, Send } from '@mui/icons-material';
-import router from 'next/router';
+import router from 'next/navigation';
 
 import CancelButton from './CancelButton';
 import DeliveryButton from './DeliveryButton';

@@ -1,5 +1,7 @@
+'use client';
+
 import { makeStyles } from '@mui/styles';
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 import {
   Box,
   Button,
@@ -96,7 +98,7 @@ const Cell: FC<{
   columnIdx: number;
   personId: number;
 }> = ({ cell, columnIdx, personId }) => {
-  const query = useRouter().query;
+  const query = useParams().query;
   const orgId = parseInt(query.orgId as string);
   const viewId = parseInt(query.viewId as string);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);

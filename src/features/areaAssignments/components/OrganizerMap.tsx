@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { latLngBounds, Map as MapType } from 'leaflet';
 import { MapContainer } from 'react-leaflet';
-import { useRouter } from 'next/router';
+import { useSearchParams } from 'next/navigation';
 import {
   Box,
   Button,
@@ -87,9 +87,9 @@ const OrganizerMap: FC<OrganizerMapProps> = ({
   const { onAssigneesFilterChange } = useContext(assigneesFilterContext);
   const { setActiveGroupIds, setActiveTagIdsByGroup } =
     useContext(areaFilterContext);
-  const router = useRouter();
+  const searchParams = useSearchParams();
   const navigateToAreaId = parseInt(
-    router.query.navigateToAreaId?.toString() ?? '0'
+    searchParams.get('navigateToAreaId') ?? '0'
   );
 
   const mapRef = useRef<MapType | null>(null);

@@ -1,5 +1,5 @@
 import NextLink from 'next/link';
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 import { Box, Card, CardActionArea, Link, Typography } from '@mui/material';
 
 import { Msg } from 'core/i18n';
@@ -11,7 +11,7 @@ interface JourneyCardProps {
 }
 
 const JourneyCard = ({ journey }: JourneyCardProps): JSX.Element => {
-  const { orgId } = useRouter().query;
+  const { orgId } = useParams().query;
   const { id, title, stats } = journey;
 
   return (

@@ -1,5 +1,7 @@
+'use client';
+
 import { makeStyles } from '@mui/styles';
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 import { Box, Chip } from '@mui/material';
 import { FC, useState } from 'react';
 import {
@@ -103,7 +105,7 @@ const useStyles = makeStyles(() => ({
 const Cell: FC<{
   cell: SurveyOptionsViewCell | undefined;
 }> = ({ cell }) => {
-  const { orgId } = useRouter().query;
+  const { orgId } = useParams().query;
   const styles = useStyles();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const { openPane } = usePanes();

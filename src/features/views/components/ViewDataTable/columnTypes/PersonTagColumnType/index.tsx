@@ -1,5 +1,7 @@
+'use client';
+
 import { makeStyles } from '@mui/styles';
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 import { Box, lighten, TextField, TextFieldProps } from '@mui/material';
 import { FC, KeyboardEvent, useCallback, useState } from 'react';
 import {
@@ -236,7 +238,7 @@ const BasicTagCell: FC<{
   tagId: number;
 }> = ({ cell, personId, tagId }) => {
   // TODO: Find a way to share a model between cells in a column
-  const query = useRouter().query;
+  const query = useParams().query;
   const orgId = parseInt(query.orgId as string);
   const { tagFuture } = useTag(orgId, tagId);
   const { assignToPerson, removeFromPerson } = useTagging(orgId);

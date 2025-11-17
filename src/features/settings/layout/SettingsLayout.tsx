@@ -1,5 +1,5 @@
 import { FunctionComponent } from 'react';
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 
 import messageIds from '../l10n/messageIds';
 import TabbedLayout from '../../../utils/layout/TabbedLayout';
@@ -12,7 +12,7 @@ interface SettingsLayoutProps {
 const SettingsLayout: FunctionComponent<SettingsLayoutProps> = ({
   children,
 }) => {
-  const { orgId } = useRouter().query;
+  const { orgId } = useParams();
   const messages = useMessages(messageIds);
 
   return (
