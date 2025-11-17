@@ -32,13 +32,12 @@ const AreaAssignmentPage = () => {
   ).size;
 
   return (
-    <>
-            <ZUIFutures
-        futures={{
-          assignment: assignmentFuture,
-          stats: statsFuture,
-        }}
-      >
+    <ZUIFutures
+      futures={{
+        assignment: assignmentFuture,
+        stats: statsFuture,
+      }}
+    >
         {({ data: { assignment, stats } }) => {
           const planUrl = `/organize/${orgId}/projects/${assignment.project_id}/areaassignments/${assignment.id}/map`;
           return (
@@ -185,7 +184,6 @@ const AreaAssignmentPage = () => {
           );
         }}
       </ZUIFutures>
-    </>
   );
 };
 

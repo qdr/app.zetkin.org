@@ -20,20 +20,18 @@ const CampaignSummaryPage = () => {
 
   return (
     <>
-            <>
-        <Box mb={campaign?.info_text || campaign?.manager ? 2 : 0}>
-          <Grid container spacing={2}>
-            {campaign?.info_text && (
-              <Grid size={{ lg: 6, md: 12, xs: 12 }}>
-                <Typography variant="body1">{campaign?.info_text}</Typography>
-              </Grid>
-            )}
-          </Grid>
-        </Box>
-        <Suspense>
-          <ActivitiesOverview campaignId={campId} orgId={orgId} />
-        </Suspense>
-      </>
+      <Box mb={campaign?.info_text || campaign?.manager ? 2 : 0}>
+        <Grid container spacing={2}>
+          {campaign?.info_text && (
+            <Grid size={{ lg: 6, md: 12, xs: 12 }}>
+              <Typography variant="body1">{campaign?.info_text}</Typography>
+            </Grid>
+          )}
+        </Grid>
+      </Box>
+      <Suspense>
+        <ActivitiesOverview campaignId={campId} orgId={orgId} />
+      </Suspense>
     </>
   );
 };
