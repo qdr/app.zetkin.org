@@ -93,7 +93,7 @@ const ZUIOrganizeSidebar = (): JSX.Element => {
   const router = useRouter();
   const pathname = usePathname();
   const { orgId } = useNumericRouteParams();
-  const key = orgId && pathname ? pathname.split(`/${orgId}/`)[1] || '' : 'organize';
+  const key = orgId && pathname ? (pathname.split(`/${orgId}/`)[1] || '') : 'organize';
 
   const [checked, setChecked] = useState(false);
   const [lastOpen, setLastOpen] = useLocalStorage('orgSidebarOpen', true);
@@ -324,7 +324,7 @@ const ZUIOrganizeSidebar = (): JSX.Element => {
                         icon={icon}
                         name={name}
                         open={open}
-                        selected={key.startsWith('/' + name)}
+                        selected={key.startsWith(name)}
                       />
                     </Tooltip>
                   </NextLink>

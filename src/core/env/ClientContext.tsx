@@ -3,6 +3,8 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import { IntlProvider } from 'react-intl';
 import { Provider as ReduxProvider } from 'react-redux';
 import { FC, ReactNode, Suspense, useRef } from 'react';
@@ -18,6 +20,7 @@ import { EmotionCache } from '@emotion/utils';
 import BrowserApiClient from 'core/api/client/BrowserApiClient';
 import Environment, { EnvVars } from 'core/env/Environment';
 import { EnvProvider } from 'core/env/EnvContext';
+import { EventPopperProvider } from 'features/events/components/EventPopper/EventPopperProvider';
 import { MessageList } from 'utils/locale';
 import createStore, { Store } from 'core/store';
 import { oldThemeWithLocale } from '../../theme';
@@ -93,8 +96,12 @@ const ClientContext: FC<ClientContextProps> = ({
                         messages={messages}
                       >
                         <ZUIConfirmDialogProvider>
-                          <CssBaseline />
-                          <Suspense>{children}</Suspense>
+                          <EventPopperProvider>
+                            <DndProvider backend={HTML5Backend}>
+                              <CssBaseline />
+                              <Suspense>{children}</Suspense>
+                            </DndProvider>
+                          </EventPopperProvider>
                         </ZUIConfirmDialogProvider>
                       </IntlProvider>
                     </ZUISnackbarProvider>

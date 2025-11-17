@@ -1,6 +1,6 @@
 import { Box } from '@mui/system';
 import dayjs from 'dayjs';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import utc from 'dayjs/plugin/utc';
 
