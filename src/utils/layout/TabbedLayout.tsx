@@ -13,7 +13,7 @@ import {
   Tabs,
   Theme,
 } from '@mui/material';
-import { FunctionComponent, ReactElement, useState } from 'react';
+import { FunctionComponent, ReactElement, useEffect, useState } from 'react';
 
 import DefaultLayout from './DefaultLayout';
 import Header from '../../zui/ZUIHeader';
@@ -75,6 +75,13 @@ const TabbedLayout: FunctionComponent<TabbedLayoutProps> = ({
   const classes = useStyles({ noPad });
   const router = useRouter();
   const pathname = usePathname();
+
+  // Redirect to default tab if on base path
+  useEffect(() => {
+    if (pathname === baseHref) {
+      router.replace(baseHref + defaultTab);
+    }
+  }, [pathname, baseHref, defaultTab, router]);
 
   const currentTab =
     pathname === baseHref
