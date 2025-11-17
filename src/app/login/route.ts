@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
   });
 
   const protocol = process.env.ZETKIN_APP_PROTOCOL || 'http';
-  const headersList = headers();
+  const headersList = await headers();
   const host =
     headersList.get('host') || process.env.ZETKIN_APP_HOST || 'localhost:3000';
   const baseUrl = `${protocol}://${host}`;
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
       ? `${redirectAsUrl.pathname}${redirectAsUrl.search}`
       : '/';
 
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const session = await getIronSession<AppSession>(cookieStore as any, {
       cookieName: 'zsid',
       password: requiredEnvVar('SESSION_PASSWORD'),
