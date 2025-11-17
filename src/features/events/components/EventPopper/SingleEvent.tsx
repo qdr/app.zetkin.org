@@ -14,7 +14,7 @@ import {
 } from '@mui/icons-material';
 import { Box, Button, Link, Typography } from '@mui/material';
 import React, { FC, useContext, useState } from 'react';
-import router from 'next/router';
+import router from 'next/navigation';
 
 import { useMessages } from 'core/i18n';
 import { eventsDeselected } from 'features/events/store';

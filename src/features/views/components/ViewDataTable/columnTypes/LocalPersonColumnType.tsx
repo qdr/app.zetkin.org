@@ -1,7 +1,7 @@
 'use client';
 
 import { FC } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import {
   GridColDef,
   GridRenderCellParams,
@@ -90,7 +90,7 @@ const EditCell: FC<{
   row: ZetkinViewRow;
 }> = ({ cell, column, row }) => {
   const api = useGridApiContext();
-  const { orgId, viewId } = useRouter().query;
+  const { orgId, viewId } = useParams().query;
 
   const { columnsFuture, rowsFuture, setCellValue } = useViewGrid(
     parseInt(orgId as string),

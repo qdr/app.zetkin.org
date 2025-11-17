@@ -2,7 +2,7 @@
 
 import { Box } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { FC, useState } from 'react';
 import {
   GridColDef,
@@ -84,7 +84,7 @@ const useStyles = makeStyles({
 });
 
 const Cell: FC<{ cell: SurveyResponseViewCell | undefined }> = ({ cell }) => {
-  const { orgId } = useRouter().query;
+  const { orgId } = useParams().query;
   const styles = useStyles();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const { openPane } = usePanes();

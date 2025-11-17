@@ -11,6 +11,23 @@ import { useParams } from 'next/navigation';
 import useServerSide from 'core/useServerSide';
 import { ZetkinCampaign } from 'utils/types/zetkin';
 
+export default function CampaignSummaryPage() {
+  const onServer = useServerSide();
+  const params = useParams();
+  const orgId = parseInt(params.orgId as string);
+  const campId = parseInt(params.campId as string);
 
+  if (onServer) {
+    return null;
+  }
 
-export default CampaignSummaryPage;
+  return (
+    <SingleCampaignLayout>
+      <Box sx={{ padding: 2 }}>
+        <Suspense fallback={null}>
+          <ActivitiesOverview orgId={orgId} campId={campId} />
+        </Suspense>
+      </Box>
+    </SingleCampaignLayout>
+  );
+}

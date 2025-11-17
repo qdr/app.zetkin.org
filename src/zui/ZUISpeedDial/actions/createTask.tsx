@@ -1,5 +1,5 @@
 import { CheckBox } from '@mui/icons-material';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 import TaskDetailsForm from 'features/tasks/components/TaskDetailsForm';
 import { ZetkinTaskRequestBody } from 'features/tasks/components/types';

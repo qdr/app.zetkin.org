@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 import { Avatar, Box, Button, Tooltip } from '@mui/material';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import { Delete, Edit } from '@mui/icons-material';
@@ -66,7 +66,7 @@ const CallAssignmentCallersList = ({
   onRemove: (caller: CallAssignmentCaller) => void;
 }) => {
   const messages = useMessages(messageIds);
-  const { orgId } = useRouter().query;
+  const { orgId } = useParams();
 
   const columns: GridColDef<CallAssignmentCaller>[] = [
     {

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { MobileFriendly } from '@mui/icons-material';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import {
   Avatar,
   ListItem,

@@ -1,4 +1,4 @@
-import Router from 'next/router';
+import Router from 'next/navigation';
 
 import { loadItemIfNecessary } from 'core/caching/cacheUtils';
 import {

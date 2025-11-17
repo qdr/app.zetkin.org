@@ -1,5 +1,5 @@
 import makeStyles from '@mui/styles/makeStyles';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { Box, Button, Theme } from '@mui/material';
 import { FunctionComponent, useContext, useState } from 'react';
 import NProgress from 'nprogress';
