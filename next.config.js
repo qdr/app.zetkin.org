@@ -15,15 +15,18 @@ module.exports = {
   allowedDevOrigins: [],
 
   experimental: {
-    esmExternals: "loose",
     serverComponentsExternalPackages: ["mjml", "mongoose"],
   },
   images: {
-    domains: [
-      `files.${process.env.ZETKIN_API_DOMAIN}`,
-
-      // localhost added for playwright testing
-      'localhost',
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: `files.${process.env.ZETKIN_API_DOMAIN}`,
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
     ],
   },
   async redirects() {

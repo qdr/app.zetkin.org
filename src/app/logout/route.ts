@@ -10,7 +10,7 @@ import requiredEnvVar from 'utils/requiredEnvVar';
 const Z = require('zetkin');
 
 export async function GET() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const session = await getIronSession<AppSession>(cookieStore as any, {
     cookieName: 'zsid',
     password: requiredEnvVar('SESSION_PASSWORD'),

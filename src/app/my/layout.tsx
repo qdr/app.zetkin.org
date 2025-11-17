@@ -9,7 +9,8 @@ import getServerMessages from 'core/i18n/server';
 import messageIds from 'features/home/l10n/messageIds';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const lang = getBrowserLanguage(headers().get('accept-language') || '');
+  const headersList = await headers();
+  const lang = getBrowserLanguage(headersList.get('accept-language') || '');
   const messages = await getServerMessages(lang, messageIds);
 
   return {

@@ -17,7 +17,7 @@ type Props = PropsWithChildren<{
 }>;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const headersList = headers();
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);
@@ -26,7 +26,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     `/api/orgs/${params.orgId}/actions/${params.eventId}`
   );
 
-  const lang = getBrowserLanguage(headers().get('accept-language') || '');
+  const headersForLang = await headers();
+  const lang = getBrowserLanguage(headersForLang.get('accept-language') || '');
   const messages = await getMessages(lang);
 
   return {
@@ -40,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // @ts-expect-error https://nextjs.org/docs/app/building-your-application/configuring/typescript#async-server-component-typescript-error
 const EventLayout: FC<Props> = async ({ children, params }) => {
-  const headersList = headers();
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);
