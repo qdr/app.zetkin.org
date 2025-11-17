@@ -32,9 +32,13 @@ const JoinSubmissionTable: FC<Props> = ({ onSelect, orgId, submissions }) => {
   const { approveSubmission, deleteSubmission } =
     useJoinSubmissionMutations(orgId);
 
+  const empty = submissions.length === 0;
+
   return (
     <Box bgcolor={theme.palette.background.paper} m={2}>
       <DataGridPro
+        autoHeight={empty}
+        columnBuffer={3}
         columns={[
           {
             disableColumnMenu: true,
@@ -121,7 +125,15 @@ const JoinSubmissionTable: FC<Props> = ({ onSelect, orgId, submissions }) => {
         onRowClick={(params) => {
           onSelect(params.row);
         }}
+        rowBuffer={5}
         rows={submissions}
+        rowThreshold={5}
+        style={{
+          ...(!empty && {
+            height: 'calc(100vh - 280px)',
+            minHeight: 400,
+          }),
+        }}
       />
     </Box>
   );
