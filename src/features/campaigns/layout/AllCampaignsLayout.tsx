@@ -1,5 +1,7 @@
+'use client';
+
 import { FunctionComponent } from 'react';
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 
 import CampaignsActionButtons from '../components/CampaignsActionButtons';
 import TabbedLayout from '../../../utils/layout/TabbedLayout';
@@ -15,7 +17,7 @@ const AllCampaignsLayout: FunctionComponent<AllCampaignsLayoutProps> = ({
   children,
   fixedHeight,
 }) => {
-  const { orgId } = useRouter().query;
+  const { orgId } = useParams();
   const messages = useMessages(messageIds);
 
   return (

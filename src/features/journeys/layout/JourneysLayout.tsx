@@ -1,4 +1,6 @@
-import { useRouter } from 'next/router';
+'use client';
+
+import { useParams } from 'next/navigation';
 
 import { useMessages } from 'core/i18n';
 import TabbedLayout from '../../../utils/layout/TabbedLayout';
@@ -12,7 +14,7 @@ const JourneysLayout: React.FunctionComponent<JourneysLayoutProps> = ({
   children,
 }) => {
   const messages = useMessages(messageIds);
-  const { orgId } = useRouter().query;
+  const { orgId } = useParams();
 
   return (
     <TabbedLayout

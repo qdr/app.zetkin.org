@@ -1,3 +1,5 @@
+'use client';
+
 import { FormattedDate } from 'react-intl';
 import { FunctionComponent } from 'react';
 
