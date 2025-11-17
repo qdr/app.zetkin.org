@@ -12,18 +12,6 @@ import useEmailStats from 'features/emails/hooks/useEmailStats';
 import { useNumericRouteParams } from 'core/hooks';
 import useServerSide from 'core/useServerSide';
 
-
-  async () => {
-    return {
-      props: {},
-    };
-  },
-  {
-    authLevelRequired: 2,
-    localeScope: ['layout.organize.email', 'pages.organizeEmail'],
-  }
-);
-
 const EmailPage = () => {
   const { orgId, emailId } = useNumericRouteParams();
   const {
