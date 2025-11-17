@@ -122,7 +122,11 @@ export default async function handle(
       res.status(errRes.httpStatus).json(errRes.data);
     } else {
       // Not an API error, i.e. this is a bug!
-      throw err;
+      console.error('API proxy error:', err);
+      res.status(500).json({
+        error: 'Internal server error',
+        message: err instanceof Error ? err.message : 'Unknown error',
+      });
     }
   }
 }
