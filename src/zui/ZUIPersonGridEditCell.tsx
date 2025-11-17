@@ -44,12 +44,12 @@ const ZUIPersonGridEditCell: FC<{
 }) => {
   const messages = useMessages(messageIds);
 
-  const query = useRouter().query;
+  const params = useParams();
   const styles = useStyles({ isRestrictedMode });
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [searching, setSearching] = useState(false);
 
-  const orgId = parseInt(query.orgId as string);
+  const orgId = parseInt(params?.orgId as string);
 
   const [activeIndex, setActiveIndex] = useState<number>(Infinity);
   const scrollableRef = useRef<HTMLUListElement>(null);

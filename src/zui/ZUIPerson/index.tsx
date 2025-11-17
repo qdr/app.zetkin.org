@@ -1,5 +1,6 @@
 'use client';
 import NextLink from 'next/link';
+import { useParams } from 'next/navigation';
 import {
   Avatar,
   Box,
@@ -58,7 +59,8 @@ const ZUIPerson: React.FunctionComponent<{
   subtitle,
   tooltip = true,
 }) => {
-  const { orgId } = useRouter().query as { orgId: string };
+  const params = useParams();
+  const orgId = params?.orgId as string | undefined;
 
   return (
     <PersonLink id={id} link={link} orgId={orgId} underline={!showText}>
