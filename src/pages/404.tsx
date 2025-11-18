@@ -1,5 +1,4 @@
-'use client';
-
+import Head from 'next/head';
 import Link from 'next/link';
 import { AppBar, Box, Container, Toolbar, Typography } from '@mui/material';
 
@@ -7,9 +6,12 @@ import { Msg } from 'core/i18n';
 import ZUILogo from 'zui/ZUILogo';
 import messageIds from 'core/l10n/messageIds';
 
-export default function NotFound() {
+export default function Custom404(): JSX.Element {
   return (
     <>
+      <Head>
+        <title>Zetkin</title>
+      </Head>
       <AppBar color="transparent" elevation={0} position="static">
         <Toolbar>
           <Link href="/" passHref>

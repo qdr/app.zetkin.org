@@ -52,10 +52,29 @@ module.exports = {
   images: {
     domains: [
       `files.${process.env.ZETKIN_API_DOMAIN}`,
+  // Moved from experimental in Next.js 15
+  serverExternalPackages: ["mjml", "mongoose", "canvas"],
 
-      // localhost added for playwright testing
-      'localhost',
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.zetkin.org',
+      },
+      {
+        protocol: 'http',
+        hostname: '**.zetkin.org',
+      },
+      {
+        // localhost added for playwright testing
+        protocol: 'http',
+        hostname: 'localhost',
+      },
     ],
+  },
+
+  turbopack: {
+    root: process.cwd(),
   },
   async redirects() {
     return [

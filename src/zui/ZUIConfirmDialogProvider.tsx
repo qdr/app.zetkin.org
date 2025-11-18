@@ -1,7 +1,7 @@
 'use client';
 
 /* eslint-disable @typescript-eslint/no-empty-function */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import ZUIConfirmDialog, { ZUIConfirmDialogProps } from 'zui/ZUIConfirmDialog';
 
@@ -56,15 +56,24 @@ export const ZUIConfirmDialogProvider: React.FunctionComponent<
   const [confirmDialogProps, setConfirmDialogProps] = useState<
     Partial<ZUIConfirmDialogProps>
   >(defaultConfirmDialogProps);
+  const [isMounted, setIsMounted] = useState(false);
+
   const showConfirmDialog = (newProps: Partial<ZUIConfirmDialogProps>) => {
     setConfirmDialogProps({ open: true, ...newProps });
   };
 
+  // Only render dialog after mount to avoid hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   return (
     <ZUIConfirmDialogContext.Provider value={{ showConfirmDialog }}>
-      <ConfirmDialog
-        {...{ ...defaultConfirmDialogProps, ...confirmDialogProps }}
-      />
+      {isMounted && (
+        <ConfirmDialog
+          {...{ ...defaultConfirmDialogProps, ...confirmDialogProps }}
+        />
+      )}
       {props.children}
     </ZUIConfirmDialogContext.Provider>
   );

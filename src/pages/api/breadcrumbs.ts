@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 import { ApiFetch, createApiFetch } from 'utils/apiFetch';
 import { isInteger } from 'utils/stringUtils';
@@ -18,28 +18,20 @@ export type BreadcrumbElement =
   | LabeledBreadcrumbElement
   | LocalizedBreadcrumbElement;
 
-export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const queryObj: Record<string, string> = {};
-
-  // Convert URLSearchParams to plain object
-  searchParams.forEach((value, key) => {
-    queryObj[key] = value;
-  });
-
-  const { query, error } = validateQuery(queryObj);
+const breadcrumbs = async (
+  req: NextApiRequest,
+  res: NextApiResponse
+): Promise<void> => {
+  const { query, error } = validateQuery(req.query);
 
   if (query) {
     const { orgId, pathname } = query;
 
     if (!orgId) {
-      return NextResponse.json(
-        { error: 'orgId not provided' },
-        { status: 400 }
-      );
+      return res.status(400).json({ error: 'orgId not provided' });
     }
 
-    const apiFetch = createApiFetch(Object.fromEntries(request.headers));
+    const apiFetch = createApiFetch(req.headers);
     const pathFields = pathname.split('/').slice(1);
     const breadcrumbs: BreadcrumbElement[] = [];
     const curPath = [];
@@ -75,11 +67,11 @@ export async function GET(request: NextRequest) {
         });
       }
     }
-    return NextResponse.json({ data: breadcrumbs });
+    res.status(200).json({ data: breadcrumbs });
   } else {
-    return NextResponse.json({ error }, { status: 400 });
+    return res.status(400).json({ error });
   }
-}
+};
 
 async function fetchElements(
   basePath: string,
@@ -267,7 +259,7 @@ const getFolderAsElement = (folder: ZetkinViewFolder, basePath: string) => {
 };
 
 const validateQuery = (
-  query: Record<string, string>
+  query: NextApiRequest['query']
 ): {
   error?: string;
   query?: Record<string, string>;
@@ -298,3 +290,5 @@ const validateQuery = (
   }
   return { query: query as Record<string, string> };
 };
+
+export default breadcrumbs;

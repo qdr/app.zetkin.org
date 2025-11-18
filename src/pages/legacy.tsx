@@ -1,32 +1,53 @@
-'use client';
-
+/* eslint-disable react/no-danger */
+import Head from 'next/head';
 import NextLink from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { Box, Button, Card, Link, Typography } from '@mui/material';
+import { GetServerSideProps, NextPage } from 'next';
 
+import { scaffold } from 'utils/next';
 import { Msg, useMessages } from 'core/i18n';
 import messageIds from 'core/l10n/messageIds';
 
-export default function LegacyPage() {
+export const getServerSideProps: GetServerSideProps = scaffold(
+  async (context) => {
+    const path = context.query.path || '';
+    const orgQuerystring = context.query.orgId
+      ? `?org=${context.query.orgId}`
+      : '';
+    const destination = `https://organize.${process.env.ZETKIN_API_DOMAIN}/${path}${orgQuerystring}`;
+
+    return {
+      props: {
+        destination,
+      },
+    };
+  },
+  {
+    localeScope: ['pages.legacy'],
+  }
+);
+
+interface LegacyPageProps {
+  destination: string;
+}
+
+const LegacyPage: NextPage<LegacyPageProps> = ({ destination }) => {
   const messages = useMessages(messageIds);
   const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const path = searchParams.get('path') || '';
-  const orgQuerystring = searchParams.get('orgId')
-    ? `?org=${searchParams.get('orgId')}`
-    : '';
-  const destination = `https://organize.${process.env.NEXT_PUBLIC_ZETKIN_API_DOMAIN || 'dev.zetkin.org'}/${path}${orgQuerystring}`;
 
   return (
     <>
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
+      <Head>
+        <title>{messages.legacy.header()}</title>
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
         html, body, body > div { height: 100%; padding: 0; margin: 0; }
         `,
-        }}
-      />
+          }}
+        />
+      </Head>
       <Box
         style={{
           alignItems: 'center',
@@ -79,4 +100,6 @@ export default function LegacyPage() {
       </Box>
     </>
   );
-}
+};
+
+export default LegacyPage;
