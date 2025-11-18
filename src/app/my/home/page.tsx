@@ -17,7 +17,6 @@ export default async function Page() {
 
   const today = new Date().toISOString().slice(0, 10);
 
-  // Fetch all activities in parallel
   const [areaAssignments, callAssignments, bookedEvents, signedUpEventsData] =
     await Promise.all([
       apiClient.get<ZetkinAreaAssignment[]>(
@@ -30,7 +29,6 @@ export default async function Page() {
       apiClient.get<{ action: ZetkinEvent }[]>(`/api/users/me/action_responses`),
     ]);
 
-  // Process user events
   const bookedEventIds: number[] = [];
   const bookedEventsWithStatus = bookedEvents.map<ZetkinEventWithStatus>(
     (event) => {
