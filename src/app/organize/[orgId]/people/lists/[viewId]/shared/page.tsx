@@ -1,54 +1,41 @@
-'use client';
+import { getServerApiClient } from 'core/api/server';
+import {
+  ZetkinView,
+  ZetkinViewColumn,
+  ZetkinViewRow,
+} from 'features/views/components/types';
+import SharedViewPageClient from './SharedViewPageClient';
 
-import { AccessLevelProvider } from 'features/views/hooks/useAccessLevel';
-import { useNumericRouteParams } from 'core/hooks';
-import useServerSide from 'core/useServerSide';
-import useView from 'features/views/hooks/useView';
-import useViewAccessLevel from 'features/views/hooks/useViewAccessLevel';
-import useViewGrid from 'features/views/hooks/useViewGrid';
-import ViewDataTable from 'features/views/components/ViewDataTable';
-import ZUIFutures from 'zui/ZUIFutures';
-
-const SharedViewPage = () => {
-  const { orgId, viewId } = useNumericRouteParams();
-  const { data: accessLevel } = useViewAccessLevel(orgId, viewId);
-
-  const { columnsFuture, rowsFuture } = useViewGrid(orgId, viewId);
-  const viewFuture = useView(orgId, viewId);
-  const canConfigure = accessLevel == 'configure';
-
-  const onServer = useServerSide();
-  if (onServer) {
-    return null;
-  }
-
-  return (
-    <ZUIFutures
-      futures={{
-        cols: columnsFuture,
-        rows: rowsFuture,
-        view: viewFuture,
-      }}
-    >
-      {({ data: { cols, rows, view } }) => (
-        <>
-          <AccessLevelProvider
-            accessLevel={accessLevel || 'none'}
-            isRestricted={true}
-          >
-            {!columnsFuture.isLoading ? (
-              <ViewDataTable
-                columns={cols}
-                disableConfigure={!canConfigure}
-                rows={rows}
-                view={view}
-              />
-            ) : null}
-          </AccessLevelProvider>
-        </>
-      )}
-    </ZUIFutures>
-  );
+type PageProps = {
+  params: {
+    orgId: string;
+    viewId: string;
+  };
 };
 
-export default SharedViewPage;
+export default async function SharedViewPage({ params }: PageProps) {
+  const orgId = parseInt(params.orgId);
+  const viewId = parseInt(params.viewId);
+
+  const apiClient = await getServerApiClient();
+
+  const [view, columns, rows] = await Promise.all([
+    apiClient.get<ZetkinView>(`/api/orgs/${orgId}/people/views/${viewId}`),
+    apiClient.get<ZetkinViewColumn[]>(
+      `/api/orgs/${orgId}/people/views/${viewId}/columns`
+    ),
+    apiClient.get<ZetkinViewRow[]>(
+      `/api/orgs/${orgId}/people/views/${viewId}/rows`
+    ),
+  ]);
+
+  return (
+    <SharedViewPageClient
+      columns={columns}
+      orgId={orgId}
+      rows={rows}
+      view={view}
+      viewId={viewId}
+    />
+  );
+}
