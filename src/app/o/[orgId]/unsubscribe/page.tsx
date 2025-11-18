@@ -1,7 +1,6 @@
-import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
-import BackendApiClient from 'core/api/client/BackendApiClient';
+import { getServerApiClient } from 'core/api/server';
 import UnsubscribePage from 'features/emails/pages/UnsubscribePage';
 import { ZetkinOrganization } from 'utils/types/zetkin';
 
@@ -15,10 +14,7 @@ type PageProps = {
 };
 
 export default async function Page({ params, searchParams }: PageProps) {
-  const headersList = await headers();
-  const headersEntries = headersList.entries();
-  const headersObject = Object.fromEntries(headersEntries);
-  const apiClient = new BackendApiClient(headersObject);
+  const apiClient = await getServerApiClient();
 
   const unsubUrl = searchParams.unsub;
   if (!unsubUrl) {
