@@ -1,20 +1,14 @@
 'use client';
 
-import { Grid } from '@mui/material';
-
-import JourneyCard from 'features/journeys/components/JourneyCard';
+import JourneysGrid from 'features/journeys/components/JourneysGrid';
 import messageIds from 'features/journeys/l10n/messageIds';
-import useJourneys from 'features/journeys/hooks/useJourneys';
 import { useMessages } from 'core/i18n';
 import { useNumericRouteParams } from 'core/hooks';
-import { ZetkinJourney } from 'utils/types/zetkin';
 import ZUISection from 'zui/ZUISection';
 
 const AllJourneysOverviewPage = () => {
   const messages = useMessages(messageIds);
   const { orgId } = useNumericRouteParams();
-
-  const journeysFuture = useJourneys(orgId);
 
   return (
     <ZUISection title={messages.journeys.overview.overviewTitle()}>
@@ -26,6 +20,8 @@ const AllJourneysOverviewPage = () => {
           ))}
         </Grid>
       </ZUISection>
+      <JourneysGrid orgId={orgId} />
+    </ZUISection>
   );
 };
 
