@@ -4,19 +4,14 @@ import { Box, Grid, Typography } from '@mui/material';
 import { Suspense } from 'react';
 
 import ActivitiesOverview from 'features/campaigns/components/ActivitiesOverview';
+import ActivitiesOverviewSkeleton from 'features/campaigns/components/ActivitiesOverviewSkeleton';
 import useCampaign from 'features/campaigns/hooks/useCampaign';
 import { useNumericRouteParams } from 'core/hooks';
-import useServerSide from 'core/useServerSide';
 
 const CampaignSummaryPage = () => {
-  const isOnServer = useServerSide();
   const { orgId, campId } = useNumericRouteParams();
   const { campaignFuture } = useCampaign(orgId, campId);
   const campaign = campaignFuture.data;
-
-  if (isOnServer) {
-    return null;
-  }
 
   return (
     <>
@@ -30,6 +25,7 @@ const CampaignSummaryPage = () => {
         </Grid>
       </Box>
       <Suspense>
+      <Suspense fallback={<ActivitiesOverviewSkeleton />}>
         <ActivitiesOverview campaignId={campId} orgId={orgId} />
       </Suspense>
     </>

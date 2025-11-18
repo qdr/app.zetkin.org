@@ -1,24 +1,28 @@
-'use client';
+import { getServerApiClient } from '@/core/api/server';
+import { ZetkinCampaign } from '@/utils/types/zetkin';
+import { ZetkinSurvey } from '@/utils/types/zetkin';
+import ProjectsPageClient from './ProjectsPageClient';
 
-import { Suspense } from 'react';
+interface PageProps {
+  params: {
+    orgId: string;
+  };
+}
 
-import ActivitiesOverview from 'features/campaigns/components/ActivitiesOverview';
-import ActivitiesOverviewSkeleton from 'features/campaigns/components/ActivitiesOverviewSkeleton';
-import CampaignsGrid from 'features/campaigns/components/CampaignsGrid';
-import { useNumericRouteParams } from 'core/hooks';
+// Server Component - pre-fetches data for faster initial render
+export default async function AllCampaignsSummaryPage({
+  params,
+}: PageProps) {
+  const orgId = parseInt(params.orgId);
 
-const AllCampaignsSummaryPage = () => {
-  const { orgId } = useNumericRouteParams();
+  // Pre-fetch campaigns and surveys data on server
+  const apiClient = await getServerApiClient();
+  const [campaigns, surveys] = await Promise.all([
+    apiClient.get<ZetkinCampaign[]>(`/api/orgs/${orgId}/campaigns`),
+    apiClient.get<ZetkinSurvey[]>(`/api/orgs/${orgId}/surveys`),
+  ]);
 
   return (
-    <>
-      <Suspense fallback={<ActivitiesOverviewSkeleton />}>
-        <ActivitiesOverview orgId={orgId} />
-      </Suspense>
-
-      <CampaignsGrid orgId={orgId} />
-    </>
+    <ProjectsPageClient campaigns={campaigns} orgId={orgId} surveys={surveys} />
   );
-};
-
-export default AllCampaignsSummaryPage;
+}

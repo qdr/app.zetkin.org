@@ -5,8 +5,6 @@ import { FC, useEffect } from 'react';
 import { redirect } from 'next/navigation';
 import { ErrorBoundary } from 'react-error-boundary';
 
-import useServerSide from 'core/useServerSide';
-import ZUILogoLoadingIndicator from 'zui/ZUILogoLoadingIndicator';
 import Call from '../components/Call';
 import useCallInitialization from '../hooks/useCallInitialization';
 import ZUIText from 'zui/components/ZUIText';
@@ -24,23 +22,6 @@ const CallPage: FC = () => {
       return redirect('/my');
     }
   }, []);
-
-  const onServer = useServerSide();
-
-  if (onServer) {
-    return (
-      <Box
-        sx={{
-          alignItems: 'center',
-          display: 'flex',
-          height: '100dvh',
-          justifyContent: 'center',
-        }}
-      >
-        <ZUILogoLoadingIndicator />
-      </Box>
-    );
-  }
 
   return (
     <main>
