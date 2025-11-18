@@ -5,8 +5,10 @@ import { FC } from 'react';
 import AllJourneyInstancesLayout from 'features/journeys/layout/AllJourneyInstancesLayout';
 import JourneyInstanceCreateFab from 'features/journeys/components/JourneyInstanceCreateFab';
 import JourneyInstancesDataTable from 'features/journeys/components/JourneyInstancesDataTable';
+import { JourneyInstancesData } from 'features/journeys/hooks/useJourneyInstances';
 import useJourney from 'features/journeys/hooks/useJourney';
 import useJourneyInstances from 'features/journeys/hooks/useJourneyInstances';
+import { ZetkinJourneyInstance } from 'utils/types/zetkin';
 import ZUIFuture from 'zui/ZUIFuture';
 
 interface JourneyInstancesPageClientProps {
@@ -17,16 +19,17 @@ interface JourneyInstancesPageClientProps {
 const JourneyInstancesPageClient: FC<JourneyInstancesPageClientProps> = ({
   orgId,
   journeyId,
-}) => {
+}: JourneyInstancesPageClientProps) => {
   const journeyFuture = useJourney(orgId, journeyId);
   const journeyInstancesFuture = useJourneyInstances(orgId, journeyId);
 
   return (
     <AllJourneyInstancesLayout fixedHeight>
       <ZUIFuture future={journeyInstancesFuture}>
-        {(data) => {
+        {(data: JourneyInstancesData) => {
           const openJourneyInstances = data.journeyInstances.filter(
-            (journeyInstance) => journeyInstance.closed == null
+            (journeyInstance: ZetkinJourneyInstance) =>
+              journeyInstance.closed == null
           );
 
           return (

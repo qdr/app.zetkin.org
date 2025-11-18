@@ -10,6 +10,7 @@ import messageIds from 'features/journeys/l10n/messageIds';
 import { Msg } from 'core/i18n';
 import useJourneyInstance from 'features/journeys/hooks/useJourneyInstance';
 import useJourneyInstanceMilestones from 'features/journeys/hooks/useJourneyInstanceMilestones';
+import { ZetkinJourneyMilestoneStatus } from 'utils/types/zetkin';
 
 interface MilestonesPageClientProps {
   orgId: number;
@@ -19,11 +20,12 @@ interface MilestonesPageClientProps {
 const MilestonesPageClient: FC<MilestonesPageClientProps> = ({
   orgId,
   instanceId,
-}) => {
+}: MilestonesPageClientProps) => {
   const journeyInstanceFuture = useJourneyInstance(orgId, instanceId);
   const milestonesFuture = useJourneyInstanceMilestones(orgId, instanceId);
   const journeyInstance = journeyInstanceFuture.data;
-  const milestones = milestonesFuture.data || [];
+  const milestones: ZetkinJourneyMilestoneStatus[] =
+    milestonesFuture.data || [];
 
   if (!journeyInstance) {
     return null;
@@ -53,7 +55,7 @@ const MilestonesPageClient: FC<MilestonesPageClientProps> = ({
                 />
               </Typography>
               <LinearProgress value={percentComplete} variant="determinate" />
-              {milestones.map((milestone) => (
+              {milestones.map((milestone: ZetkinJourneyMilestoneStatus) => (
                 <JourneyMilestoneCard
                   key={milestone.id}
                   milestone={milestone}
