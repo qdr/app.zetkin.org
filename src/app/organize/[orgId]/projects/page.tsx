@@ -1,24 +1,23 @@
-'use client';
+import ProjectsPageClient from './ProjectsPageClient';
 
-import { Suspense } from 'react';
+interface PageProps {
+  params: {
+    orgId: string;
+  };
+}
 
-import ActivitiesOverview from 'features/campaigns/components/ActivitiesOverview';
-import ActivitiesOverviewSkeleton from 'features/campaigns/components/ActivitiesOverviewSkeleton';
-import CampaignsGrid from 'features/campaigns/components/CampaignsGrid';
-import { useNumericRouteParams } from 'core/hooks';
+// Server Component - can pre-fetch data here in future
+export default async function AllCampaignsSummaryPage({
+  params,
+}: PageProps) {
+  const orgId = parseInt(params.orgId);
 
-const AllCampaignsSummaryPage = () => {
-  const { orgId } = useNumericRouteParams();
+  // Future: Pre-fetch campaigns and surveys data here
+  // const apiClient = await getServerApiClient();
+  // const [campaigns, surveys] = await Promise.all([
+  //   apiClient.get(`/api/orgs/${orgId}/campaigns`),
+  //   apiClient.get(`/api/orgs/${orgId}/surveys`),
+  // ]);
 
-  return (
-    <>
-      <Suspense fallback={<ActivitiesOverviewSkeleton />}>
-        <ActivitiesOverview orgId={orgId} />
-      </Suspense>
-
-      <CampaignsGrid orgId={orgId} />
-    </>
-  );
-};
-
-export default AllCampaignsSummaryPage;
+  return <ProjectsPageClient orgId={orgId} />;
+}
