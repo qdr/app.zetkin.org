@@ -2,7 +2,7 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import BackendApiClient from 'core/api/client/BackendApiClient';
-import { ZetkinSession } from 'utils/types/zetkin';
+import { ZetkinUser } from 'utils/types/zetkin';
 
 export default async function redirectIfLoginNeeded(
   requiredAuthLevel: number = 1
@@ -15,20 +15,16 @@ export default async function redirectIfLoginNeeded(
   let shouldRedirectToLogin = false;
 
   try {
-    const session = await apiClient.get<ZetkinSession>('/api/session');
-    console.log('[redirectIfLoginNeeded] Session level:', session.level, 'Required:', requiredAuthLevel);
-    if (session.level < requiredAuthLevel) {
-      shouldRedirectToLogin = true;
-    }
+    // Check if user is authenticated by fetching their profile
+    await apiClient.get<ZetkinUser>('/api/users/me');
+    // If successful, user is authenticated (meets level 1 requirement)
   } catch (err) {
-    console.log('[redirectIfLoginNeeded] Session check failed:', err);
+    // If failed, user is not authenticated
     shouldRedirectToLogin = true;
   }
 
   if (shouldRedirectToLogin) {
     const path = headersList.get('x-requested-path');
-    const encodedPath = path ? encodeURIComponent(path) : '';
-    console.log('[redirectIfLoginNeeded] Redirecting to login. Path:', path);
-    redirect(`/login?level=${requiredAuthLevel}&redirect=${encodedPath}`);
+    redirect(`/login?redirect=${path}`);
   }
 }
