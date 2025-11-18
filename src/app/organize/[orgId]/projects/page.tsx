@@ -1,6 +1,5 @@
-import { getServerApiClient } from '@/core/api/server';
-import { ZetkinCampaign } from '@/utils/types/zetkin';
-import { ZetkinSurvey } from '@/utils/types/zetkin';
+import { getServerApiClient } from 'core/api/server';
+import { ZetkinCampaign, ZetkinSurvey } from 'utils/types/zetkin';
 import ProjectsPageClient from './ProjectsPageClient';
 
 interface PageProps {
