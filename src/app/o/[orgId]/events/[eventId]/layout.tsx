@@ -17,16 +17,17 @@ type Props = PropsWithChildren<{
 }>;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { orgId, eventId } = await params;
   const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);
 
   const event = await apiClient.get<ZetkinEvent>(
-    `/api/orgs/${params.orgId}/actions/${params.eventId}`
+    `/api/orgs/${orgId}/actions/${eventId}`
   );
 
-  const lang = getBrowserLanguage(headers().get('accept-language') || '');
+  const lang = getBrowserLanguage(headersList.get('accept-language') || '');
   const messages = await getMessages(lang);
 
   return {
@@ -40,6 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // @ts-expect-error https://nextjs.org/docs/app/building-your-application/configuring/typescript#async-server-component-typescript-error
 const EventLayout: FC<Props> = async ({ children, params }) => {
+  const { orgId, eventId } = await params;
   const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
@@ -47,7 +49,7 @@ const EventLayout: FC<Props> = async ({ children, params }) => {
 
   try {
     const event = await apiClient.get<ZetkinEvent>(
-      `/api/orgs/${params.orgId}/actions/${params.eventId}`
+      `/api/orgs/${orgId}/actions/${eventId}`
     );
 
     return (

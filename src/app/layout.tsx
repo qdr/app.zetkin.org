@@ -24,7 +24,7 @@ export default async function RootLayout({
   }
 
   const lang =
-    user?.lang || getBrowserLanguage(headers().get('accept-language') || '');
+    user?.lang || getBrowserLanguage(headersList.get('accept-language') || '');
   const messages = await getMessages(lang);
 
   return (
