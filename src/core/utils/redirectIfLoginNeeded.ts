@@ -2,7 +2,7 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import BackendApiClient from 'core/api/client/BackendApiClient';
-import { ZetkinSession } from 'utils/types/zetkin';
+import { ZetkinUser } from 'utils/types/zetkin';
 
 export default async function redirectIfLoginNeeded(
   requiredAuthLevel: number = 1
@@ -15,11 +15,11 @@ export default async function redirectIfLoginNeeded(
   let shouldRedirectToLogin = false;
 
   try {
-    const session = await apiClient.get<ZetkinSession>('/api/session');
-    if (session.level < requiredAuthLevel) {
-      shouldRedirectToLogin = true;
-    }
+    // Check if user is authenticated by fetching their profile
+    await apiClient.get<ZetkinUser>('/api/users/me');
+    // If successful, user is authenticated (meets level 1 requirement)
   } catch (err) {
+    // If failed, user is not authenticated
     shouldRedirectToLogin = true;
   }
 
