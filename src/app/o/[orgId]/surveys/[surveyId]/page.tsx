@@ -1,7 +1,15 @@
+<<<<<<< HEAD
 import { notFound } from 'next/navigation';
 
 import { getServerApiClient } from 'core/api/server';
 import PublicSurveyPage from 'features/surveys/pages/PublicSurveyPage';
+=======
+import { headers } from 'next/headers';
+import { notFound } from 'next/navigation';
+
+import PublicSurveyPageClient from './PublicSurveyPageClient';
+import BackendApiClient from 'core/api/client/BackendApiClient';
+>>>>>>> 44bc9c466da9b5e96bcb7cabdc3ad91c664aac94
 import { ZetkinSurveyExtended, ZetkinUser } from 'utils/types/zetkin';
 import { ApiClientError } from 'core/api/errors';
 
@@ -12,8 +20,17 @@ type PageProps = {
   };
 };
 
+<<<<<<< HEAD
 // Server Component - pre-fetches survey data for faster initial render
 export default async function PublicSurveyDetailPage({ params }: PageProps) {
+=======
+export default async function Page({ params }: Props) {
+  const headersList = headers();
+  const headersEntries = headersList.entries();
+  const headersObject = Object.fromEntries(headersEntries);
+  const apiClient = new BackendApiClient(headersObject);
+
+>>>>>>> 44bc9c466da9b5e96bcb7cabdc3ad91c664aac94
   const { orgId, surveyId } = params;
 
   const apiClient = await getServerApiClient();
@@ -40,5 +57,9 @@ export default async function PublicSurveyDetailPage({ params }: PageProps) {
     // User not authenticated - that's ok
   }
 
+<<<<<<< HEAD
   return <PublicSurveyPage survey={survey} user={user} />;
+=======
+  return <PublicSurveyPageClient survey={survey} user={user} />;
+>>>>>>> 44bc9c466da9b5e96bcb7cabdc3ad91c664aac94
 }

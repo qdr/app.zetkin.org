@@ -1,9 +1,19 @@
+<<<<<<< HEAD
 import { getServerApiClient } from 'core/api/server';
 import PublicEventPageClient from './PublicEventPageClient';
 import { ZetkinEvent, ZetkinMembership } from 'utils/types/zetkin';
 import { ZetkinEventWithStatus } from 'features/home/types';
 
 type PageProps = {
+=======
+import { headers } from 'next/headers';
+
+import BackendApiClient from 'core/api/client/BackendApiClient';
+import { ZetkinEvent } from 'utils/types/zetkin';
+import PublicEventPageClient from './PublicEventPageClient';
+
+type Props = {
+>>>>>>> 44bc9c466da9b5e96bcb7cabdc3ad91c664aac94
   params: {
     eventId: string;
     orgId: string;
@@ -22,6 +32,7 @@ export default async function PublicEventDetailPage({ params }: PageProps) {
     `/api/orgs/${orgId}/actions/${eventId}`
   );
 
+<<<<<<< HEAD
   // Try to get user's data if authenticated (may fail if not logged in)
   let myEvents: ZetkinEventWithStatus[] = [];
   let memberships: ZetkinMembership[] = [];
@@ -68,6 +79,13 @@ export default async function PublicEventDetailPage({ params }: PageProps) {
       memberships={memberships}
       myEvents={myEvents}
       orgId={orgId}
+=======
+  return (
+    <PublicEventPageClient
+      event={event}
+      eventId={event.id}
+      orgId={event.organization.id}
+>>>>>>> 44bc9c466da9b5e96bcb7cabdc3ad91c664aac94
     />
   );
 }
