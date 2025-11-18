@@ -1,8 +1,8 @@
 import redirectIfLoginNeeded from 'core/utils/redirectIfLoginNeeded';
-import HomePage from 'features/home/pages/HomePage';
+import HomePageClient from './HomePageClient';
 
 export default async function Page() {
   await redirectIfLoginNeeded();
 
-  return <HomePage />;
+  return <HomePageClient />;
 }
