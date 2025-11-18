@@ -1,6 +1,8 @@
+'use client';
+
 import { isEqual } from 'lodash';
-import { ParsedUrlQuery } from 'querystring';
-import { useRouter } from 'next/router';
+import { ReadonlyURLSearchParams } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import {
   DataGridProProps,
   GridFilterModel,
@@ -24,21 +26,19 @@ interface UseModelsFromQueryString {
 
 export default function useModelsFromQueryString(): UseModelsFromQueryString {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const [filterModel, setFilterModel] = useState<GridFilterModel>(
-    parseFilterModelFromQuery(router.query)
+    parseFilterModelFromQuery(searchParams)
   );
 
   const [sortModel, setSortModel] = useState<GridSortModel>(
-    parseSortModelFromQuery(router.query)
+    parseSortModelFromQuery(searchParams)
   );
 
   // Update router URL when model changes
   useEffect(() => {
-    const pathWithoutQuery = router.asPath.includes('?')
-      ? router.asPath.slice(0, router.asPath.indexOf('?'))
-      : router.asPath;
-
     const qs = [
       serializeFilterQueryString(filterModel),
       serializeSortQueryString(sortModel),
@@ -46,21 +46,18 @@ export default function useModelsFromQueryString(): UseModelsFromQueryString {
       .filter((item) => !!item.length)
       .join('&');
 
-    const modelPath = [pathWithoutQuery, qs]
-      .filter((elem) => elem.length)
-      .join('?');
+    const modelPath = qs ? `${pathname}?${qs}` : pathname;
+    const currentPath = searchParams.toString() ? `${pathname}?${searchParams.toString()}` : pathname;
 
-    if (modelPath != router.asPath) {
-      router.push(modelPath, modelPath, {
-        shallow: true,
-      });
+    if (modelPath != currentPath) {
+      router.replace(modelPath, { scroll: false });
     }
-  }, [filterModel, sortModel]);
+  }, [filterModel, sortModel, router, pathname, searchParams]);
 
   // Update model when router URL changes
   useEffect(() => {
-    const routerFilterModel = parseFilterModelFromQuery(router.query);
-    const routerSortModel = parseSortModelFromQuery(router.query);
+    const routerFilterModel = parseFilterModelFromQuery(searchParams);
+    const routerSortModel = parseSortModelFromQuery(searchParams);
 
     if (!isEqual(routerFilterModel, filterModel)) {
       setFilterModel(routerFilterModel);
@@ -69,7 +66,7 @@ export default function useModelsFromQueryString(): UseModelsFromQueryString {
     if (!isEqual(routerSortModel, sortModel)) {
       setSortModel(routerSortModel);
     }
-  }, [router.query]);
+  }, [searchParams]);
 
   return {
     filterModel,
@@ -93,11 +90,11 @@ export default function useModelsFromQueryString(): UseModelsFromQueryString {
   };
 }
 
-function parseFilterModelFromQuery(query: ParsedUrlQuery): GridFilterModel {
-  const items = Object.entries(query)
+function parseFilterModelFromQuery(searchParams: ReadonlyURLSearchParams): GridFilterModel {
+  const items = Array.from(searchParams.entries())
     .filter(([param]) => param.startsWith('filter_'))
     .flatMap(([param, val], idx) => {
-      const values = Array.isArray(val) ? val : [val];
+      const values = [val];
 
       return values.map((val, valIdx) => {
         // Split the query param, ignoring the first field ('filter')
@@ -123,15 +120,15 @@ function parseFilterModelFromQuery(query: ParsedUrlQuery): GridFilterModel {
     items,
     ...(!!items.length && {
       logicOperator:
-        query.filterOperator == 'or'
+        searchParams.get('filterOperator') == 'or'
           ? GridLogicOperator.Or
           : GridLogicOperator.And,
     }),
   };
 }
 
-function parseSortModelFromQuery(query: ParsedUrlQuery): GridSortModel {
-  const sort = Array.isArray(query.sort) ? query.sort[0] : query.sort;
+function parseSortModelFromQuery(searchParams: ReadonlyURLSearchParams): GridSortModel {
+  const sort = searchParams.get('sort');
   if (sort) {
     return sort.split(',').map((sortStr) => {
       const direction = sortStr.charAt(0) == '-' ? 'desc' : 'asc';

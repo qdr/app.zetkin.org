@@ -1,9 +1,11 @@
+'use client';
+
 import { FC } from 'react';
 import { InfoOutlined } from '@mui/icons-material';
 import { linearGradientDef } from '@nivo/core';
 import MapIcon from '@mui/icons-material/Map';
 import { ResponsiveLine } from '@nivo/line';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import {
   Box,
   Card,
