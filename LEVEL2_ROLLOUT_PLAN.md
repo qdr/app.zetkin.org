@@ -324,10 +324,10 @@ echo "  - View source for data in HTML"
 
 | Page | Priority | Status | Effort | Performance Gain | Completed |
 |------|----------|--------|--------|------------------|-----------|
-| Projects Overview | ✅ POC | ✅ Done | 4h | Stunning | ✅ |
-| People List | 🔥 High | ⏳ Pending | 2-3h | Expected: 70% | - |
-| Journeys List | 🔥 High | ⏳ Pending | 1-2h | Expected: 60% | - |
-| Tags List | 📌 Med | ⏳ Pending | 1-2h | Expected: 50% | - |
+| Projects Overview | ✅ POC | ✅ Done | 4h | Stunning (reported) | ✅ 2025-01-18 |
+| People List | 🔥 High | ✅ Done | 1.5h | Expected: 70% | ✅ 2025-01-18 |
+| Journeys List | 🔥 High | ✅ Done | 1h | Expected: 60% | ✅ 2025-01-18 |
+| Tags List | 📌 Med | ✅ Done | 1.5h | Expected: 50% | ✅ 2025-01-18 |
 | Geography | 📌 Med | ⏳ Pending | 2-3h | Expected: 55% | - |
 | Campaign Detail | 📌 Med | ⏳ Pending | 1-2h | Expected: 50% | - |
 | Person Profile | 🔥 High | ⏳ Pending | 2-3h | Expected: 65% | - |
@@ -336,7 +336,9 @@ echo "  - View source for data in HTML"
 | My Feed | 📌 Med | ⏳ Pending | 1-2h | Expected: 50% | - |
 | Public Org | 🔥 High | ⏳ Pending | 1-2h | Expected: 70% | - |
 
-**Estimated Total Effort**: 18-28 hours (2-4 weeks with testing)
+**Progress**: 4 of 11 pages complete (36%)
+**Completed in this session**: ~4 hours actual (vs 6-9h estimated)
+**Remaining Effort**: 12-21 hours (1.5-3 weeks)
 
 ---
 
@@ -344,11 +346,11 @@ echo "  - View source for data in HTML"
 
 ### Reusable Patterns
 
-Some hydration components can be reused:
-- ✅ `CampaignsGridWithInitialData` - Already created
-- ⏳ `PeopleListWithInitialData` - Can reuse for multiple people pages
-- ⏳ `JourneysListWithInitialData` - Can reuse for multiple journey pages
-- ⏳ `TagsListWithInitialData` - Can reuse for tags pages
+Hydration components created (can be reused):
+- ✅ `CampaignsGridWithInitialData` - For campaign/project pages
+- ✅ `ViewBrowserWithInitialData` - For People/view browser pages (REUSABLE!)
+- ✅ `JourneysGridWithInitialData` - For journeys pages
+- ✅ `TagGroupsDisplayWithInitialData` - For tags pages
 
 ### Quick Wins (1-2 hours each)
 
