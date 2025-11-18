@@ -1,14 +1,16 @@
-'use client';
+import { getServerApiClient } from 'core/api/server';
+import { ZetkinJourney } from 'utils/types/zetkin';
+import JourneysPageClient from './JourneysPageClient';
 
-import JourneysGrid from 'features/journeys/components/JourneysGrid';
-import messageIds from 'features/journeys/l10n/messageIds';
-import { useMessages } from 'core/i18n';
-import { useNumericRouteParams } from 'core/hooks';
-import ZUISection from 'zui/ZUISection';
+interface PageProps {
+  params: {
+    orgId: string;
+  };
+}
 
-const AllJourneysOverviewPage = () => {
-  const messages = useMessages(messageIds);
-  const { orgId } = useNumericRouteParams();
+// Server Component - pre-fetches journeys data for faster initial render
+export default async function AllJourneysOverviewPage({ params }: PageProps) {
+  const orgId = parseInt(params.orgId);
 
   return (
     <ZUISection title={messages.journeys.overview.overviewTitle()}>
@@ -22,7 +24,11 @@ const AllJourneysOverviewPage = () => {
       </ZUISection>
       <JourneysGrid orgId={orgId} />
     </ZUISection>
+  // Pre-fetch journeys data on server
+  const apiClient = await getServerApiClient();
+  const journeys = await apiClient.get<ZetkinJourney[]>(
+    `/api/orgs/${orgId}/journeys`
   );
-};
 
-export default AllJourneysOverviewPage;
+  return <JourneysPageClient journeys={journeys} orgId={orgId} />;
+}

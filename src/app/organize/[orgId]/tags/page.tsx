@@ -1,26 +1,12 @@
-'use client';
-
-import { useContext, useState } from 'react';
-
-import messageIds from 'features/tags/l10n/messageIds';
-import TagDialog from 'features/tags/components/TagManager/components/TagDialog';
-import TagGroupsDisplay from 'features/tags/components/TagGroupsDisplay';
-import useDeleteTag from 'features/tags/hooks/useDeleteTag';
-import { useNumericRouteParams } from 'core/hooks';
-import useTagGroups from 'features/tags/hooks/useTagGroups';
-import useTagMutations from 'features/tags/hooks/useTagMutations';
+import { getServerApiClient } from 'core/api/server';
 import { ZetkinTag } from 'utils/types/zetkin';
-import { ZUIConfirmDialogContext } from 'zui/ZUIConfirmDialogProvider';
-import { useMessages } from 'core/i18n';
+import TagsPageClient from './TagsPageClient';
 
-const TagsPage = () => {
-  const { orgId } = useNumericRouteParams();
-  const messages = useMessages(messageIds);
-  const tagGroups = useTagGroups(orgId).data || [];
-  const deleteTag = useDeleteTag(orgId);
-  const { updateTag } = useTagMutations(orgId);
-  const { showConfirmDialog } = useContext(ZUIConfirmDialogContext);
-  const [tagToEdit, setTagToEdit] = useState<ZetkinTag | undefined>(undefined);
+interface PageProps {
+  params: {
+    orgId: string;
+  };
+}
 
   return (
     <Box display="flex" flexDirection="column" gap={2}>
@@ -90,28 +76,16 @@ const TagsPage = () => {
       </Box>
     <>
       <TagGroupsDisplay orgId={orgId} onTagClick={setTagToEdit} />
+// Server Component - pre-fetches tag groups and tags data for faster initial render
+export default async function TagsPage({ params }: PageProps) {
+  const orgId = parseInt(params.orgId);
 
-      <TagDialog
-        groups={tagGroups}
-        onClose={() => setTagToEdit(undefined)}
-        onDelete={(tagId) => {
-          showConfirmDialog({
-            onSubmit: () => {
-              deleteTag(tagId);
-            },
-            warningText: messages.dialog.deleteWarning(),
-          });
-        }}
-        onSubmit={(tag) => {
-          if ('id' in tag) {
-            updateTag(tag);
-          }
-        }}
-        open={!!tagToEdit}
-        tag={tagToEdit}
-      />
-    </>
-  );
-};
+  // Pre-fetch tag groups and tags data on server (in parallel)
+  const apiClient = await getServerApiClient();
+  const [tagGroups, tags] = await Promise.all([
+    apiClient.get<ZetkinTag[]>(`/api/orgs/${orgId}/tag_groups`),
+    apiClient.get<ZetkinTag[]>(`/api/orgs/${orgId}/people/tags`),
+  ]);
 
-export default TagsPage;
+  return <TagsPageClient orgId={orgId} tagGroups={tagGroups} tags={tags} />;
+}
