@@ -1,23 +1,15 @@
-'use client';
+import CalendarPageClient from './CalendarPageClient';
 
-import Calendar from 'features/calendar/components';
-import messageIds from 'features/campaigns/l10n/messageIds';
-import { useMessages } from 'core/i18n';
-import useServerSide from 'core/useServerSide';
+interface PageProps {
+  params: {
+    orgId: string;
+  };
+}
 
-const AllCampaignsCalendarPage = () => {
-  const messages = useMessages(messageIds);
+// Server Component - no data pre-fetching yet (Calendar is complex)
+// Future: Could pre-fetch events for the current month
+export default async function AllCampaignsCalendarPage({ params }: PageProps) {
+  const orgId = parseInt(params.orgId);
 
-  const isOnServer = useServerSide();
-  if (isOnServer) {
-    return null;
-  }
-
-  return (
-    <>
-            <Calendar />
-    </>
-  );
-};
-
-export default AllCampaignsCalendarPage;
+  return <CalendarPageClient orgId={orgId} />;
+}
