@@ -1,4 +1,5 @@
-module.exports = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   /**
    * Block cross-origin requests during development.
    *
@@ -15,8 +16,16 @@ module.exports = {
   allowedDevOrigins: [],
 
   // Moved from experimental in Next.js 15
-  serverExternalPackages: ["mjml", "mongoose", "canvas"],
+  serverExternalPackages: ['mjml', 'mongoose', 'canvas'],
 
+  // Enable React strict mode for better development experience
+  reactStrictMode: true,
+
+  // Optimize production builds
+  compress: true,
+  poweredByHeader: false,
+
+  // Image optimization
   images: {
     remotePatterns: [
       {
@@ -33,11 +42,50 @@ module.exports = {
         hostname: 'localhost',
       },
     ],
+    formats: ['image/avif', 'image/webp'],
   },
 
+  // Turbopack configuration for faster development
   turbopack: {
     root: process.cwd(),
   },
+
+  // Webpack configuration for production optimization
+  webpack: (config, { isServer }) => {
+    // Optimize production builds
+    if (!isServer) {
+      config.optimization = {
+        ...config.optimization,
+        moduleIds: 'deterministic',
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            default: false,
+            vendors: false,
+            // Vendor chunk for node_modules
+            vendor: {
+              name: 'vendor',
+              chunks: 'all',
+              test: /node_modules/,
+              priority: 20,
+            },
+            // Common chunk for shared code
+            common: {
+              name: 'common',
+              minChunks: 2,
+              chunks: 'all',
+              priority: 10,
+              reuseExistingChunk: true,
+              enforce: true,
+            },
+          },
+        },
+      };
+    }
+    return config;
+  },
+
+  // Redirects
   async redirects() {
     return [
       {
@@ -106,3 +154,5 @@ module.exports = {
     ];
   },
 };
+
+module.exports = nextConfig;
