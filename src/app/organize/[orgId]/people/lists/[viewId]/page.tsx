@@ -1,51 +1,41 @@
-'use client';
+import { getServerApiClient } from 'core/api/server';
+import {
+  ZetkinView,
+  ZetkinViewColumn,
+  ZetkinViewRow,
+} from 'features/views/components/types';
+import SingleViewPageClient from './SingleViewPageClient';
 
-import { AccessLevelProvider } from 'features/views/hooks/useAccessLevel';
-import { useNumericRouteParams } from 'core/hooks';
-import useServerSide from 'core/useServerSide';
-import useView from 'features/views/hooks/useView';
-import useViewGrid from 'features/views/hooks/useViewGrid';
-import ViewDataTable from 'features/views/components/ViewDataTable';
-import ZUIFutures from 'zui/ZUIFutures';
-
-const SingleViewPage = () => {
-  const { orgId, viewId } = useNumericRouteParams();
-  const onServer = useServerSide();
-
-  const { columnsFuture, rowsFuture } = useViewGrid(orgId, viewId);
-  const viewFuture = useView(orgId, viewId);
-
-  if (onServer) {
-    return null;
-  }
-
-  return (
-    <ZUIFutures
-      futures={{
-        cols: columnsFuture,
-        rows: rowsFuture,
-        view: viewFuture,
-      }}
-    >
-      {({ data: { cols, rows, view } }) => (
-        <>
-          
-          <AccessLevelProvider>
-            {!columnsFuture.isLoading || !!columnsFuture.data?.length ? (
-              <ViewDataTable
-                columns={cols}
-                rows={rows}
-                rowSelection={{
-                  mode: 'selectWithBulkActions',
-                }}
-                view={view}
-              />
-            ) : null}
-          </AccessLevelProvider>
-        </>
-      )}
-    </ZUIFutures>
-  );
+type PageProps = {
+  params: {
+    orgId: string;
+    viewId: string;
+  };
 };
 
-export default SingleViewPage;
+export default async function SingleViewPage({ params }: PageProps) {
+  const orgId = parseInt(params.orgId);
+  const viewId = parseInt(params.viewId);
+
+  const apiClient = await getServerApiClient();
+
+  const [view, columns, rows] = await Promise.all([
+    apiClient.get<ZetkinView>(`/api/orgs/${orgId}/people/views/${viewId}`),
+    apiClient.get<ZetkinViewColumn[]>(
+      `/api/orgs/${orgId}/people/views/${viewId}/columns`
+    ),
+    apiClient.get<ZetkinViewRow[]>(
+      `/api/orgs/${orgId}/people/views/${viewId}/rows`
+    ),
+  ]);
+
+  return (
+    <SingleViewPageClient
+      columns={columns}
+      orgId={orgId}
+      rows={rows}
+      view={view}
+      viewId={viewId}
+    />
+  );
+}
