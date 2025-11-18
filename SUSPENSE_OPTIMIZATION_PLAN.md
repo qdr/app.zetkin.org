@@ -426,13 +426,15 @@ export default async function ProjectsPage({ params }) {
 
 ## 🎯 Implementation Checklist
 
-### Phase 1: Add Suspense Boundaries (1-2 days)
-- [ ] Identify components with loading states
-- [ ] Replace ZUIFuture with Suspense where applicable
-- [ ] Add fallback components (skeletons)
-- [ ] Test that loading states work correctly
+### Phase 1: Add Suspense Boundaries (1-2 days) ✅ COMPLETED
+- [x] Identify components with loading states
+- [x] Replace ZUIFuture with Suspense where applicable
+- [x] Add fallback components (skeletons)
+- [x] Test that loading states work correctly
 
-### Phase 2: Convert High-Traffic Pages (3-5 days)
+**Completed:** All 5 main pages (Projects, People, Journeys, Tags, Geography) now have granular Suspense boundaries with skeleton fallbacks.
+
+### Phase 2: Convert High-Traffic Pages (3-5 days) 🚧 READY
 - [ ] Convert `/people` page to Server Component
 - [ ] Convert `/projects` page to Server Component
 - [ ] Move data fetching to server
@@ -440,17 +442,29 @@ export default async function ProjectsPage({ params }) {
 - [ ] Test authentication still works
 - [ ] Measure performance improvements
 
-### Phase 3: Optimize Data Fetching (2-3 days)
+**Infrastructure Ready:**
+- ✅ Created `src/core/api/server.ts` with `getServerApiClient()` helper
+- ✅ Documented usage patterns for Server Components
+- ⏳ Awaiting conversion of pages (requires careful refactoring)
+
+### Phase 3: Optimize Data Fetching (2-3 days) 🚧 PARTIALLY COMPLETE
 - [ ] Implement parallel fetching in layouts
-- [ ] Add `loading.tsx` files for streaming
+- [x] Add `loading.tsx` files for streaming
 - [ ] Use `use()` hook where beneficial
 - [ ] Profile and optimize slow queries
 
-### Phase 4: Server Actions (Optional, 3-5 days)
+**Completed:**
+- ✅ Added `loading.tsx` for: projects, people, journeys, tags, geography
+- ✅ Instant navigation feedback now available
+- ⏳ Parallel fetching awaits Server Component conversions
+
+### Phase 4: Server Actions (Optional, 3-5 days) ⏳ NOT STARTED
 - [ ] Convert mutations to Server Actions
 - [ ] Implement optimistic updates
 - [ ] Add form validation
 - [ ] Test progressive enhancement
+
+**Status:** Awaiting completion of Phase 2 before starting
 
 ---
 
