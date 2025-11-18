@@ -15,7 +15,7 @@ module.exports = {
   allowedDevOrigins: [],
 
   // Moved from experimental in Next.js 15
-  serverExternalPackages: ["mjml", "mongoose"],
+  serverExternalPackages: ["mjml", "mongoose", "canvas"],
 
   images: {
     remotePatterns: [

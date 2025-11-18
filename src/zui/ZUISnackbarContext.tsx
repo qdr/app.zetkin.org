@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Snackbar } from '@mui/material';
 import { Alert, AlertColor } from '@mui/material';
-import { createContext, ReactNode, useState } from 'react';
+import { createContext, ReactNode, useEffect, useState } from 'react';
 
 import { useMessages } from 'core/i18n';
 import messageIds from './l10n/messageIds';
@@ -33,6 +33,7 @@ const ZUISnackbarProvider: React.FunctionComponent<SnackbarProviderProps> = ({
     message: ReactNode;
     severity: AlertColor;
   }>();
+  const [isMounted, setIsMounted] = useState(false);
 
   const showSnackbar: ZUISnackbarContextProps['showSnackbar'] = (
     severity,
@@ -51,6 +52,11 @@ const ZUISnackbarProvider: React.FunctionComponent<SnackbarProviderProps> = ({
     setSnackbarState(undefined);
   };
 
+  // Only render snackbar after mount to avoid hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   return (
     <>
       <ZUISnackbarContext.Provider
@@ -62,24 +68,26 @@ const ZUISnackbarProvider: React.FunctionComponent<SnackbarProviderProps> = ({
       >
         {children}
       </ZUISnackbarContext.Provider>
-      <Snackbar
-        autoHideDuration={5000}
-        data-testid={`Snackbar-${snackbarState?.severity}`}
-        onClose={() => {
-          setSnackbarOpen(false);
-        }}
-        open={snackbarOpen}
-        TransitionProps={{
-          onExited: () => setSnackbarState(undefined),
-        }}
-      >
-        <Alert
-          onClose={() => setSnackbarOpen(false)}
-          severity={snackbarState?.severity}
+      {isMounted && (
+        <Snackbar
+          autoHideDuration={5000}
+          data-testid={`Snackbar-${snackbarState?.severity}`}
+          onClose={() => {
+            setSnackbarOpen(false);
+          }}
+          open={snackbarOpen}
+          TransitionProps={{
+            onExited: () => setSnackbarState(undefined),
+          }}
         >
-          {snackbarState?.message}
-        </Alert>
-      </Snackbar>
+          <Alert
+            onClose={() => setSnackbarOpen(false)}
+            severity={snackbarState?.severity}
+          >
+            {snackbarState?.message}
+          </Alert>
+        </Snackbar>
+      )}
     </>
   );
 };
