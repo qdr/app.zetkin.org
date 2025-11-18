@@ -21,7 +21,11 @@ module.exports = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: `files.${process.env.ZETKIN_API_DOMAIN}`,
+        hostname: '**.zetkin.org',
+      },
+      {
+        protocol: 'http',
+        hostname: '**.zetkin.org',
       },
       {
         // localhost added for playwright testing
