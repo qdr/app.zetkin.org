@@ -17,12 +17,11 @@ type PageProps = {
 };
 
 export default async function Page({ params }: PageProps) {
-  const { emailId, orgId } = params;
+  const { emailId, orgId } = await params;
 
-  const lang = getBrowserLanguage(headers().get('accept-language') || '');
+  const headersList = await headers();
+  const lang = getBrowserLanguage(headersList.get('accept-language') || '');
   const messages = await getServerMessages(lang, messageIds);
-
-  const headersList = headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);

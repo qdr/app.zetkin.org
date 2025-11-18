@@ -51,7 +51,7 @@ const SurveyLayout: FC<Props> = async ({
   children,
   params,
 }): Promise<ReactElement> => {
-  const headersList = headers();
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);
