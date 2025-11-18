@@ -1,22 +1,20 @@
-import { getOfficialMembershipsDef } from 'features/settings/rpc/getOfficialMemberships';
-import { getServerApiClient } from 'core/api/server';
+import { Metadata } from 'next';
+
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
 import SettingsPageClient from './SettingsPageClient';
 
-type PageProps = {
-  params: {
-    orgId: string;
-  };
+export const metadata: Metadata = {
+  title: 'Settings - Zetkin',
 };
 
-export default async function SettingsPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
+type PageProps = {
+  params: Promise<{ orgId: string }>;
+};
 
-  const apiClient = await getServerApiClient();
+export default async function Page({ params }: PageProps) {
+  const { orgId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  const memberships = await getOfficialMembershipsDef.handler(
-    { orgId },
-    apiClient
-  );
-
-  return <SettingsPageClient memberships={memberships} orgId={orgId} />;
+  return <SettingsPageClient orgId={parseInt(orgId)} />;
 }

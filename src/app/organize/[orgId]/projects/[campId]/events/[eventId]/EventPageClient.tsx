@@ -1,47 +1,52 @@
 'use client';
 
-import { useEffect } from 'react';
+import { FC } from 'react';
 import { Grid } from '@mui/material';
 
+import EventLayout from 'features/events/layout/EventLayout';
 import EventOverviewCard from 'features/events/components/EventOverviewCard';
 import EventParticipantsCard from 'features/events/components/EventParticipantsCard';
 import EventRelatedCard from 'features/events/components/EventRelatedCard';
 import EventURLCard from 'features/events/components/EventURLCard';
-import { eventLoaded } from 'features/events/store';
-import { useAppDispatch } from 'core/hooks';
-import { ZetkinEvent } from 'utils/types/zetkin';
+import useEvent from 'features/events/hooks/useEvent';
+import ZUIFuture from 'zui/ZUIFuture';
 
 interface EventPageClientProps {
-  event: ZetkinEvent;
-  eventId: number;
   orgId: number;
+  eventId: number;
 }
 
-export default function EventPageClient({
-  event,
-  eventId,
-  orgId,
-}: EventPageClientProps) {
-  const dispatch = useAppDispatch();
+const EventPageClient: FC<EventPageClientProps> = ({ orgId, eventId }) => {
+  const eventFuture = useEvent(orgId, eventId);
 
-  useEffect(() => {
-    dispatch(eventLoaded(event));
-  }, [event, dispatch]);
+  if (!eventFuture || !eventFuture.data) {
+    return null;
+  }
 
   return (
-    <Grid container spacing={2}>
-      <Grid size={{ md: 8, xs: 12 }}>
-        <EventOverviewCard data={event} orgId={orgId} />
-      </Grid>
-      <Grid size={{ md: 4, xs: 6 }}>
-        <EventParticipantsCard eventId={eventId} orgId={orgId} />
-        <EventRelatedCard data={event} orgId={orgId} />
-        <EventURLCard
-          eventId={eventId}
-          isOpen={event.published != null}
-          orgId={orgId}
-        />
-      </Grid>
-    </Grid>
+    <EventLayout eventId={eventId.toString()} orgId={orgId.toString()}>
+      <ZUIFuture future={eventFuture}>
+        {(data) => {
+          return (
+            <Grid container spacing={2}>
+              <Grid size={{ md: 8, xs: 12 }}>
+                <EventOverviewCard data={data} orgId={orgId} />
+              </Grid>
+              <Grid size={{ md: 4, xs: 6 }}>
+                <EventParticipantsCard eventId={eventId} orgId={orgId} />
+                <EventRelatedCard data={data} orgId={orgId} />
+                <EventURLCard
+                  eventId={eventId}
+                  isOpen={data.published != null}
+                  orgId={orgId}
+                />
+              </Grid>
+            </Grid>
+          );
+        }}
+      </ZUIFuture>
+    </EventLayout>
   );
-}
+};
+
+export default EventPageClient;

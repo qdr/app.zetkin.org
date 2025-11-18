@@ -1,26 +1,25 @@
-'use client';
-
+import { Metadata } from 'next';
 import { Suspense } from 'react';
 
-import ActivitiesOverview from 'features/campaigns/components/ActivitiesOverview';
-import { useNumericRouteParams } from 'core/hooks';
-import useServerSide from 'core/useServerSide';
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
+import SharedPageClient from './SharedPageClient';
 
-const SharedSummaryPage = () => {
-  const { orgId } = useNumericRouteParams();
-  const onServer = useServerSide();
-
-  if (onServer) {
-    return null;
-  }
-
-  return (
-    <>
-      <Suspense>
-        <ActivitiesOverview isShared orgId={orgId} />
-      </Suspense>
-    </>
-  );
+export const metadata: Metadata = {
+  title: 'Shared Activities - Zetkin',
 };
 
-export default SharedSummaryPage;
+type PageProps = {
+  params: Promise<{ orgId: string }>;
+};
+
+export default async function Page({ params }: PageProps) {
+  const { orgId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
+
+  return (
+    <Suspense>
+      <SharedPageClient orgId={orgId} />
+    </Suspense>
+  );
+}

@@ -1,46 +1,35 @@
-import { CallAssignmentStats } from 'features/callAssignments/hooks/useCallAssignmentStats';
-import { getServerApiClient } from 'core/api/server';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
 import { ZetkinCallAssignment } from 'utils/types/zetkin';
 import CallAssignmentPageClient from './CallAssignmentPageClient';
 
-type PageProps = {
-  params: {
-    orgId: string;
-    campId: string;
-    callAssId: string;
-  };
+export const metadata: Metadata = {
+  title: 'Call Assignment - Zetkin',
 };
 
-export default async function CallAssignmentPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
-  const callAssId = parseInt(params.callAssId);
+type PageProps = {
+  params: Promise<{ orgId: string; campId: string; callAssId: string }>;
+};
 
-  const apiClient = await getServerApiClient();
+export default async function Page({ params }: PageProps) {
+  const { orgId, campId, callAssId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  const callAssignment = await apiClient.get<ZetkinCallAssignment>(
-    `/api/orgs/${orgId}/call_assignments/${callAssId}`
-  );
-
-  const isTargeted = !!(
-    callAssignment &&
-    callAssignment.target?.filter_spec?.length != 0
-  );
-
-  let stats: (CallAssignmentStats & { id: number }) | null = null;
-  if (isTargeted) {
-    const statsData = await apiClient.get<CallAssignmentStats>(
-      `/api/callAssignments/targets?org=${orgId}&assignment=${callAssId}`
+  // Check if call assignment exists and belongs to campaign
+  try {
+    const data = await apiClient.get<ZetkinCallAssignment>(
+      `/api/orgs/${orgId}/call_assignments/${callAssId}`
     );
-    stats = { ...statsData, id: callAssId };
-  }
+    const actualCampaign = data.campaign?.id.toString() ?? 'standalone';
+    if (actualCampaign !== campId) {
+      notFound();
+    }
 
-  return (
-    <CallAssignmentPageClient
-      callAssId={callAssId}
-      callAssignment={callAssignment}
-      isTargeted={isTargeted}
-      orgId={orgId}
-      stats={stats}
-    />
-  );
+    return <CallAssignmentPageClient orgId={parseInt(orgId)} callAssId={parseInt(callAssId)} />;
+  } catch (error) {
+    notFound();
+  }
 }

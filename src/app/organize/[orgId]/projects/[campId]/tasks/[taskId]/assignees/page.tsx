@@ -1,34 +1,38 @@
-import { getServerApiClient } from 'core/api/server';
-import { ZetkinAssignedTask, ZetkinTask } from 'utils/types/zetkin';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
+import { ZetkinTask } from 'utils/types/zetkin';
 import TaskAssigneesPageClient from './TaskAssigneesPageClient';
 
-type PageProps = {
-  params: {
-    orgId: string;
-    campId: string;
-    taskId: string;
-  };
+export const metadata: Metadata = {
+  title: 'Task Assignees - Zetkin',
 };
 
-export default async function TaskAssigneesPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
-  const taskId = parseInt(params.taskId);
+type PageProps = {
+  params: Promise<{ orgId: string; campId: string; taskId: string }>;
+};
 
-  const apiClient = await getServerApiClient();
+export default async function Page({ params }: PageProps) {
+  const { orgId, campId, taskId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  const [task, assignedTasks] = await Promise.all([
-    apiClient.get<ZetkinTask>(`/api/orgs/${orgId}/tasks/${taskId}`),
-    apiClient.get<ZetkinAssignedTask[]>(
-      `/api/orgs/${orgId}/tasks/${taskId}/assigned`
-    ),
-  ]);
+  // Check if task exists and belongs to campaign
+  try {
+    const task = await apiClient.get<ZetkinTask>(
+      `/api/orgs/${orgId}/tasks/${taskId}`
+    );
 
-  return (
-    <TaskAssigneesPageClient
-      assignedTasks={assignedTasks}
-      orgId={orgId}
-      task={task}
-      taskId={taskId}
-    />
-  );
+    if (
+      parseInt(campId) == task.campaign.id &&
+      parseInt(orgId) == task.organization.id
+    ) {
+      return <TaskAssigneesPageClient orgId={parseInt(orgId)} taskId={parseInt(taskId)} />;
+    } else {
+      notFound();
+    }
+  } catch (err) {
+    notFound();
+  }
 }

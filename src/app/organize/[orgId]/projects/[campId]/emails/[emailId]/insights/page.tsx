@@ -1,32 +1,20 @@
-import { getServerApiClient } from 'core/api/server';
-import { ZetkinEmail } from 'utils/types/zetkin';
+import { Metadata } from 'next';
+
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
 import EmailInsightsPageClient from './EmailInsightsPageClient';
 
-type PageProps = {
-  params: {
-    orgId: string;
-    campId: string;
-    emailId: string;
-  };
+export const metadata: Metadata = {
+  title: 'Email Insights - Zetkin',
 };
 
-export default async function EmailInsightsPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
-  const emailId = parseInt(params.emailId);
+type PageProps = {
+  params: Promise<{ orgId: string; campId: string; emailId: string }>;
+};
 
-  const apiClient = await getServerApiClient();
+export default async function Page({ params }: PageProps) {
+  const { orgId, campId, emailId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  const [email, emails] = await Promise.all([
-    apiClient.get<ZetkinEmail>(`/api/orgs/${orgId}/emails/${emailId}`),
-    apiClient.get<ZetkinEmail[]>(`/api/orgs/${orgId}/emails`),
-  ]);
-
-  return (
-    <EmailInsightsPageClient
-      email={email}
-      emailId={emailId}
-      emails={emails}
-      orgId={orgId}
-    />
-  );
+  return <EmailInsightsPageClient orgId={parseInt(orgId)} emailId={parseInt(emailId)} />;
 }

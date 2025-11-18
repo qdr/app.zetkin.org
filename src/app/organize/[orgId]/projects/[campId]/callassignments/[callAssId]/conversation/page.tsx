@@ -1,28 +1,20 @@
-import { Grid } from '@mui/material';
+import { Metadata } from 'next';
 
-import CallerInstructions from 'features/callAssignments/components/CallerInstructions';
-import ConversationSettings from 'features/callAssignments/components/ConversationSettings';
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
+import ConversationPageClient from './ConversationPageClient';
 
-type PageProps = {
-  params: {
-    orgId: string;
-    campId: string;
-    callAssId: string;
-  };
+export const metadata: Metadata = {
+  title: 'Call Assignment Conversation - Zetkin',
 };
 
-export default function ConversationPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
-  const callAssId = parseInt(params.callAssId);
+type PageProps = {
+  params: Promise<{ orgId: string; campId: string; callAssId: string }>;
+};
 
-  return (
-    <Grid container spacing={2}>
-      <Grid size={{ lg: 8, md: 6, sm: 12 }}>
-        <CallerInstructions assignmentId={callAssId} orgId={orgId} />
-      </Grid>
-      <Grid size={{ lg: 4, md: 6, sm: 12 }}>
-        <ConversationSettings assignmentId={callAssId} orgId={orgId} />
-      </Grid>
-    </Grid>
-  );
+export default async function Page({ params }: PageProps) {
+  const { orgId, campId, callAssId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
+
+  return <ConversationPageClient orgId={parseInt(orgId)} callAssId={parseInt(callAssId)} />;
 }

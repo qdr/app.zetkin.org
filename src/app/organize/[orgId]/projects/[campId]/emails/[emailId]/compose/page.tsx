@@ -1,24 +1,20 @@
-import { getServerApiClient } from 'core/api/server';
-import { ZetkinEmail } from 'utils/types/zetkin';
+import { Metadata } from 'next';
+
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
 import EmailComposePageClient from './EmailComposePageClient';
 
-type PageProps = {
-  params: {
-    orgId: string;
-    campId: string;
-    emailId: string;
-  };
+export const metadata: Metadata = {
+  title: 'Compose Email - Zetkin',
 };
 
-export default async function EmailComposePage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
-  const emailId = parseInt(params.emailId);
+type PageProps = {
+  params: Promise<{ orgId: string; campId: string; emailId: string }>;
+};
 
-  const apiClient = await getServerApiClient();
+export default async function Page({ params }: PageProps) {
+  const { orgId, campId, emailId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  const email = await apiClient.get<ZetkinEmail>(
-    `/api/orgs/${orgId}/emails/${emailId}`
-  );
-
-  return <EmailComposePageClient email={email} emailId={emailId} orgId={orgId} />;
+  return <EmailComposePageClient orgId={parseInt(orgId)} emailId={parseInt(emailId)} />;
 }

@@ -1,33 +1,41 @@
-import { getServerApiClient } from 'core/api/server';
-import { ZetkinJourneyInstance } from 'utils/types/zetkin';
-import JourneyMilestonesPageClient from './JourneyMilestonesPageClient';
+import { Metadata } from 'next';
+import { notFound, redirect } from 'next/navigation';
 
-type PageProps = {
-  params: {
-    orgId: string;
-    journeyId: string;
-    instanceId: string;
-  };
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
+import { ZetkinJourneyInstance } from 'utils/types/zetkin';
+import MilestonesPageClient from './MilestonesPageClient';
+
+export const metadata: Metadata = {
+  title: 'Journey Milestones - Zetkin',
 };
 
-export default async function JourneyMilestonesPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
-  const instanceId = parseInt(params.instanceId);
+type PageProps = {
+  params: Promise<{ orgId: string; journeyId: string; instanceId: string }>;
+};
 
-  const apiClient = await getServerApiClient();
+export default async function Page({ params }: PageProps) {
+  const { orgId, journeyId, instanceId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  const instance = await apiClient.get<ZetkinJourneyInstance>(
-    `/api/orgs/${orgId}/journey_instances/${instanceId}`
-  );
+  try {
+    const journeyInstance = await apiClient.get<ZetkinJourneyInstance>(
+      `/api/orgs/${orgId}/journey_instances/${instanceId}`
+    );
 
-  const milestones = instance.milestones || [];
+    if (journeyInstance.journey.id.toString() !== journeyId) {
+      redirect(
+        `/organize/${orgId}/journeys/${journeyInstance.journey.id}/${instanceId}/milestones`
+      );
+    }
 
-  return (
-    <JourneyMilestonesPageClient
-      instance={instance}
-      instanceId={instanceId}
-      milestones={milestones}
-      orgId={orgId}
-    />
-  );
+    return (
+      <MilestonesPageClient
+        orgId={parseInt(orgId)}
+        instanceId={parseInt(instanceId)}
+      />
+    );
+  } catch {
+    notFound();
+  }
 }

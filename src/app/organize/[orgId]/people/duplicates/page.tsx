@@ -1,21 +1,20 @@
-import { getServerApiClient } from 'core/api/server';
-import { PotentialDuplicate } from 'features/duplicates/store';
+import { Metadata } from 'next';
+
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
 import DuplicatesPageClient from './DuplicatesPageClient';
 
-type PageProps = {
-  params: {
-    orgId: string;
-  };
+export const metadata: Metadata = {
+  title: 'Duplicates - Zetkin',
 };
 
-export default async function DuplicatesPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
+type PageProps = {
+  params: Promise<{ orgId: string }>;
+};
 
-  const apiClient = await getServerApiClient();
+export default async function Page({ params }: PageProps) {
+  const { orgId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  const duplicates = await apiClient.get<PotentialDuplicate[]>(
-    `/api/orgs/${orgId}/people/duplicates?filter=status==pending`
-  );
-
-  return <DuplicatesPageClient duplicates={duplicates} orgId={orgId} />;
+  return <DuplicatesPageClient orgId={parseInt(orgId)} />;
 }

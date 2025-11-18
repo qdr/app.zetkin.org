@@ -1,41 +1,86 @@
-import { getServerApiClient } from 'core/api/server';
-import {
-  ZetkinView,
-  ZetkinViewColumn,
-  ZetkinViewRow,
-} from 'features/views/components/types';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
+import IApiClient from 'core/api/client/IApiClient';
+import { ZetkinMembership } from 'utils/types/zetkin';
+import { ZetkinObjectAccess } from 'core/api/types';
+import { ZetkinView } from 'features/views/components/types';
 import SharedViewPageClient from './SharedViewPageClient';
 
-type PageProps = {
-  params: {
-    orgId: string;
-    viewId: string;
-  };
+export const metadata: Metadata = {
+  title: 'Shared View - Zetkin',
 };
 
-export default async function SharedViewPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
-  const viewId = parseInt(params.viewId);
+async function getAccessLevel(
+  apiClient: IApiClient,
+  orgId: number,
+  viewId: number
+): Promise<ZetkinObjectAccess['level'] | null> {
+  const memberships = await apiClient.get<ZetkinMembership[]>(
+    `/api/users/me/memberships`
+  );
+  const myMembership = memberships.find((mem) => mem.organization.id == orgId);
 
-  const apiClient = await getServerApiClient();
+  if (!myMembership) {
+    // NOTE: Might be superuser
+    return null;
+  }
 
-  const [view, columns, rows] = await Promise.all([
-    apiClient.get<ZetkinView>(`/api/orgs/${orgId}/people/views/${viewId}`),
-    apiClient.get<ZetkinViewColumn[]>(
-      `/api/orgs/${orgId}/people/views/${viewId}/columns`
-    ),
-    apiClient.get<ZetkinViewRow[]>(
-      `/api/orgs/${orgId}/people/views/${viewId}/rows`
-    ),
-  ]);
+  const isOfficial = Boolean(myMembership.role);
+  if (isOfficial) {
+    return 'configure';
+  }
+
+  let accessList: ZetkinObjectAccess[] = [];
+  try {
+    accessList = await apiClient.get<ZetkinObjectAccess[]>(
+      `/api/orgs/${orgId}/people/views/${viewId}/access`
+    );
+  } catch (e) {
+    return null;
+  }
+  const accessObject = accessList.find(
+    (obj) => obj.person.id == myMembership.profile.id
+  );
+
+  return accessObject?.level ?? null;
+}
+
+type PageProps = {
+  params: Promise<{ orgId: string; viewId: string }>;
+};
+
+export default async function Page({ params }: PageProps) {
+  const { orgId, viewId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+
+  // Allow non-officials to access shared views
+  await requireOrgAccess(apiClient, user, orgId, true);
+
+  const accessLevel = await getAccessLevel(
+    apiClient,
+    parseInt(orgId),
+    parseInt(viewId)
+  );
+
+  if (accessLevel == null) {
+    notFound();
+  }
+
+  try {
+    await apiClient.get<ZetkinView>(
+      `/api/orgs/${orgId}/people/views/${viewId}`
+    );
+  } catch (err) {
+    notFound();
+  }
 
   return (
     <SharedViewPageClient
-      columns={columns}
-      orgId={orgId}
-      rows={rows}
-      view={view}
-      viewId={viewId}
+      accessLevel={accessLevel}
+      orgId={parseInt(orgId)}
+      viewId={parseInt(viewId)}
     />
   );
 }

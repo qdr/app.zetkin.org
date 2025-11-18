@@ -1,35 +1,36 @@
 'use client';
 
+import { FC } from 'react';
 import { Grid } from '@mui/material';
-import { useEffect } from 'react';
 
 import PersonDeleteCard from 'features/profile/components/PersonDeleteCard';
-import { personLoaded } from 'features/profile/store';
-import { useAppDispatch } from 'core/hooks';
-import { ZetkinPerson } from 'utils/types/zetkin';
+import SinglePersonLayout from 'features/profile/layout/SinglePersonLayout';
+import usePerson from 'features/profile/hooks/usePerson';
 
 interface PersonManagePageClientProps {
   orgId: number;
-  person: ZetkinPerson;
   personId: number;
 }
 
-export default function PersonManagePageClient({
+const PersonManagePageClient: FC<PersonManagePageClientProps> = ({
   orgId,
-  person,
   personId,
-}: PersonManagePageClientProps) {
-  const dispatch = useAppDispatch();
+}) => {
+  const { data: person } = usePerson(orgId, personId);
 
-  useEffect(() => {
-    dispatch(personLoaded([personId, person]));
-  }, [person, personId, dispatch]);
+  if (!person) {
+    return null;
+  }
 
   return (
-    <Grid container direction="row" spacing={6}>
-      <Grid size={{ lg: 4 }}>
-        <PersonDeleteCard orgId={orgId} person={person} />
+    <SinglePersonLayout>
+      <Grid container direction="row" spacing={6}>
+        <Grid size={{ lg: 4 }}>
+          <PersonDeleteCard orgId={orgId} person={person} />
+        </Grid>
       </Grid>
-    </Grid>
+    </SinglePersonLayout>
   );
-}
+};
+
+export default PersonManagePageClient;

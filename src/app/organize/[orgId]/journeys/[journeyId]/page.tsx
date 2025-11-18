@@ -1,44 +1,29 @@
-import { getServerApiClient } from 'core/api/server';
-import JourneyDetailPageClient from './JourneyDetailPageClient';
-import { ZetkinJourney, ZetkinJourneyInstance } from 'utils/types/zetkin';
-import { getTagColumns } from 'features/journeys/utils/journeyInstanceUtils';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
-type PageProps = {
-  params: {
-    orgId: string;
-    journeyId: string;
-  };
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
+import { ZetkinJourney } from 'utils/types/zetkin';
+import JourneyInstancesPageClient from './JourneyInstancesPageClient';
+
+export const metadata: Metadata = {
+  title: 'Journey Instances - Zetkin',
 };
 
-export default async function JourneyDetailPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
-  const journeyId = parseInt(params.journeyId);
+type PageProps = {
+  params: Promise<{ orgId: string; journeyId: string }>;
+};
 
-  return (
-    <>
-      <ZUIFuture future={journeyInstancesFuture}>
-        {(data) => {
-          const openJourneyInstances = data.journeyInstances.filter(
-            (journeyInstance) => journeyInstance.closed == null
-          );
-  const apiClient = await getServerApiClient();
+export default async function Page({ params }: PageProps) {
+  const { orgId, journeyId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  const [journey, journeyInstances] = await Promise.all([
-    apiClient.get<ZetkinJourney>(`/api/orgs/${orgId}/journeys/${journeyId}`),
-    apiClient.get<ZetkinJourneyInstance[]>(
-      `/api/orgs/${orgId}/journeys/${journeyId}/instances`
-    ),
-  ]);
-
-  const tagColumnsData = getTagColumns(journeyInstances);
-
-  return (
-    <JourneyDetailPageClient
-      journey={journey}
-      journeyId={journeyId}
-      journeyInstances={journeyInstances}
-      orgId={orgId}
-      tagColumnsData={tagColumnsData}
-    />
-  );
+  try {
+    await apiClient.get<ZetkinJourney>(
+      `/api/orgs/${orgId}/journeys/${journeyId}`
+    );
+    return <JourneyInstancesPageClient orgId={parseInt(orgId)} journeyId={parseInt(journeyId)} />;
+  } catch {
+    notFound();
+  }
 }

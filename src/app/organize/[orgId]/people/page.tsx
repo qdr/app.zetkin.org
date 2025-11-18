@@ -1,38 +1,28 @@
-import { getServerApiClient } from 'core/api/server';
-import { ViewTreeData } from 'pages/api/views/tree';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
+import { ZetkinView } from 'features/views/components/types';
 import PeoplePageClient from './PeoplePageClient';
 
-import { Suspense } from 'react';
-import { useParams } from 'next/navigation';
+export const metadata: Metadata = {
+  title: 'People - Zetkin',
+};
 
-import messageIds from 'features/views/l10n/messageIds';
-import { useMessages } from 'core/i18n';
-import useServerSide from 'core/useServerSide';
-import PeopleLayout from 'features/views/layout/PeopleLayout';
-import ViewBrowser from 'features/views/components/ViewBrowser';
-import ViewBrowserSkeleton from 'features/views/components/ViewBrowserSkeleton';
-interface PageProps {
-  params: {
-    orgId: string;
-  };
-}
+type PageProps = {
+  params: Promise<{ orgId: string }>;
+};
 
-// Server Component - pre-fetches view tree data for faster initial render
-export default async function PeopleViewsPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
+export default async function Page({ params }: PageProps) {
+  const { orgId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  return <ViewBrowser basePath={`/organize/${orgId}/people`} />;
-  return (
-    <PeopleLayout>
-      <Suspense fallback={<ViewBrowserSkeleton />}>
-        <ViewBrowser basePath={`/organize/${orgId}/people`} />
-      </Suspense>
-    </PeopleLayout>
-  // Pre-fetch view tree data on server
-  const apiClient = await getServerApiClient();
-  const viewTree = await apiClient.get<ViewTreeData>(
-    `/api/views/tree?orgId=${orgId}`
-  );
-
-  return <PeoplePageClient orgId={orgId} viewTree={viewTree} />;
+  // Check if views endpoint is accessible
+  try {
+    await apiClient.get<ZetkinView[]>(`/api/orgs/${orgId}/people/views`);
+    return <PeoplePageClient orgId={orgId} />;
+  } catch {
+    notFound();
+  }
 }

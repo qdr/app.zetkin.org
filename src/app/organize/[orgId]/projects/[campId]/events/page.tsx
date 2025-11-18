@@ -1,15 +1,17 @@
 import { redirect } from 'next/navigation';
 
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
+
 type PageProps = {
-  params: {
-    orgId: string;
-    campId: string;
-  };
+  params: Promise<{ orgId: string; campId: string }>;
 };
 
-export default function EventsRedirect({ params }: PageProps) {
-  const { orgId, campId } = params;
+export default async function Page({ params }: PageProps) {
+  const { orgId, campId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
+  // Redirect to calendar
   if (campId === 'standalone') {
     redirect(`/organize/${orgId}/projects/calendar`);
   } else {

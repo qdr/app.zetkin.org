@@ -1,18 +1,19 @@
 'use client';
 
-import { FunctionComponent, useEffect } from 'react';
+import { FC, FunctionComponent } from 'react';
 import { ResponsivePie } from '@nivo/pie';
 import { Box, Typography } from '@mui/material';
 
-import { assignedTasksLoaded, taskLoaded } from 'features/tasks/store';
+import messageIds from 'features/campaigns/l10n/messageIds';
+import SingleTaskLayout from 'features/tasks/layout/SingleTaskLayout';
+import useAssignedTasks from 'features/tasks/hooks/useAssignedTasks';
+import useTask from 'features/tasks/hooks/useTask';
+import ZUIFuture from 'zui/ZUIFuture';
 import {
   ASSIGNED_STATUS,
   ZetkinAssignedTask,
 } from 'features/tasks/components/types';
-import messageIds from 'features/campaigns/l10n/messageIds';
 import { Msg, useMessages } from 'core/i18n';
-import { useAppDispatch } from 'core/hooks';
-import { ZetkinTask } from 'utils/types/zetkin';
 
 interface PieChartProps {
   tasks: ZetkinAssignedTask[];
@@ -102,31 +103,31 @@ const PieChart: FunctionComponent<PieChartProps> = ({ tasks }) => {
 };
 
 interface TaskInsightsPageClientProps {
-  assignedTasks: ZetkinAssignedTask[];
   orgId: number;
-  task: ZetkinTask;
   taskId: number;
 }
 
-export default function TaskInsightsPageClient({
-  assignedTasks,
-  task,
-  taskId,
-}: TaskInsightsPageClientProps) {
-  const dispatch = useAppDispatch();
+const TaskInsightsPageClient: FC<TaskInsightsPageClientProps> = ({ orgId, taskId }) => {
   const messages = useMessages(messageIds);
-
-  useEffect(() => {
-    dispatch(taskLoaded(task));
-    dispatch(assignedTasksLoaded([taskId, assignedTasks]));
-  }, [task, taskId, assignedTasks, dispatch]);
+  const assignedTasksQuery = useAssignedTasks(orgId, taskId);
+  const task = useTask(orgId, taskId);
 
   return (
-    <Box height={400} maxWidth={500} mt={3} width="100%">
-      <Typography>
-        <Msg id={messageIds.assigneeActions} />
-      </Typography>
-      <PieChart tasks={assignedTasks} />
-    </Box>
+    <SingleTaskLayout>
+      <ZUIFuture future={assignedTasksQuery}>
+        {(data) => {
+          return (
+            <Box height={400} maxWidth={500} mt={3} width="100%">
+              <Typography>
+                <Msg id={messageIds.assigneeActions} />
+              </Typography>
+              <PieChart tasks={data} />
+            </Box>
+          );
+        }}
+      </ZUIFuture>
+    </SingleTaskLayout>
   );
-}
+};
+
+export default TaskInsightsPageClient;

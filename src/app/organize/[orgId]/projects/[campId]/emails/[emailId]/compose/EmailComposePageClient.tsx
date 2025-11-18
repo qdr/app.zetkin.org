@@ -1,31 +1,20 @@
 'use client';
 
-import { useEffect } from 'react';
+import { FC } from 'react';
 
 import EmailEditor from 'features/emails/components/EmailEditor';
-import { emailLoaded } from 'features/emails/store';
-import { useAppDispatch } from 'core/hooks';
+import EmailLayout from 'features/emails/layout/EmailLayout';
 import useDebounce from 'utils/hooks/useDebounce';
 import useEmail from 'features/emails/hooks/useEmail';
 import { ZetkinEmail } from 'utils/types/zetkin';
 
 interface EmailComposePageClientProps {
-  email: ZetkinEmail;
-  emailId: number;
   orgId: number;
+  emailId: number;
 }
 
-export default function EmailComposePageClient({
-  email,
-  emailId,
-  orgId,
-}: EmailComposePageClientProps) {
-  const dispatch = useAppDispatch();
-  const { updateEmail } = useEmail(orgId, emailId);
-
-  useEffect(() => {
-    dispatch(emailLoaded(email));
-  }, [email, dispatch]);
+const EmailComposePageClient: FC<EmailComposePageClientProps> = ({ orgId, emailId }) => {
+  const { data: email, updateEmail } = useEmail(orgId, emailId);
 
   const debouncedUpdateEmail = useDebounce(
     async (email: Partial<ZetkinEmail>) => {
@@ -37,12 +26,20 @@ export default function EmailComposePageClient({
     400
   );
 
+  if (!email) {
+    return null;
+  }
+
   return (
-    <EmailEditor
-      email={email}
-      onSave={(email) => {
-        debouncedUpdateEmail(email);
-      }}
-    />
+    <EmailLayout fixedHeight>
+      <EmailEditor
+        email={email}
+        onSave={(email) => {
+          debouncedUpdateEmail(email);
+        }}
+      />
+    </EmailLayout>
   );
-}
+};
+
+export default EmailComposePageClient;

@@ -1,39 +1,20 @@
-import { getServerApiClient } from 'core/api/server';
-import SubmissionsPageClient from './SubmissionsPageClient';
-import {
-  ZetkinSurveyExtended,
-  ZetkinSurveySubmission,
-} from 'utils/types/zetkin';
+import { Metadata } from 'next';
 
-type PageProps = {
-  params: {
-    orgId: string;
-    campId: string;
-    surveyId: string;
-  };
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
+import SurveySubmissionsPageClient from './SurveySubmissionsPageClient';
+
+export const metadata: Metadata = {
+  title: 'Survey Submissions - Zetkin',
 };
 
-export default async function SubmissionsPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
-  const campId = parseInt(params.campId);
-  const surveyId = parseInt(params.surveyId);
+type PageProps = {
+  params: Promise<{ orgId: string; campId: string; surveyId: string }>;
+};
 
-  const apiClient = await getServerApiClient();
+export default async function Page({ params }: PageProps) {
+  const { orgId, campId, surveyId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  const [survey, submissions] = await Promise.all([
-    apiClient.get<ZetkinSurveyExtended>(`/api/orgs/${orgId}/surveys/${surveyId}`),
-    apiClient.get<ZetkinSurveySubmission[]>(
-      `/api/orgs/${orgId}/surveys/${surveyId}/submissions`
-    ),
-  ]);
-
-  return (
-    <SubmissionsPageClient
-      campId={campId}
-      orgId={orgId}
-      submissions={submissions}
-      survey={survey}
-      surveyId={surveyId}
-    />
-  );
+  return <SurveySubmissionsPageClient orgId={parseInt(orgId)} surveyId={parseInt(surveyId)} />;
 }

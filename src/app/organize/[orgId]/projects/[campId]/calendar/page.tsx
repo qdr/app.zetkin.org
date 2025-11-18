@@ -1,34 +1,31 @@
-import Calendar from 'features/calendar/components';
-import { getServerApiClient } from 'core/api/server';
-import { ZetkinCampaign } from 'utils/types/zetkin';
-import { generateRandomColor } from 'utils/colorUtils';
-import CampaignCalendarClient from './CampaignCalendarClient';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
-type PageProps = {
-  params: {
-    orgId: string;
-    campId: string;
-  };
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
+import { ZetkinCampaign } from 'utils/types/zetkin';
+import CampaignCalendarPageClient from './CampaignCalendarPageClient';
+
+export const metadata: Metadata = {
+  title: 'Campaign Calendar - Zetkin',
 };
 
-export default async function CampaignCalendarPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
-  const campId = parseInt(params.campId);
+type PageProps = {
+  params: Promise<{ orgId: string; campId: string }>;
+};
 
-  const apiClient = await getServerApiClient();
+export default async function Page({ params }: PageProps) {
+  const { orgId, campId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  const campaign = await apiClient.get<ZetkinCampaign>(
-    `/api/orgs/${orgId}/campaigns/${campId}`
-  );
+  // Check if campaign exists
+  try {
+    await apiClient.get<ZetkinCampaign>(
+      `/api/orgs/${orgId}/campaigns/${campId}`
+    );
+  } catch (error) {
+    notFound();
+  }
 
-  const campaignWithColor = {
-    ...campaign,
-    color: generateRandomColor(campaign.id.toString()),
-  };
-
-  return (
-    <CampaignCalendarClient campaign={campaignWithColor} campId={campId} orgId={orgId}>
-      <Calendar />
-    </CampaignCalendarClient>
-  );
+  return <CampaignCalendarPageClient orgId={parseInt(orgId)} campId={parseInt(campId)} />;
 }

@@ -1,27 +1,29 @@
-import { getServerApiClient } from 'core/api/server';
-import { ZetkinCampaign, ZetkinSurvey } from 'utils/types/zetkin';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
+import BackendApiClient from 'core/api/client/BackendApiClient';
 import ProjectsPageClient from './ProjectsPageClient';
 
-interface PageProps {
-  params: {
-    orgId: string;
-  };
-}
+export const metadata: Metadata = {
+  title: 'Projects - Zetkin',
+};
 
-// Server Component - pre-fetches data for faster initial render
-export default async function AllCampaignsSummaryPage({
-  params,
-}: PageProps) {
-  const orgId = parseInt(params.orgId);
+type PageProps = {
+  params: Promise<{ orgId: string }>;
+};
 
-  // Pre-fetch campaigns and surveys data on server
-  const apiClient = await getServerApiClient();
-  const [campaigns, surveys] = await Promise.all([
-    apiClient.get<ZetkinCampaign[]>(`/api/orgs/${orgId}/campaigns`),
-    apiClient.get<ZetkinSurvey[]>(`/api/orgs/${orgId}/surveys`),
-  ]);
+export default async function Page({ params }: PageProps) {
+  const { orgId } = await params;
+  const { user, apiClient, headersList } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  return (
-    <ProjectsPageClient campaigns={campaigns} orgId={orgId} surveys={surveys} />
-  );
+  // Check if org exists
+  try {
+    await apiClient.get(`/api/orgs/${orgId}`);
+  } catch (e) {
+    notFound();
+  }
+
+  return <ProjectsPageClient orgId={parseInt(orgId)} />;
 }

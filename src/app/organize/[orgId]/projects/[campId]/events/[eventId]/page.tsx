@@ -1,24 +1,36 @@
-import { getServerApiClient } from 'core/api/server';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
 import { ZetkinEvent } from 'utils/types/zetkin';
 import EventPageClient from './EventPageClient';
 
-type PageProps = {
-  params: {
-    orgId: string;
-    campId: string;
-    eventId: string;
-  };
+export const metadata: Metadata = {
+  title: 'Event - Zetkin',
 };
 
-export default async function EventPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
-  const eventId = parseInt(params.eventId);
+type PageProps = {
+  params: Promise<{ orgId: string; campId: string; eventId: string }>;
+};
 
-  const apiClient = await getServerApiClient();
+export default async function Page({ params }: PageProps) {
+  const { orgId, campId, eventId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  const event = await apiClient.get<ZetkinEvent>(
-    `/api/orgs/${orgId}/actions/${eventId}`
-  );
+  // Check if event exists and belongs to campaign
+  try {
+    const event = await apiClient.get<ZetkinEvent>(
+      `/api/orgs/${orgId}/actions/${eventId}`
+    );
+    const actualCampaign = event.campaign?.id.toString() ?? 'standalone';
 
-  return <EventPageClient event={event} eventId={eventId} orgId={orgId} />;
+    if (actualCampaign !== campId) {
+      notFound();
+    }
+  } catch (error) {
+    notFound();
+  }
+
+  return <EventPageClient orgId={parseInt(orgId)} eventId={parseInt(eventId)} />;
 }

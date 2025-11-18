@@ -1,37 +1,29 @@
-import { getServerApiClient } from 'core/api/server';
-import ClosedJourneysPageClient from './ClosedJourneysPageClient';
-import { ZetkinJourney, ZetkinJourneyInstance } from 'utils/types/zetkin';
-import { getTagColumns } from 'features/journeys/utils/journeyInstanceUtils';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
-type PageProps = {
-  params: {
-    orgId: string;
-    journeyId: string;
-  };
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
+import { ZetkinJourney } from 'utils/types/zetkin';
+import ClosedInstancesPageClient from './ClosedInstancesPageClient';
+
+export const metadata: Metadata = {
+  title: 'Closed Journey Instances - Zetkin',
 };
 
-export default async function ClosedJourneysPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
-  const journeyId = parseInt(params.journeyId);
+type PageProps = {
+  params: Promise<{ orgId: string; journeyId: string }>;
+};
 
-  const apiClient = await getServerApiClient();
+export default async function Page({ params }: PageProps) {
+  const { orgId, journeyId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  const [journey, journeyInstances] = await Promise.all([
-    apiClient.get<ZetkinJourney>(`/api/orgs/${orgId}/journeys/${journeyId}`),
-    apiClient.get<ZetkinJourneyInstance[]>(
-      `/api/orgs/${orgId}/journeys/${journeyId}/instances`
-    ),
-  ]);
-
-  const tagColumnsData = getTagColumns(journeyInstances);
-
-  return (
-    <ClosedJourneysPageClient
-      journey={journey}
-      journeyId={journeyId}
-      journeyInstances={journeyInstances}
-      orgId={orgId}
-      tagColumnsData={tagColumnsData}
-    />
-  );
+  try {
+    await apiClient.get<ZetkinJourney>(
+      `/api/orgs/${orgId}/journeys/${journeyId}`
+    );
+    return <ClosedInstancesPageClient orgId={parseInt(orgId)} journeyId={parseInt(journeyId)} />;
+  } catch {
+    notFound();
+  }
 }

@@ -1,24 +1,20 @@
-import { getServerApiClient } from 'core/api/server';
-import { ZetkinEvent } from 'utils/types/zetkin';
-import ParticipantsPageClient from './ParticipantsPageClient';
+import { Metadata } from 'next';
 
-type PageProps = {
-  params: {
-    orgId: string;
-    campId: string;
-    eventId: string;
-  };
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
+import EventParticipantsPageClient from './EventParticipantsPageClient';
+
+export const metadata: Metadata = {
+  title: 'Event Participants - Zetkin',
 };
 
-export default async function ParticipantsPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
-  const eventId = parseInt(params.eventId);
+type PageProps = {
+  params: Promise<{ orgId: string; campId: string; eventId: string }>;
+};
 
-  const apiClient = await getServerApiClient();
+export default async function Page({ params }: PageProps) {
+  const { orgId, campId, eventId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  const event = await apiClient.get<ZetkinEvent>(
-    `/api/orgs/${orgId}/actions/${eventId}`
-  );
-
-  return <ParticipantsPageClient event={event} eventId={eventId} orgId={orgId} />;
+  return <EventParticipantsPageClient orgId={parseInt(orgId)} eventId={parseInt(eventId)} />;
 }

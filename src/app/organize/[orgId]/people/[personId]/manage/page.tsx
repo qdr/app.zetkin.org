@@ -1,23 +1,28 @@
-import { getServerApiClient } from 'core/api/server';
-import PersonManagePageClient from './PersonManagePageClient';
-import { ZetkinPerson } from 'utils/types/zetkin';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
-type PageProps = {
-  params: {
-    orgId: string;
-    personId: string;
-  };
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
+import { ZetkinPerson } from 'utils/types/zetkin';
+import PersonManagePageClient from './PersonManagePageClient';
+
+export const metadata: Metadata = {
+  title: 'Manage Person - Zetkin',
 };
 
-export default async function PersonManagePage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
-  const personId = parseInt(params.personId);
+type PageProps = {
+  params: Promise<{ orgId: string; personId: string }>;
+};
 
-  const apiClient = await getServerApiClient();
+export default async function Page({ params }: PageProps) {
+  const { orgId, personId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  const person = await apiClient.get<ZetkinPerson>(
-    `/api/orgs/${orgId}/people/${personId}`
-  );
-
-  return <PersonManagePageClient orgId={orgId} person={person} personId={personId} />;
+  // Check if person exists
+  try {
+    await apiClient.get<ZetkinPerson>(`/api/orgs/${orgId}/people/${personId}`);
+    return <PersonManagePageClient orgId={parseInt(orgId)} personId={parseInt(personId)} />;
+  } catch (err) {
+    notFound();
+  }
 }

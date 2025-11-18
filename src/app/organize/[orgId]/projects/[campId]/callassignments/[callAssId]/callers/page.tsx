@@ -1,37 +1,20 @@
-import { CallAssignmentCaller } from 'features/callAssignments/hooks/useCallers';
-import { getServerApiClient } from 'core/api/server';
-import { ZetkinCallAssignment } from 'utils/types/zetkin';
+import { Metadata } from 'next';
+
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
 import CallersPageClient from './CallersPageClient';
 
-type PageProps = {
-  params: {
-    orgId: string;
-    campId: string;
-    callAssId: string;
-  };
+export const metadata: Metadata = {
+  title: 'Call Assignment Callers - Zetkin',
 };
 
-export default async function CallersPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
-  const callAssId = parseInt(params.callAssId);
+type PageProps = {
+  params: Promise<{ orgId: string; campId: string; callAssId: string }>;
+};
 
-  const apiClient = await getServerApiClient();
+export default async function Page({ params }: PageProps) {
+  const { orgId, campId, callAssId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  const [callAssignment, callers] = await Promise.all([
-    apiClient.get<ZetkinCallAssignment>(
-      `/api/orgs/${orgId}/call_assignments/${callAssId}`
-    ),
-    apiClient.get<CallAssignmentCaller[]>(
-      `/api/orgs/${orgId}/call_assignments/${callAssId}/callers`
-    ),
-  ]);
-
-  return (
-    <CallersPageClient
-      callAssId={callAssId}
-      callAssignment={callAssignment}
-      callers={callers}
-      orgId={orgId}
-    />
-  );
+  return <CallersPageClient orgId={parseInt(orgId)} callAssId={parseInt(callAssId)} />;
 }

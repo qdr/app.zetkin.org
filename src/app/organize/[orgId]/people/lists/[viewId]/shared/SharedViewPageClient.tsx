@@ -1,51 +1,54 @@
 'use client';
 
-import { useEffect } from 'react';
+import { FC } from 'react';
 
 import { AccessLevelProvider } from 'features/views/hooks/useAccessLevel';
-import { columnsLoaded, rowsLoaded, viewLoaded } from 'features/views/store';
-import { useAppDispatch } from 'core/hooks';
+import SharedViewLayout from 'features/views/layout/SharedViewLayout';
+import useView from 'features/views/hooks/useView';
+import useViewGrid from 'features/views/hooks/useViewGrid';
 import ViewDataTable from 'features/views/components/ViewDataTable';
-import {
-  ZetkinView,
-  ZetkinViewColumn,
-  ZetkinViewRow,
-} from 'features/views/components/types';
+import { ZetkinObjectAccess } from 'core/api/types';
+import ZUIFutures from 'zui/ZUIFutures';
 
 interface SharedViewPageClientProps {
-  columns: ZetkinViewColumn[];
+  accessLevel: ZetkinObjectAccess['level'];
   orgId: number;
-  rows: ZetkinViewRow[];
-  view: ZetkinView;
   viewId: number;
 }
 
-export default function SharedViewPageClient({
-  columns,
-  rows,
-  view,
+const SharedViewPageClient: FC<SharedViewPageClientProps> = ({
+  accessLevel,
+  orgId,
   viewId,
-}: SharedViewPageClientProps) {
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    dispatch(viewLoaded(view));
-    dispatch(columnsLoaded([viewId, columns]));
-    dispatch(rowsLoaded([viewId, rows]));
-  }, [view, viewId, columns, rows, dispatch]);
-
-  // Note: useViewAccessLevel hook doesn't exist in the codebase, defaulting to 'none'
-  const accessLevel = 'none';
-  const canConfigure = accessLevel === 'configure';
+}) => {
+  const { columnsFuture, rowsFuture } = useViewGrid(orgId, viewId);
+  const viewFuture = useView(orgId, viewId);
+  const canConfigure = accessLevel == 'configure';
 
   return (
-    <AccessLevelProvider accessLevel={accessLevel} isRestricted={true}>
-      <ViewDataTable
-        columns={columns}
-        disableConfigure={!canConfigure}
-        rows={rows}
-        view={view}
-      />
-    </AccessLevelProvider>
+    <SharedViewLayout>
+      <ZUIFutures
+        futures={{
+          cols: columnsFuture,
+          rows: rowsFuture,
+          view: viewFuture,
+        }}
+      >
+        {({ data: { cols, rows, view } }) => (
+          <AccessLevelProvider accessLevel={accessLevel} isRestricted={true}>
+            {!columnsFuture.isLoading ? (
+              <ViewDataTable
+                columns={cols}
+                disableConfigure={!canConfigure}
+                rows={rows}
+                view={view}
+              />
+            ) : null}
+          </AccessLevelProvider>
+        )}
+      </ZUIFutures>
+    </SharedViewLayout>
   );
-}
+};
+
+export default SharedViewPageClient;

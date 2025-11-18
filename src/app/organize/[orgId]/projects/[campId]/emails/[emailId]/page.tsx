@@ -1,42 +1,20 @@
-import { getServerApiClient } from 'core/api/server';
-import { ZetkinEmail, ZetkinEmailStats } from 'utils/types/zetkin';
+import { Metadata } from 'next';
+
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
 import EmailPageClient from './EmailPageClient';
 
-type PageProps = {
-  params: {
-    orgId: string;
-    campId: string;
-    emailId: string;
-  };
+export const metadata: Metadata = {
+  title: 'Email - Zetkin',
 };
 
-export default async function EmailPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
-  const emailId = parseInt(params.emailId);
+type PageProps = {
+  params: Promise<{ orgId: string; campId: string; emailId: string }>;
+};
 
-  const apiClient = await getServerApiClient();
+export default async function Page({ params }: PageProps) {
+  const { orgId, campId, emailId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  const email = await apiClient.get<ZetkinEmail>(
-    `/api/orgs/${orgId}/emails/${emailId}`
-  );
-
-  const isTargeted = !!(email && email.target?.filter_spec?.length != 0);
-
-  let stats: (ZetkinEmailStats & { id: number }) | null = null;
-  if (isTargeted) {
-    const statsData = await apiClient.get<ZetkinEmailStats>(
-      `/api/orgs/${orgId}/emails/${emailId}/stats`
-    );
-    stats = { ...statsData, id: emailId };
-  }
-
-  return (
-    <EmailPageClient
-      email={email}
-      emailId={emailId}
-      isTargeted={isTargeted}
-      orgId={orgId}
-      stats={stats}
-    />
-  );
+  return <EmailPageClient orgId={parseInt(orgId)} emailId={parseInt(emailId)} />;
 }

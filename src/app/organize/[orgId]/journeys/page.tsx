@@ -1,34 +1,27 @@
-import { getServerApiClient } from 'core/api/server';
-import { ZetkinJourney } from 'utils/types/zetkin';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
+import { ZetkinOrganization } from 'utils/types/zetkin';
 import JourneysPageClient from './JourneysPageClient';
 
-interface PageProps {
-  params: {
-    orgId: string;
-  };
-}
+export const metadata: Metadata = {
+  title: 'Journeys - Zetkin',
+};
 
-// Server Component - pre-fetches journeys data for faster initial render
-export default async function AllJourneysOverviewPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
+type PageProps = {
+  params: Promise<{ orgId: string }>;
+};
 
-  return (
-    <ZUISection title={messages.journeys.overview.overviewTitle()}>
-        <Grid container spacing={2}>
-          {journeysFuture.data?.map((journey: ZetkinJourney) => (
-            <Grid key={journey.id} size={{ lg: 4, md: 6, xl: 3, xs: 12 }}>
-              <JourneyCard journey={journey} />
-            </Grid>
-          ))}
-        </Grid>
-      </ZUISection>
-      <JourneysGrid orgId={orgId} />
-    </ZUISection>
-  // Pre-fetch journeys data on server
-  const apiClient = await getServerApiClient();
-  const journeys = await apiClient.get<ZetkinJourney[]>(
-    `/api/orgs/${orgId}/journeys`
-  );
+export default async function Page({ params }: PageProps) {
+  const { orgId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  return <JourneysPageClient journeys={journeys} orgId={orgId} />;
+  try {
+    await apiClient.get<ZetkinOrganization>(`/api/orgs/${orgId}`);
+    return <JourneysPageClient orgId={parseInt(orgId)} />;
+  } catch {
+    notFound();
+  }
 }

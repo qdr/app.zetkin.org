@@ -1,26 +1,19 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { FC, useState } from 'react';
 import { Box } from '@mui/material';
 
-import { assignedTasksLoaded, taskLoaded } from 'features/tasks/store';
-import getTaskStatus, { TASK_STATUS } from 'features/tasks/utils/getTaskStatus';
-import messageIds from 'features/campaigns/l10n/messageIds';
 import { QUERY_STATUS } from 'features/smartSearch/components/types';
 import QueryStatusAlert from 'features/tasks/components/QueryStatusAlert';
+import SingleTaskLayout from 'features/tasks/layout/SingleTaskLayout';
 import SmartSearchDialog from 'features/smartSearch/components/SmartSearchDialog';
 import TaskAssigneesList from 'features/tasks/components/TaskAssigneesList';
-import { useAppDispatch } from 'core/hooks';
-import { useMessages } from 'core/i18n';
+import useAssignedTasks from 'features/tasks/hooks/useAssignedTasks';
+import useTask from 'features/tasks/hooks/useTask';
 import useTaskMutations from 'features/tasks/hooks/useTaskMutations';
+import ZUIFuture from 'zui/ZUIFuture';
+import getTaskStatus, { TASK_STATUS } from 'features/tasks/utils/getTaskStatus';
 import { ZetkinAssignedTask, ZetkinTask } from 'utils/types/zetkin';
-
-interface TaskAssigneesPageClientProps {
-  assignedTasks: ZetkinAssignedTask[];
-  orgId: number;
-  task: ZetkinTask;
-  taskId: number;
-}
 
 const getQueryStatus = (
   task: ZetkinTask | null,
@@ -37,50 +30,51 @@ const getQueryStatus = (
       queryStatus = QUERY_STATUS.NEW;
     }
   } else if (assignedTasks && !assignedTasks.length) {
+    // we don't want 'publishing' state to appear on page load while the data is being fetched
     queryStatus = QUERY_STATUS.PUBLISHED;
   }
   return queryStatus;
 };
 
-export default function TaskAssigneesPageClient({
-  assignedTasks,
-  orgId,
-  task,
-  taskId,
-}: TaskAssigneesPageClientProps) {
-  const dispatch = useAppDispatch();
-  const messages = useMessages(messageIds);
+interface TaskAssigneesPageClientProps {
+  orgId: number;
+  taskId: number;
+}
+
+const TaskAssigneesPageClient: FC<TaskAssigneesPageClientProps> = ({ orgId, taskId }) => {
+  const assignedTasksQuery = useAssignedTasks(orgId, taskId);
+  const task = useTask(orgId, taskId);
   const { updateTargetQuery } = useTaskMutations(orgId, taskId);
+  const assignedTasks = assignedTasksQuery?.data;
+  const query = task?.target;
+
   const [dialogOpen, setDialogOpen] = useState(false);
+  const handleDialogClose = () => setDialogOpen(false);
 
-  useEffect(() => {
-    dispatch(taskLoaded(task));
-    dispatch(assignedTasksLoaded([taskId, assignedTasks]));
-  }, [task, taskId, assignedTasks, dispatch]);
-
-  const queryStatus = useMemo(
-    () => getQueryStatus(task, assignedTasks),
-    [task, assignedTasks]
-  );
+  const queryStatus = getQueryStatus(task, assignedTasks);
 
   const readOnly =
     queryStatus === QUERY_STATUS.PUBLISHED ||
     queryStatus === QUERY_STATUS.ASSIGNED;
 
-  const query = task?.target;
-
   return (
-    <>
+    <SingleTaskLayout>
       <QueryStatusAlert
         openDialog={() => setDialogOpen(true)}
         status={queryStatus}
       />
-      <Box mt={3}>
-        <TaskAssigneesList assignedTasks={assignedTasks} />
-      </Box>
+      <ZUIFuture future={assignedTasksQuery}>
+        {(data) => {
+          return (
+            <Box mt={3}>
+              <TaskAssigneesList assignedTasks={data} />
+            </Box>
+          );
+        }}
+      </ZUIFuture>
       {dialogOpen && (
         <SmartSearchDialog
-          onDialogClose={() => setDialogOpen(false)}
+          onDialogClose={handleDialogClose}
           onSave={(query) => {
             updateTargetQuery(query);
             setDialogOpen(false);
@@ -89,6 +83,8 @@ export default function TaskAssigneesPageClient({
           readOnly={readOnly}
         />
       )}
-    </>
+    </SingleTaskLayout>
   );
-}
+};
+
+export default TaskAssigneesPageClient;

@@ -1,8 +1,14 @@
-import OrganizePageClient from './OrganizePageClient';
-import redirectIfLoginNeeded from 'core/utils/redirectIfLoginNeeded';
+import { Metadata } from 'next';
 
-export default async function OrganizePage() {
-  await redirectIfLoginNeeded(2);
+import { requireAuth } from './auth';
+import OrganizePageClient from './OrganizePageClient';
+
+export const metadata: Metadata = {
+  title: 'Organize - Zetkin',
+};
+
+export default async function Page() {
+  await requireAuth(2);
 
   return <OrganizePageClient />;
 }

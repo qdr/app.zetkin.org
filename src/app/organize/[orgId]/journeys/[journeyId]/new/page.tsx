@@ -1,189 +1,45 @@
-'use client';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
-import { Box, Chip, Grid, Typography, useTheme } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
+import { ZetkinJourney } from 'utils/types/zetkin';
+import NewJourneyPageClient from './NewJourneyPageClient';
 
-import Header from 'zui/ZUIHeader';
-import JourneyInstanceSidebar from 'features/journeys/components/JourneyInstanceSidebar';
-import messageIds from 'features/journeys/l10n/messageIds';
-import { useApiClient, useNumericRouteParams } from 'core/hooks';
-import useCreateJourneyInstance from 'features/journeys/hooks/useCreateJourneyInstance';
-import useJourney from 'features/journeys/hooks/useJourney';
-import ZUIAutoTextArea from 'zui/ZUIAutoTextArea';
-import ZUIEditTextinPlace from 'zui/ZUIEditTextInPlace';
-import ZUIFuture from 'zui/ZUIFuture';
-import ZUISubmitCancelButtons from 'zui/ZUISubmitCancelButtons';
-import { Msg, useMessages } from 'core/i18n';
-import {
-  ZetkinAppliedTag,
-  ZetkinPerson,
-} from 'utils/types/zetkin';
-
-const NewJourneyPage = () => {
-  const { orgId, journeyId } = useNumericRouteParams();
-  const [assignees, setAssignees] = useState<ZetkinPerson[]>([]);
-  const [subjects, setSubjects] = useState<ZetkinPerson[]>([]);
-  const [tags, setTags] = useState<ZetkinAppliedTag[]>([]);
-  const [note, setNote] = useState('');
-  const [editedNote, setEditedNote] = useState(false);
-  const [title, setTitle] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const messages = useMessages(messageIds);
-  const theme = useTheme();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const subjectParam = searchParams.get('subject');
-  const inputSubjectIds = subjectParam ? [subjectParam] : [];
-
-  // Maybe in the future we can support multiple subjects added using
-  // the link, but for now a single subject (the first) is enough.
-  const subjectId = inputSubjectIds[0];
-  const apiClient = useApiClient();
-  useEffect(() => {
-    async function loadSubject() {
-      if (subjectId) {
-        const person = await apiClient.get<ZetkinPerson>(
-          `/api/orgs/${orgId}/people/${subjectId}`
-        );
-        setSubjects([...subjects, person]);
-      }
-    }
-    loadSubject();
-  }, []);
-
-  const journeyFuture = useJourney(orgId, journeyId);
-  const createJourneyInstance = useCreateJourneyInstance(orgId, journeyId);
-
-  return (
-    <ZUIFuture future={journeyFuture}>
-      {(journey) => {
-        if (!editedNote) {
-          setNote(journey.opening_note_template);
-        }
-        return (
-          <>
-                        <Header
-              subtitle={
-                <Box
-                  style={{
-                    alignItems: 'center',
-                    display: 'flex',
-                  }}
-                >
-                  <Chip
-                    label={messages.instance.newInstance.draft()}
-                    style={{
-                      backgroundColor: theme.palette.grey['300'],
-                      fontWeight: 'bold',
-                    }}
-                  />
-                </Box>
-              }
-              title={
-                <ZUIEditTextinPlace
-                  allowEmpty
-                  onChange={setTitle}
-                  placeholder={messages.instance.newInstance.title({
-                    journey: journey.singular_label,
-                  })}
-                  value={title}
-                />
-              }
-            />
-            <Box p={3}>
-              <Grid container justifyContent="space-between" spacing={2}>
-                <Grid size={{ md: 6 }}>
-                  <Typography
-                    color="secondary"
-                    style={{ marginBottom: '1.5rem' }}
-                    variant="h6"
-                  >
-                    <Msg id={messageIds.instance.newInstance.openingNote} />
-                  </Typography>
-                  <ZUIAutoTextArea
-                    onChange={(value) => {
-                      setNote(value);
-                      setEditedNote(true);
-                    }}
-                    value={note}
-                  />
-                  <form
-                    onSubmit={async (ev) => {
-                      ev.preventDefault();
-                      setIsLoading(true);
-                      await createJourneyInstance({
-                        assignees,
-                        note,
-                        subjects,
-                        tags,
-                        title,
-                      });
-                      setIsLoading(false);
-                    }}
-                  >
-                    <ZUISubmitCancelButtons
-                      onCancel={() => {
-                        router.push(`/organize/${orgId}/journeys/${journeyId}`);
-                      }}
-                      submitDisabled={!editedNote || isLoading}
-                      submitText={messages.instance.newInstance.submitLabel({
-                        journey: journey.singular_label,
-                      })}
-                    />
-                  </form>
-                </Grid>
-                <Grid size={{ md: 4 }}>
-                  <JourneyInstanceSidebar
-                    journeyInstance={{
-                      assignees,
-                      journey,
-                      next_milestone: null,
-                      subjects,
-                      tags,
-                    }}
-                    onAddAssignee={(person) =>
-                      setAssignees([...assignees, person])
-                    }
-                    onAddSubject={(person) =>
-                      setSubjects([...subjects, person])
-                    }
-                    onAssignTag={(tag) => setTags([...tags, tag])}
-                    onRemoveAssignee={(person) =>
-                      setAssignees(
-                        assignees.filter((assignee) => assignee.id != person.id)
-                      )
-                    }
-                    onRemoveSubject={(person) =>
-                      setSubjects(
-                        subjects.filter((subject) => subject.id != person.id)
-                      )
-                    }
-                    onTagEdited={(editedTag) => {
-                      setTags(
-                        tags.map((tag) => {
-                          if (tag.id == editedTag.id) {
-                            return { ...editedTag, value: tag.value };
-                          } else {
-                            return tag;
-                          }
-                        })
-                      );
-                    }}
-                    onUnassignTag={(tagToUnassign) =>
-                      setTags(tags.filter((tag) => tag.id != tagToUnassign.id))
-                    }
-                  />
-                </Grid>
-              </Grid>
-            </Box>
-          </>
-        );
-      }}
-    </ZUIFuture>
-  );
+export const metadata: Metadata = {
+  title: 'New Journey Instance - Zetkin',
 };
 
-export default NewJourneyPage;
+type PageProps = {
+  params: Promise<{ orgId: string; journeyId: string }>;
+  searchParams: Promise<{ subject?: string | string[] }>;
+};
+
+export default async function Page({ params, searchParams }: PageProps) {
+  const { orgId, journeyId } = await params;
+  const search = await searchParams;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
+
+  try {
+    await apiClient.get<ZetkinJourney>(
+      `/api/orgs/${orgId}/journeys/${journeyId}`
+    );
+
+    const inputSubjectIds = search.subject
+      ? Array.isArray(search.subject)
+        ? search.subject
+        : [search.subject]
+      : [];
+    const subjectId = inputSubjectIds[0];
+
+    return (
+      <NewJourneyPageClient
+        orgId={orgId}
+        journeyId={journeyId}
+        subjectId={subjectId}
+      />
+    );
+  } catch {
+    notFound();
+  }
+}

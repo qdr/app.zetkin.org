@@ -1,44 +1,28 @@
-import { getServerApiClient } from 'core/api/server';
-import PersonProfilePageClient from './PersonProfilePageClient';
-import {
-  ZetkinAppliedTag,
-  ZetkinCustomField,
-  ZetkinJourney,
-  ZetkinPerson,
-} from 'utils/types/zetkin';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
-type PageProps = {
-  params: {
-    orgId: string;
-    personId: string;
-  };
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
+import { ZetkinPerson } from 'utils/types/zetkin';
+import PersonPageClient from './PersonPageClient';
+
+export const metadata: Metadata = {
+  title: 'Person Profile - Zetkin',
 };
 
-// Server Component - pre-fetches person profile data for faster initial render
-export default async function PersonProfilePage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
-  const personId = parseInt(params.personId);
+type PageProps = {
+  params: Promise<{ orgId: string; personId: string }>;
+};
 
-  const apiClient = await getServerApiClient();
+export default async function Page({ params }: PageProps) {
+  const { orgId, personId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  // Pre-fetch all person data in parallel
-  const [person, customFields, personTags, journeys] = await Promise.all([
-    apiClient.get<ZetkinPerson>(`/api/orgs/${orgId}/people/${personId}`),
-    apiClient.get<ZetkinCustomField[]>(`/api/orgs/${orgId}/people/fields`),
-    apiClient.get<ZetkinAppliedTag[]>(
-      `/api/orgs/${orgId}/people/${personId}/tags`
-    ),
-    apiClient.get<ZetkinJourney[]>(`/api/orgs/${orgId}/journeys`),
-  ]);
-
-  return (
-    <PersonProfilePageClient
-      customFields={customFields}
-      journeys={journeys}
-      orgId={orgId}
-      person={person}
-      personId={personId}
-      personTags={personTags}
-    />
-  );
+  // Check if person exists
+  try {
+    await apiClient.get<ZetkinPerson>(`/api/orgs/${orgId}/people/${personId}`);
+    return <PersonPageClient orgId={parseInt(orgId)} personId={parseInt(personId)} />;
+  } catch (err) {
+    notFound();
+  }
 }

@@ -1,15 +1,29 @@
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
+import { ZetkinOrganization } from 'utils/types/zetkin';
 import CalendarPageClient from './CalendarPageClient';
 
-interface PageProps {
-  params: {
-    orgId: string;
-  };
-}
+export const metadata: Metadata = {
+  title: 'Calendar - Zetkin',
+};
 
-// Server Component - no data pre-fetching yet (Calendar is complex)
-// Future: Could pre-fetch events for the current month
-export default async function AllCampaignsCalendarPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
+type PageProps = {
+  params: Promise<{ orgId: string }>;
+};
 
-  return <CalendarPageClient orgId={orgId} />;
+export default async function Page({ params }: PageProps) {
+  const { orgId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
+
+  // Check if org exists
+  try {
+    await apiClient.get<ZetkinOrganization>(`/api/orgs/${orgId}`);
+  } catch (err) {
+    notFound();
+  }
+
+  return <CalendarPageClient />;
 }

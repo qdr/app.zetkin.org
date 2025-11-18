@@ -1,21 +1,20 @@
-import { getServerApiClient } from 'core/api/server';
-import JoinFormsPageClient from './JoinFormsPageClient';
-import { ZetkinJoinForm } from 'features/joinForms/types';
+import { Metadata } from 'next';
 
-type PageProps = {
-  params: {
-    orgId: string;
-  };
+import { requireAuth, requireOrgAccess } from 'app/organize/auth';
+import JoinFormsPageClient from './JoinFormsPageClient';
+
+export const metadata: Metadata = {
+  title: 'Join Forms - Zetkin',
 };
 
-export default async function JoinFormsPage({ params }: PageProps) {
-  const orgId = parseInt(params.orgId);
+type PageProps = {
+  params: Promise<{ orgId: string }>;
+};
 
-  const apiClient = await getServerApiClient();
+export default async function Page({ params }: PageProps) {
+  const { orgId } = await params;
+  const { user, apiClient } = await requireAuth(2);
+  await requireOrgAccess(apiClient, user, orgId);
 
-  const joinForms = await apiClient.get<ZetkinJoinForm[]>(
-    `/api/orgs/${orgId}/join_forms`
-  );
-
-  return <JoinFormsPageClient joinForms={joinForms} orgId={orgId} />;
+  return <JoinFormsPageClient orgId={parseInt(orgId)} />;
 }
