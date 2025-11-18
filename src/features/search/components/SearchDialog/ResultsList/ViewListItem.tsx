@@ -1,4 +1,5 @@
 'use client';
+
 import { InsertDriveFileOutlined } from '@mui/icons-material';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -19,7 +20,7 @@ const ViewListItem: React.FunctionComponent<{ view: ZetkinView }> = ({
 }) => {
   const messages = useMessages(messageIds);
   const params = useParams();
-  const orgId = params.orgId as string;
+  const { orgId } = params as { orgId: string };
 
   const elements = [messages.results.people()];
   if (view.folder) {

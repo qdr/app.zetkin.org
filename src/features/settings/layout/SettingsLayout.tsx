@@ -1,4 +1,5 @@
 'use client';
+
 import { FunctionComponent } from 'react';
 import { useParams } from 'next/navigation';
 
@@ -13,7 +14,8 @@ interface SettingsLayoutProps {
 const SettingsLayout: FunctionComponent<SettingsLayoutProps> = ({
   children,
 }) => {
-  const { orgId } = useParams();
+  const params = useParams();
+  const orgId = params.orgId as string;
   const messages = useMessages(messageIds);
 
   return (

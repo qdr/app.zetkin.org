@@ -17,7 +17,8 @@ const AllCampaignsLayout: FunctionComponent<AllCampaignsLayoutProps> = ({
   children,
   fixedHeight,
 }) => {
-  const { orgId } = useParams();
+  const params = useParams();
+  const orgId = params.orgId as string;
   const messages = useMessages(messageIds);
 
   return (

@@ -1,4 +1,5 @@
 'use client';
+
 import { Event } from '@mui/icons-material';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -18,7 +19,7 @@ const CampaignListItem: React.FunctionComponent<{
   campaign: ZetkinCampaign;
 }> = ({ campaign }) => {
   const params = useParams();
-  const orgId = params.orgId as string;
+  const { orgId } = params as { orgId: string };
   return (
     <Link key={campaign.id} href={`/organize/${orgId}/projects/${campaign.id}`}>
       <ListItem data-testid="SearchDialog-resultsListItem">

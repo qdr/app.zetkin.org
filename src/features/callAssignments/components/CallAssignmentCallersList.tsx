@@ -1,4 +1,5 @@
 'use client';
+
 import { useParams } from 'next/navigation';
 import { Avatar, Box, Button, Tooltip } from '@mui/material';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
@@ -67,7 +68,8 @@ const CallAssignmentCallersList = ({
   onRemove: (caller: CallAssignmentCaller) => void;
 }) => {
   const messages = useMessages(messageIds);
-  const { orgId } = useParams();
+  const params = useParams();
+  const { orgId } = params;
 
   const columns: GridColDef<CallAssignmentCaller>[] = [
     {
@@ -138,12 +140,9 @@ const CallAssignmentCallersList = ({
     },
   ];
 
-  const empty = callers.length === 0;
-
   return (
     <DataGridPro
-      autoHeight={empty}
-      columnBuffer={3}
+      autoHeight
       columns={columns}
       disableColumnFilter
       disableColumnMenu
@@ -151,15 +150,9 @@ const CallAssignmentCallersList = ({
       disableColumnResize
       disableRowSelectionOnClick
       hideFooter
-      rowBuffer={5}
       rows={callers}
-      rowThreshold={5}
       style={{
         border: 'none',
-        ...(!empty && {
-          height: 'calc(100vh - 280px)',
-          minHeight: 400,
-        }),
       }}
     />
   );

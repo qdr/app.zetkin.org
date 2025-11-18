@@ -1,16 +1,8 @@
 'use client';
-// NOTE: This hook uses imperative navigation which should ideally be handled
-// by components using useRouter() from next/navigation. Consider refactoring
-// to return navigation info rather than navigating directly.
-import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+
+import { redirect } from 'next/navigation';
 
 import { loadItemIfNecessary } from 'core/caching/cacheUtils';
-
-// Global router instance - will be set by calling component
-let hookRouter: AppRouterInstance | null = null;
-export const setEmailHookRouter = (router: AppRouterInstance) => {
-  hookRouter = router;
-};
 import {
   emailDeleted,
   emailLoad,
@@ -58,11 +50,9 @@ export default function useEmail(
   const deleteEmail = async () => {
     await apiClient.delete(`/api/orgs/${orgId}/emails/${emailId}`).then(() => {
       if (email?.campaign) {
-        hookRouter?.push(
-          `/organize/${orgId}/projects/${email.campaign.id}/activities`
-        );
+        redirect(`/organize/${orgId}/projects/${email.campaign.id}/activities`);
       } else {
-        hookRouter?.push(`/organize/${orgId}/projects`);
+        redirect(`/organize/${orgId}/projects`);
       }
     });
     dispatch(emailDeleted(emailId));

@@ -1,4 +1,5 @@
 'use client';
+
 import { Link } from '@mui/material';
 import NextLink from 'next/link';
 import { useParams } from 'next/navigation';
@@ -10,7 +11,8 @@ interface ZUIPersonLinkProps {
   person: Pick<ZetkinPerson, 'id' | 'first_name' | 'last_name'>;
 }
 const ZUIPersonLink: React.FC<ZUIPersonLinkProps> = ({ person }) => {
-  const { orgId } = useParams();
+  const params = useParams();
+  const { orgId } = params;
 
   return (
     <ZUIPersonHoverCard

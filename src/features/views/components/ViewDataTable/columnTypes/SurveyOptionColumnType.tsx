@@ -1,6 +1,4 @@
-'use client';
 import { GridColDef } from '@mui/x-data-grid-pro';
-import { useParams } from 'next/navigation';
 import { Box, Typography } from '@mui/material';
 import { Check, History } from '@mui/icons-material';
 import { FC, useState } from 'react';
@@ -78,8 +76,7 @@ export default class SurveyOptionColumnType
 const Cell: FC<{ cell: SurveyOptionViewCell }> = ({ cell }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const { openPane } = usePanes();
-  const params = useParams();
-  const orgId = params.orgId as string;
+  const { orgId } = useRouter().query;
   const { open: openPopper, close: closePopper } = useToggleDebounce(
     (ev) => setAnchorEl(ev.currentTarget),
     () => setAnchorEl(null)

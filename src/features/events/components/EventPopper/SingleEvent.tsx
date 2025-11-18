@@ -1,4 +1,5 @@
 'use client';
+
 import { makeStyles } from '@mui/styles';
 import NextLink from 'next/link';
 import {
@@ -64,8 +65,8 @@ const SingleEvent: FC<SingleEventProps> = ({ event, onClickAway }) => {
   const { showConfirmDialog } = useContext(ZUIConfirmDialogContext);
   const messages = useMessages(messageIds);
   const classes = useStyles();
-  const orgId = event.organization.id;
   const router = useRouter();
+  const orgId = event.organization.id;
   const { participantsFuture, respondentsFuture } = useEventParticipants(
     event.organization.id,
     event.id

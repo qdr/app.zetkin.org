@@ -1,4 +1,5 @@
 'use client';
+
 import { Add } from '@mui/icons-material';
 import { Fab } from '@mui/material';
 import Link from 'next/link';
@@ -17,7 +18,8 @@ const useStyles = makeStyles(() => ({
 
 const JourneyInstanceCreateFab: React.FunctionComponent = () => {
   const classes = useStyles();
-  const { orgId, journeyId } = useParams();
+  const params = useParams();
+  const { orgId, journeyId } = params;
 
   return (
     <Link

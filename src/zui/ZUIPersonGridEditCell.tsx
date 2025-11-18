@@ -1,4 +1,5 @@
 'use client';
+
 import { Close, PersonAdd } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'next/navigation';
@@ -49,7 +50,7 @@ const ZUIPersonGridEditCell: FC<{
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [searching, setSearching] = useState(false);
 
-  const orgId = parseInt(params?.orgId as string);
+  const orgId = parseInt(params.orgId as string);
 
   const [activeIndex, setActiveIndex] = useState<number>(Infinity);
   const scrollableRef = useRef<HTMLUListElement>(null);

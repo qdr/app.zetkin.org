@@ -1,7 +1,8 @@
 'use client';
-import { usePathname, useParams } from 'next/navigation';
 
-import { BreadcrumbElement } from 'app/api/breadcrumbs/route';
+import { useParams, usePathname, useSearchParams } from 'next/navigation';
+
+import { BreadcrumbElement } from 'pages/api/breadcrumbs';
 import { loadItemIfNecessary } from 'core/caching/cacheUtils';
 import { crumbsLoad, crumbsLoaded } from '../store';
 import { useApiClient, useAppDispatch, useAppSelector } from 'core/hooks';
@@ -10,22 +11,21 @@ export default function useBreadcrumbElements() {
   const apiClient = useApiClient();
   const dispatch = useAppDispatch();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const params = useParams();
   const pathWithoutQueryString = pathname;
   const crumbsItem = useAppSelector(
     (state) => state.breadcrumbs.crumbsByPath[pathWithoutQueryString]
   );
 
-  // Convert actual pathname to template pathname and extract query params
-  const { templatePath, queryParams } = convertToTemplatePath(pathname, params);
+  const query = getPathParameters(pathname, params);
 
   const future = loadItemIfNecessary(crumbsItem, dispatch, {
     actionOnLoad: () => crumbsLoad(pathWithoutQueryString),
     actionOnSuccess: (item) => crumbsLoaded([pathWithoutQueryString, item]),
     loader: async () => {
-      const queryString = queryParams ? `&${queryParams}` : '';
       const elements = await apiClient.get<BreadcrumbElement[]>(
-        `/api/breadcrumbs?pathname=${templatePath}${queryString}`
+        `/api/breadcrumbs?pathname=${pathname}&${query}`
       );
 
       return { elements, id: pathWithoutQueryString };
@@ -35,27 +35,11 @@ export default function useBreadcrumbElements() {
   return future.data?.elements ?? [];
 }
 
-function convertToTemplatePath(
-  pathname: string,
-  params: Record<string, string | string[]>
-): { templatePath: string; queryParams: string } {
-  let templatePath = pathname;
-  const queryParts: string[] = [];
-
-  // Convert actual values back to template format
-  // e.g., /organize/1/projects -> /organize/[orgId]/projects
-  for (const [key, value] of Object.entries(params)) {
-    const valueStr = Array.isArray(value) ? value.join('/') : value;
-
-    // Replace the actual value with [key] in the path
-    templatePath = templatePath.replace(`/${valueStr}`, `/[${key}]`);
-
-    // Add to query params
-    queryParts.push(`${key}=${valueStr}`);
-  }
-
-  return {
-    templatePath,
-    queryParams: queryParts.join('&'),
-  };
-}
+const getPathParameters = function (pathname: string, params: ReturnType<typeof useParams>): string {
+  // Only use parameters that are part of the path (e.g. [personId])
+  // and not ones that are part of the actual querystring (e.g. ?filter_*)
+  return Object.entries(params)
+    .filter(([key]) => pathname.includes(`[${key}]`))
+    .map(([key, val]) => `${key}=${val}`)
+    .join('&');
+};

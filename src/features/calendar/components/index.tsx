@@ -1,7 +1,8 @@
 'use client';
+
 import { Box } from '@mui/system';
 import dayjs from 'dayjs';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import utc from 'dayjs/plugin/utc';
 
@@ -34,10 +35,11 @@ function getDateFromString(focusDateStr: string) {
 
 const Calendar = () => {
   const router = useRouter();
+  const params = useParams();
   const searchParams = useSearchParams();
 
-  const orgId = searchParams.get('orgId');
-  const campId = searchParams.get('campId');
+  const orgId = params.orgId;
+  const campId = params.campId;
 
   const focusDateStr = searchParams.get('focusDate') || '';
   const [focusDate, setFocusDate] = useState(getDateFromString(focusDateStr));
@@ -54,13 +56,10 @@ const Calendar = () => {
   useEffect(() => {
     const focusedDate = dayjs.utc(focusDate).format('YYYY-MM-DD');
     const params = new URLSearchParams();
-    if (campId) params.set('campId', campId);
     params.set('focusDate', focusedDate);
-    if (orgId) params.set('orgId', orgId);
     params.set('timeScale', timeScale);
-
-    router.replace(`?${params.toString()}`);
-  }, [focusDate, timeScale, orgId, campId, router]);
+    router.replace(`?${params.toString()}`, { scroll: false });
+  }, [focusDate, timeScale, router]);
 
   function navigateTo(timeScale: TimeScale, date: Date) {
     setPersistentTimeScale(timeScale);
@@ -104,7 +103,7 @@ const Calendar = () => {
         marginTop={2}
         overflow="auto"
       >
-        <Suspense fallback={null}>
+        <Suspense>
           {timeScale === TimeScale.DAY && (
             <CalendarDayView
               focusDate={focusDate}

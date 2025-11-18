@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useContext, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { ArrowForward, ContentCopy, Delete, Send } from '@mui/icons-material';
@@ -29,8 +30,8 @@ const EmailActionButtons = ({
   orgId,
   state,
 }: EmailActionButtonsProp) => {
-  const messages = useMessages(messageIds);
   const router = useRouter();
+  const messages = useMessages(messageIds);
   const { showConfirmDialog } = useContext(ZUIConfirmDialogContext);
   const { showSnackbar } = useContext(ZUISnackbarContext);
   const { deleteEmail, updateEmail } = useEmail(orgId, email.id);

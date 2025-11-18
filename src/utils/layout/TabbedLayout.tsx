@@ -1,4 +1,5 @@
 'use client';
+
 import makeStyles from '@mui/styles/makeStyles';
 import { useRouter, usePathname } from 'next/navigation';
 import {
@@ -13,7 +14,7 @@ import {
   Tabs,
   Theme,
 } from '@mui/material';
-import { FunctionComponent, ReactElement, useEffect, useState } from 'react';
+import { FunctionComponent, ReactElement, useState } from 'react';
 
 import DefaultLayout from './DefaultLayout';
 import Header from '../../zui/ZUIHeader';
@@ -76,15 +77,8 @@ const TabbedLayout: FunctionComponent<TabbedLayoutProps> = ({
   const router = useRouter();
   const pathname = usePathname();
 
-  // Redirect to default tab if on base path
-  useEffect(() => {
-    if (pathname === baseHref) {
-      router.replace(baseHref + defaultTab);
-    }
-  }, [pathname, baseHref, defaultTab, router]);
-
   const currentTab =
-    pathname === baseHref
+    pathname.split('?')[0] === baseHref
       ? defaultTab
       : `/${pathname.split('/').pop()}`;
 

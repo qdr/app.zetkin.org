@@ -1,4 +1,5 @@
 'use client';
+
 import { Box } from '@mui/system';
 import { useRouter, usePathname } from 'next/navigation';
 import { Button, Typography } from '@mui/material';
@@ -36,8 +37,8 @@ const AreaAssignmentLayout: FC<AreaAssignmentLayoutProps> = ({
   areaAssId,
 }) => {
   const messages = useMessages(messageIds);
-  const pathname = usePathname();
   const router = useRouter();
+  const path = usePathname();
   const areaAssignment = useAreaAssignment(orgId, areaAssId).data;
   const { deleteAreaAssignment, updateAreaAssignment } =
     useAreaAssignmentMutations(orgId, areaAssId);
@@ -53,7 +54,7 @@ const AreaAssignmentLayout: FC<AreaAssignmentLayoutProps> = ({
 
   const areaAssignees = getAreaAssignees(sessions);
 
-  const isMapTab = pathname.endsWith('/map');
+  const isMapTab = path.endsWith('/map');
 
   const numAreas = new Set(sessions.map((assignee) => assignee.area_id)).size;
 

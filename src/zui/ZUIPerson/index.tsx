@@ -1,4 +1,5 @@
 'use client';
+
 import NextLink from 'next/link';
 import { useParams } from 'next/navigation';
 import {
@@ -60,7 +61,7 @@ const ZUIPerson: React.FunctionComponent<{
   tooltip = true,
 }) => {
   const params = useParams();
-  const orgId = params?.orgId as string | undefined;
+  const { orgId } = params as { orgId: string };
 
   return (
     <PersonLink id={id} link={link} orgId={orgId} underline={!showText}>

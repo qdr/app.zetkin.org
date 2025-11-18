@@ -1,4 +1,5 @@
 'use client';
+
 import { AssignmentOutlined } from '@mui/icons-material';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -19,7 +20,7 @@ const SurveyListItem: React.FunctionComponent<{
   survey: ZetkinSurvey;
 }> = ({ survey }) => {
   const params = useParams();
-  const orgId = params.orgId as string;
+  const { orgId } = params as { orgId: string };
   return (
     <Link href={getSurveyUrl(survey, parseInt(orgId))}>
       <ListItem data-testid="SearchDialog-resultsListItem">

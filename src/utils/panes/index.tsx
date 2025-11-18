@@ -1,4 +1,5 @@
 'use client';
+
 import { makeStyles } from '@mui/styles';
 import { usePathname } from 'next/navigation';
 import { Box, Paper, Slide } from '@mui/material';

@@ -1,6 +1,4 @@
-'use client';
 import { makeStyles } from '@mui/styles';
-import { useParams } from 'next/navigation';
 import {
   Box,
   Button,
@@ -97,9 +95,9 @@ const Cell: FC<{
   columnIdx: number;
   personId: number;
 }> = ({ cell, columnIdx, personId }) => {
-  const params = useParams();
-  const orgId = parseInt(params.orgId as string);
-  const viewId = parseInt(params.viewId as string);
+  const query = useRouter().query;
+  const orgId = parseInt(query.orgId as string);
+  const viewId = parseInt(query.viewId as string);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const { openPane } = usePanes();
   const { open: openPopper, close: closePopper } = useToggleDebounce(

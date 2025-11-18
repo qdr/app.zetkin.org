@@ -1,4 +1,5 @@
 'use client';
+
 import { Explore } from '@mui/icons-material';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -16,7 +17,7 @@ const JourneyInstanceListItem: React.FunctionComponent<{
   journeyInstance: ZetkinJourneyInstance;
 }> = ({ journeyInstance }) => {
   const params = useParams();
-  const orgId = params.orgId as string;
+  const { orgId } = params as { orgId: string };
 
   return (
     <Link

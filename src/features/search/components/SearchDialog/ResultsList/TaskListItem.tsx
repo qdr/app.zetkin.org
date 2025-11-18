@@ -1,4 +1,5 @@
 'use client';
+
 import Link from 'next/link';
 import { MobileFriendly } from '@mui/icons-material';
 import { useParams } from 'next/navigation';
@@ -19,7 +20,7 @@ const TaskListItem: React.FunctionComponent<{ task: ZetkinTask }> = ({
 }) => {
   const messages = useMessages(messageIds);
   const params = useParams();
-  const orgId = params.orgId as string;
+  const { orgId } = params as { orgId: string };
 
   const elements = [
     messages.results.project(),
