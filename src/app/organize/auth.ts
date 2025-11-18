@@ -64,9 +64,13 @@ export async function requireOrgAccess(
     throw new Error('No access to organization');
   }
 
-  // If non-officials are not allowed, check role
-  if (!allowNonOfficials && membership.role !== 'admin') {
-    throw new Error('Must be an official to access this page');
+  // If non-officials are not allowed, check role (admin or organizer are officials)
+  if (!allowNonOfficials) {
+    const isOfficial =
+      membership.role === 'admin' || membership.role === 'organizer';
+    if (!isOfficial) {
+      throw new Error('Must be an official to access this page');
+    }
   }
 
   return true;
