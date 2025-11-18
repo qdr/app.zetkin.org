@@ -2,7 +2,7 @@ import { headers } from 'next/headers';
 
 import BackendApiClient from 'core/api/client/BackendApiClient';
 import redirectIfLoginNeeded from 'core/utils/redirectIfLoginNeeded';
-import HomePageClient from './HomePageClient';
+import MyHomePageClient from './HomePageClient';
 import { ZetkinAreaAssignment } from 'features/areaAssignments/types';
 import { ZetkinCallAssignment, ZetkinEvent } from 'utils/types/zetkin';
 import { ZetkinEventWithStatus } from 'features/home/types';
@@ -51,7 +51,7 @@ export default async function Page() {
   const userEvents = [...bookedEventsWithStatus, ...signedUpEvents];
 
   return (
-    <HomePageClient
+    <MyHomePageClient
       areaAssignments={areaAssignments}
       callAssignments={callAssignments}
       userEvents={userEvents}
