@@ -1,46 +1,46 @@
-'use client';
+import { CallAssignmentStats } from 'features/callAssignments/hooks/useCallAssignmentStats';
+import { getServerApiClient } from 'core/api/server';
+import { ZetkinCallAssignment } from 'utils/types/zetkin';
+import CallAssignmentPageClient from './CallAssignmentPageClient';
 
-import { Box, Typography } from '@mui/material';
+type PageProps = {
+  params: {
+    orgId: string;
+    campId: string;
+    callAssId: string;
+  };
+};
 
-import CallAssignmentStatusCards from 'features/callAssignments/components/CallAssignmentStatusCards';
-import CallAssignmentTargets from 'features/callAssignments/components/CallAssignmentTargets';
-import messageIds from 'features/callAssignments/l10n/messageIds';
-import { Msg } from 'core/i18n';
-import useCallAssignment from 'features/callAssignments/hooks/useCallAssignment';
-import useCallAssignmentStats from 'features/callAssignments/hooks/useCallAssignmentStats';
-import { useNumericRouteParams } from 'core/hooks';
-import useServerSide from 'core/useServerSide';
-import ZUIStackedStatusBar from 'zui/ZUIStackedStatusBar';
+export default async function CallAssignmentPage({ params }: PageProps) {
+  const orgId = parseInt(params.orgId);
+  const callAssId = parseInt(params.callAssId);
 
-const AssignmentPage = () => {
-  const { orgId, callAssId } = useNumericRouteParams();
-  const { data: callAssignment } = useCallAssignment(orgId, callAssId);
-  const { statusBarStatsList } = useCallAssignmentStats(orgId, callAssId);
+  const apiClient = await getServerApiClient();
 
-  const onServer = useServerSide();
+  const callAssignment = await apiClient.get<ZetkinCallAssignment>(
+    `/api/orgs/${orgId}/call_assignments/${callAssId}`
+  );
 
-  if (onServer) {
-    return null;
+  const isTargeted = !!(
+    callAssignment &&
+    callAssignment.target?.filter_spec?.length != 0
+  );
+
+  let stats: (CallAssignmentStats & { id: number }) | null = null;
+  if (isTargeted) {
+    const statsData = await apiClient.get<CallAssignmentStats>(
+      `/api/callAssignments/targets?org=${orgId}&assignment=${callAssId}`
+    );
+    stats = { ...statsData, id: callAssId };
   }
 
   return (
-    <>
-            <Box>
-        <Box mb={2}>
-          <CallAssignmentTargets assignmentId={callAssId} orgId={orgId} />
-        </Box>
-        <Box mb={2}>
-          <Typography variant="h3">
-            <Msg id={messageIds.statusSectionTitle} />
-          </Typography>
-        </Box>
-        <ZUIStackedStatusBar values={statusBarStatsList} />
-        <Box mt={2}>
-          <CallAssignmentStatusCards assignmentId={callAssId} orgId={orgId} />
-        </Box>
-      </Box>
-    </>
+    <CallAssignmentPageClient
+      callAssId={callAssId}
+      callAssignment={callAssignment}
+      isTargeted={isTargeted}
+      orgId={orgId}
+      stats={stats}
+    />
   );
-};
-
-export default AssignmentPage;
+}
