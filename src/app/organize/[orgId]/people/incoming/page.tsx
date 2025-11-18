@@ -34,35 +34,18 @@ export default function IncomingPage() {
     useState<FilterByStatusType>('all');
   const [filterByForm, setFilterByForm] = useState<number | undefined>();
   const { openPane } = usePanes();
+import { getServerApiClient } from 'core/api/server';
+import IncomingPageClient from './IncomingPageClient';
+import { ZetkinJoinSubmission } from 'features/joinForms/types';
 
-  return (
-    <>
-      <Box
-        alignItems="center"
-        display="flex"
-        gap={1}
-        justifyContent="flex-end"
-        sx={{ mr: 2, my: 2 }}
-      >
-        <ZUIFuture
-          future={joinSubmissions}
-          ignoreDataWhileLoading
-          skeleton={<JoinFormSelect />}
-        >
-          {(submissions) => {
-            const uniqueForms = uniqBy(
-              submissions.map((s) => s.form),
-              'id'
-            );
-            return (
-              <JoinFormSelect
-                formId={filterByForm}
-                forms={uniqueForms}
-                onFormSelect={(form) => setFilterByForm(form?.id)}
-              />
-            );
-          }}
-        </ZUIFuture>
+type PageProps = {
+  params: {
+    orgId: string;
+  };
+};
+
+export default async function IncomingPage({ params }: PageProps) {
+  const orgId = parseInt(params.orgId);
 
         <FormControl sx={{ minWidth: 150 }}>
           <InputLabel>{messages.status()}</InputLabel>
@@ -104,43 +87,11 @@ export default function IncomingPage() {
               filterByStatus === 'all' || submission.state === filterByStatus;
             return hasFormMatches && hasStatusMatches;
           });
+  const apiClient = await getServerApiClient();
 
-          if (filteredSubmissions.length > 0) {
-            return (
-              <JoinSubmissionTable
-                onSelect={(submission) => {
-                  openPane({
-                    render: () => (
-                      <JoinSubmissionPane
-                        orgId={orgId}
-                        submissionId={submission.id}
-                      />
-                    ),
-                    width: 500,
-                  });
-                }}
-                orgId={orgId}
-                submissions={filteredSubmissions}
-              />
-            );
-          } else {
-            return (
-              <Box
-                alignItems="center"
-                display="flex"
-                flexDirection="column"
-                height="100%"
-                justifyContent="center"
-              >
-                <ZUIEmptyState
-                  message={messages.submissionList.noFilteringResults()}
-                  renderIcon={(props) => <InfoOutlinedIcon {...props} />}
-                />
-              </Box>
-            );
-          }
-        }}
-      </ZUIFuture>
-    </>
+  const submissions = await apiClient.get<ZetkinJoinSubmission[]>(
+    `/api/orgs/${orgId}/join_submissions`
   );
+
+  return <IncomingPageClient orgId={orgId} submissions={submissions} />;
 }

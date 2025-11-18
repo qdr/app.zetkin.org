@@ -1,28 +1,23 @@
-'use client';
+import { getServerApiClient } from 'core/api/server';
+import PersonManagePageClient from './PersonManagePageClient';
+import { ZetkinPerson } from 'utils/types/zetkin';
 
-import { Grid } from '@mui/material';
-
-import PersonDeleteCard from 'features/profile/components/PersonDeleteCard';
-import usePerson from 'features/profile/hooks/usePerson';
-import { useNumericRouteParams } from 'core/hooks';
-
-const PersonManagePage = () => {
-  const { orgId, personId } = useNumericRouteParams();
-  const { data: person } = usePerson(orgId, personId);
-
-  if (!person) {
-    return null;
-  }
-
-  return (
-    <>
-            <Grid container direction="row" spacing={6}>
-        <Grid size={{ lg: 4 }}>
-          <PersonDeleteCard orgId={orgId} person={person} />
-        </Grid>
-      </Grid>
-    </>
-  );
+type PageProps = {
+  params: {
+    orgId: string;
+    personId: string;
+  };
 };
 
-export default PersonManagePage;
+export default async function PersonManagePage({ params }: PageProps) {
+  const orgId = parseInt(params.orgId);
+  const personId = parseInt(params.personId);
+
+  const apiClient = await getServerApiClient();
+
+  const person = await apiClient.get<ZetkinPerson>(
+    `/api/orgs/${orgId}/people/${personId}`
+  );
+
+  return <PersonManagePageClient orgId={orgId} person={person} personId={personId} />;
+}

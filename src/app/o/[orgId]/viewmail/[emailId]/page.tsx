@@ -1,7 +1,7 @@
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
-import BackendApiClient from 'core/api/client/BackendApiClient';
+import { getServerApiClient } from 'core/api/server';
 import { getBrowserLanguage } from 'utils/locale';
 import getServerMessages from 'core/i18n/server';
 import messageIds from 'features/emails/l10n/messageIds';
@@ -21,24 +21,16 @@ export default async function Page({ params }: PageProps) {
 
   const lang = getBrowserLanguage(headers().get('accept-language') || '');
   const messages = await getServerMessages(lang, messageIds);
-
-  const headersList = await headers();
-  const headersEntries = headersList.entries();
-  const headersObject = Object.fromEntries(headersEntries);
-  const apiClient = new BackendApiClient(headersObject);
+  const apiClient = await getServerApiClient();
 
   try {
     const email = await apiClient.get<ZetkinEmail>(
       `/api/orgs/${orgId}/emails/${emailId}`
     );
 
-    const emailHtml = renderEmailHtml(email, {
-      'target.first_name': messages.varDefaults.target(),
-      'target.full_name': messages.varDefaults.target(),
-      'target.last_name': messages.varDefaults.target(),
-    });
+    const htmlOutput = renderEmailHtml(email.content, messages);
 
-    return <PublicEmailPage email={email} emailHtml={emailHtml} />;
+    return <PublicEmailPage email={email} htmlOutput={htmlOutput} />;
   } catch (err) {
     return notFound();
   }

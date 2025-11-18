@@ -1,37 +1,21 @@
-'use client';
+import { getServerApiClient } from 'core/api/server';
+import JoinFormsPageClient from './JoinFormsPageClient';
+import { ZetkinJoinForm } from 'features/joinForms/types';
 
-import JoinFormList from 'features/joinForms/components/JoinFormList';
-import JoinFormPane from 'features/joinForms/panes/JoinFormPane';
-import useJoinForms from 'features/joinForms/hooks/useJoinForms';
-import { useNumericRouteParams } from 'core/hooks';
-import { usePanes } from 'utils/panes';
-
-const JoinFormsPage = () => {
-  const { orgId } = useNumericRouteParams();
-  const { data: joinForms } = useJoinForms(orgId);
-  const { openPane } = usePanes();
-
-  if (!joinForms) {
-    return null;
-  }
-
-  const ownJoinForms = joinForms.filter(
-    (form) => form.organization.id == orgId
-  );
-
-  return (
-    <JoinFormList
-      forms={ownJoinForms}
-      onItemClick={(form) => {
-        openPane({
-          render: () => (
-            <JoinFormPane formId={form.id} orgId={form.organization.id} />
-          ),
-          width: 500,
-        });
-      }}
-    />
-  );
+type PageProps = {
+  params: {
+    orgId: string;
+  };
 };
 
-export default JoinFormsPage;
+export default async function JoinFormsPage({ params }: PageProps) {
+  const orgId = parseInt(params.orgId);
+
+  const apiClient = await getServerApiClient();
+
+  const joinForms = await apiClient.get<ZetkinJoinForm[]>(
+    `/api/orgs/${orgId}/join_forms`
+  );
+
+  return <JoinFormsPageClient joinForms={joinForms} orgId={orgId} />;
+}

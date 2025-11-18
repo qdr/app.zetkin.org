@@ -1,7 +1,6 @@
-import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
-import BackendApiClient from 'core/api/client/BackendApiClient';
+import { getServerApiClient } from 'core/api/server';
 import { ZetkinOrganization } from 'utils/types/zetkin';
 import JoinFormVerifiedPage from 'features/joinForms/components/JoinFormVerifiedPage';
 
@@ -12,10 +11,7 @@ type PageProps = {
 };
 
 export default async function Page({ params }: PageProps) {
-  const headersList = await headers();
-  const headersEntries = headersList.entries();
-  const headersObject = Object.fromEntries(headersEntries);
-  const apiClient = new BackendApiClient(headersObject);
+  const apiClient = await getServerApiClient();
 
   try {
     const org = await apiClient.get<ZetkinOrganization>(

@@ -1,18 +1,13 @@
-'use client';
-
 import { redirect } from 'next/navigation';
-import { useEffect } from 'react';
 
-import { useNumericRouteParams } from 'core/hooks';
-
-const TasksPage = () => {
-  const { orgId, campId } = useNumericRouteParams();
-
-  useEffect(() => {
-    redirect(`/organize/${orgId}/projects/${campId}`);
-  }, [orgId, campId]);
-
-  return null;
+type PageProps = {
+  params: {
+    orgId: string;
+    campId: string;
+  };
 };
 
-export default TasksPage;
+export default function TasksRedirect({ params }: PageProps) {
+  const { orgId, campId } = params;
+  redirect(`/organize/${orgId}/projects/${campId}`);
+}
