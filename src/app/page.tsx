@@ -34,7 +34,19 @@ export default async function HomePage({
         zetkinDomain: process.env.ZETKIN_API_DOMAIN,
       });
 
+      console.log('[OAuth Callback] Authenticating with code:', code.substring(0, 10) + '...');
+      console.log('[OAuth Callback] Redirect URL:', `${protocol}://${host}/?code=${code.substring(0, 10)}...`);
+
       await z.authenticate(`${protocol}://${host}/?code=${code}`);
+
+      const tokenData = z.getTokenData();
+      console.log('[OAuth Callback] Token data received:', tokenData ? 'Yes' : 'No');
+
+      if (!tokenData || !tokenData.access_token) {
+        console.error('[OAuth Callback] Authentication succeeded but no token data received');
+        // Redirect back to login with error
+        redirect('/login?error=no_token');
+      }
 
       const cookieStore = await cookies();
       const session = await getIronSession<AppSession>(
@@ -51,24 +63,29 @@ export default async function HomePage({
         }
       );
 
+      // Store token data
+      session.tokenData = tokenData;
+      console.log('[OAuth Callback] Token data stored in session');
+
       // Get user info
       let user: ZetkinUser | null = null;
       try {
         const userRes = await z.resource('users', 'me').get();
         user = userRes.data.data as ZetkinUser;
+        console.log('[OAuth Callback] User info retrieved:', user?.id);
       } catch (error) {
+        console.error('[OAuth Callback] Failed to get user info:', error);
         user = null;
       }
-
-      // Store token data and memberships in session
-      session.tokenData = z.getTokenData();
 
       if (user) {
         try {
           // We need to pass a context-like object to getUserMemberships
           const ctx = { z };
           session.memberships = await getUserMemberships(ctx as any);
+          console.log('[OAuth Callback] Memberships retrieved:', session.memberships?.length);
         } catch (error) {
+          console.error('[OAuth Callback] Failed to get memberships:', error);
           session.memberships = null;
         }
       }
@@ -80,8 +97,15 @@ export default async function HomePage({
       }
 
       await session.save();
+      console.log('[OAuth Callback] Session saved, redirecting to:', destination);
     } catch (err) {
-      // If authentication failed, continue to default redirect
+      console.error('[OAuth Callback] Authentication failed:', err);
+      console.error('[OAuth Callback] Error details:', {
+        message: err instanceof Error ? err.message : 'Unknown error',
+        stack: err instanceof Error ? err.stack : undefined,
+      });
+      // Redirect back to login with error parameter
+      redirect('/login?error=auth_failed');
     }
 
     redirect(destination);
