@@ -15,7 +15,7 @@ module.exports = {
   allowedDevOrigins: [],
 
   experimental: {
-    esmExternals: "loose",
+    // esmExternals: "loose", // Removed: Not supported by Turbopack, deprecated in Next.js 15
     serverComponentsExternalPackages: ["mjml", "mongoose"],
   },
   images: {
