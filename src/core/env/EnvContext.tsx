@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, FC, PropsWithChildren } from 'react';
 
 import Environment from './Environment';
