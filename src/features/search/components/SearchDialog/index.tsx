@@ -1,5 +1,7 @@
+'use client';
+
 import { makeStyles } from '@mui/styles';
-import { useRouter } from 'next/router';
+import { usePathname } from 'next/navigation';
 import { Box, Dialog } from '@mui/material';
 import { useEffect, useState } from 'react';
 
@@ -25,15 +27,10 @@ const SearchDialog: React.FunctionComponent<{
   const [isTyping, setIsTyping] = useState(false);
 
   const classes = useStyles();
-  const router = useRouter();
+  const pathname = usePathname();
   const { orgId } = useNumericRouteParams();
 
   const { error, results, isLoading, setQuery, queryString } = useSearch(orgId);
-
-  const handleRouteChange = () => {
-    // Close dialog when clicking an item
-    setOpen(false);
-  };
 
   const handleKeydown = (e: KeyboardEvent) => {
     if (!isUserTyping(e)) {
@@ -51,12 +48,10 @@ const SearchDialog: React.FunctionComponent<{
     };
   });
 
+  // Close dialog when pathname changes (navigation)
   useEffect(() => {
-    router.events.on('routeChangeStart', handleRouteChange);
-    return () => {
-      router.events.off('routeChangeStart', handleRouteChange);
-    };
-  }, [router]);
+    setOpen(false);
+  }, [pathname]);
 
   return (
     <>
