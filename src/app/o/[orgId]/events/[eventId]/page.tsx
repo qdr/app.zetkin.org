@@ -11,7 +11,8 @@ type Props = {
   };
 };
 
-export default async function Page({ params: { eventId, orgId } }: Props) {
+export default async function Page({ params }: Props) {
+  const { eventId, orgId } = await params;
   const headersList = headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
