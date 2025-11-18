@@ -1,21 +1,22 @@
-'use client';
+import { getServerApiClient } from 'core/api/server';
+import { ViewTreeData } from 'pages/api/views/tree';
+import PeoplePageClient from './PeoplePageClient';
 
-import { Suspense } from 'react';
-import { useParams } from 'next/navigation';
+interface PageProps {
+  params: {
+    orgId: string;
+  };
+}
 
-import PeopleLayout from 'features/views/layout/PeopleLayout';
-import ViewBrowser from 'features/views/components/ViewBrowser';
-import ViewBrowserSkeleton from 'features/views/components/ViewBrowserSkeleton';
+// Server Component - pre-fetches view tree data for faster initial render
+export default async function PeopleViewsPage({ params }: PageProps) {
+  const orgId = parseInt(params.orgId);
 
-export default function PeopleViewsPage() {
-  const params = useParams();
-  const orgId = parseInt(params.orgId as string);
-
-  return (
-    <PeopleLayout>
-      <Suspense fallback={<ViewBrowserSkeleton />}>
-        <ViewBrowser basePath={`/organize/${orgId}/people`} />
-      </Suspense>
-    </PeopleLayout>
+  // Pre-fetch view tree data on server
+  const apiClient = await getServerApiClient();
+  const viewTree = await apiClient.get<ViewTreeData>(
+    `/api/views/tree?orgId=${orgId}`
   );
+
+  return <PeoplePageClient orgId={orgId} viewTree={viewTree} />;
 }
