@@ -1,6 +1,7 @@
+import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
-import { getServerApiClient } from 'core/api/server';
+import BackendApiClient from 'core/api/client/BackendApiClient';
 import UnsubscribePage from 'features/emails/pages/UnsubscribePage';
 import { ZetkinOrganization } from 'utils/types/zetkin';
 
@@ -14,16 +15,21 @@ type PageProps = {
 };
 
 export default async function Page({ params, searchParams }: PageProps) {
-  const apiClient = await getServerApiClient();
+  const { orgId } = await params;
+  const { unsub: unsubUrl } = await searchParams;
 
-  const unsubUrl = searchParams.unsub;
+  const headersList = await headers();
+  const headersEntries = headersList.entries();
+  const headersObject = Object.fromEntries(headersEntries);
+  const apiClient = new BackendApiClient(headersObject);
+
   if (!unsubUrl) {
     return notFound();
   }
 
   try {
     const org = await apiClient.get<ZetkinOrganization>(
-      `/api/orgs/${params.orgId}`
+      `/api/orgs/${orgId}`
     );
 
     return <UnsubscribePage org={org} unsubUrl={unsubUrl} />;

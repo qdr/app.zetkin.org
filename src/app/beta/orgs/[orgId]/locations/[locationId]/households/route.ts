@@ -18,15 +18,14 @@ type RouteMeta = {
 };
 
 export async function GET(request: NextRequest, { params }: RouteMeta) {
+  const { orgId, locationId } = await params;
   await mongoose.connect(process.env.MONGODB_URL || '');
   const headers: IncomingHttpHeaders = {};
   request.headers.forEach((value, key) => (headers[key] = value));
   const apiClient = new BackendApiClient(headers);
 
   const households = await apiClient.get<Zetkin2Household[]>(
-    `/api2/orgs/${params.orgId}/locations/${
-      params.locationId
-    }/households?${request.nextUrl.searchParams.toString()}`
+    `/api2/orgs/${orgId}/locations/${locationId}/households?${request.nextUrl.searchParams.toString()}`
   );
 
   const householdsWithColor: HouseholdWithColor[] = [];

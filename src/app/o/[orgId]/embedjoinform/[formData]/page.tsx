@@ -15,7 +15,8 @@ type PageProps = {
 };
 
 export default async function Page({ params, searchParams }: PageProps) {
-  const { formData } = params;
+  const { formData } = await params;
+  const { stylesheet } = await searchParams;
 
   try {
     const formDataStr = decodeURIComponent(formData);
@@ -28,10 +29,10 @@ export default async function Page({ params, searchParams }: PageProps) {
     return (
       <div>
         <EmbeddedJoinForm encrypted={formDataStr} fields={formDataObj.fields} />
-        {searchParams.stylesheet && (
-          <style>{`@import url(${searchParams.stylesheet})`}</style>
+        {stylesheet && (
+          <style>{`@import url(${stylesheet})`}</style>
         )}
-        {!searchParams.stylesheet && (
+        {!stylesheet && (
           <style>{`
             body {
               padding: 0.5rem;
