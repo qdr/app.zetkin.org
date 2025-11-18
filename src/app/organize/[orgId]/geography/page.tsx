@@ -1,30 +1,30 @@
-'use client';
-
 import { Suspense } from 'react';
 
-import GLGeographyMap from 'features/geography/components/GLGeographyMap';
+import { getServerApiClient } from 'core/api/server';
+import GeographyPageClient from './GeographyPageClient';
 import GLGeographyMapSkeleton from 'features/geography/components/GLGeographyMapSkeleton';
-import useAreas from 'features/areas/hooks/useAreas';
-import { useNumericRouteParams } from 'core/hooks';
+import { Zetkin2Area } from 'features/areas/types';
+import { fetchAllPaginated } from 'utils/fetchAllPaginated';
 
-function GeographyMapContent({ orgId }: { orgId: number }) {
-  const areasFuture = useAreas(orgId);
+type PageProps = {
+  params: {
+    orgId: string;
+  };
+};
 
-  if (!areasFuture.data) {
-    return <GLGeographyMapSkeleton />;
-  }
+// Server Component - pre-fetches areas data for faster initial render
+export default async function GeographyPage({ params }: PageProps) {
+  const orgId = parseInt(params.orgId);
+  const apiClient = await getServerApiClient();
 
-  return <GLGeographyMap areas={areasFuture.data} orgId={orgId} />;
-}
-
-const GeographyPage = () => {
-  const { orgId } = useNumericRouteParams();
+  // Pre-fetch all areas (paginated)
+  const areas = await fetchAllPaginated<Zetkin2Area>((page) =>
+    apiClient.get(`/api2/orgs/${orgId}/areas?size=100&page=${page}`)
+  );
 
   return (
     <Suspense fallback={<GLGeographyMapSkeleton />}>
-      <GeographyMapContent orgId={orgId} />
+      <GeographyPageClient areas={areas} orgId={orgId} />
     </Suspense>
   );
-};
-
-export default GeographyPage;
+}
