@@ -22,7 +22,8 @@ const useCurrentUser = () => {
         dispatch(userLoaded(user));
       });
     }
-  }, [isServer, userState.userItem, dispatch, apiClient]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isServer, userState.userItem]);
 
   if (isServer) {
     return null;
