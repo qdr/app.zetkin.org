@@ -6,7 +6,6 @@ import {
   GridRenderCellParams,
   GridValueGetterParams,
 } from '@mui/x-data-grid-pro';
-import { useRouter } from 'next/router';
 
 import { IColumnType } from '.';
 import SurveySubmissionPane from 'features/surveys/panes/SurveySubmissionPane';
