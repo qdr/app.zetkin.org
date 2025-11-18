@@ -1,37 +1,37 @@
-'use client';
+import { getServerApiClient } from 'core/api/server';
+import ClosedJourneysPageClient from './ClosedJourneysPageClient';
+import { ZetkinJourney, ZetkinJourneyInstance } from 'utils/types/zetkin';
+import { getTagColumns } from 'features/journeys/utils/journeyInstanceUtils';
 
-import JourneyInstanceCreateFab from 'features/journeys/components/JourneyInstanceCreateFab';
-import JourneyInstancesDataTable from 'features/journeys/components/JourneyInstancesDataTable';
-import useJourney from 'features/journeys/hooks/useJourney';
-import useJourneyInstances from 'features/journeys/hooks/useJourneyInstances';
-import { useNumericRouteParams } from 'core/hooks';
-import ZUIFuture from 'zui/ZUIFuture';
-
-const ClosedJourneyInstancesPage = () => {
-  const { orgId, journeyId } = useNumericRouteParams();
-  const journeyFuture = useJourney(orgId, journeyId);
-  const journeyInstancesFuture = useJourneyInstances(orgId, journeyId);
-
-  return (
-    <>
-            <ZUIFuture future={journeyInstancesFuture}>
-        {(data) => {
-          const openJourneyInstances = data.journeyInstances.filter(
-            (journeyInstance) => Boolean(journeyInstance.closed)
-          );
-
-          return (
-            <JourneyInstancesDataTable
-              journeyInstances={openJourneyInstances}
-              storageKey={`journeyInstances-${journeyFuture.data?.id}-closed`}
-              tagColumnsData={data.tagColumnsData}
-            />
-          );
-        }}
-      </ZUIFuture>
-      <JourneyInstanceCreateFab />
-    </>
-  );
+type PageProps = {
+  params: {
+    orgId: string;
+    journeyId: string;
+  };
 };
 
-export default ClosedJourneyInstancesPage;
+export default async function ClosedJourneysPage({ params }: PageProps) {
+  const orgId = parseInt(params.orgId);
+  const journeyId = parseInt(params.journeyId);
+
+  const apiClient = await getServerApiClient();
+
+  const [journey, journeyInstances] = await Promise.all([
+    apiClient.get<ZetkinJourney>(`/api/orgs/${orgId}/journeys/${journeyId}`),
+    apiClient.get<ZetkinJourneyInstance[]>(
+      `/api/orgs/${orgId}/journeys/${journeyId}/instances`
+    ),
+  ]);
+
+  const tagColumnsData = getTagColumns(journeyInstances);
+
+  return (
+    <ClosedJourneysPageClient
+      journey={journey}
+      journeyId={journeyId}
+      journeyInstances={journeyInstances}
+      orgId={orgId}
+      tagColumnsData={tagColumnsData}
+    />
+  );
+}
