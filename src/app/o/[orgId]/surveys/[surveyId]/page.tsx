@@ -1,30 +1,24 @@
-'use server';
-
-import { FC } from 'react';
-import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
+import { getServerApiClient } from 'core/api/server';
 import PublicSurveyPage from 'features/surveys/pages/PublicSurveyPage';
-import BackendApiClient from 'core/api/client/BackendApiClient';
 import { ZetkinSurveyExtended, ZetkinUser } from 'utils/types/zetkin';
 import { ApiClientError } from 'core/api/errors';
 
-type Props = {
+type PageProps = {
   params: {
     orgId: string;
     surveyId: string;
   };
 };
 
-// @ts-expect-error https://nextjs.org/docs/app/building-your-application/configuring/typescript#async-server-component-typescript-error
-const Page: FC<Props> = async ({ params }) => {
-  const headersList = await headers();
-  const headersEntries = headersList.entries();
-  const headersObject = Object.fromEntries(headersEntries);
-  const apiClient = new BackendApiClient(headersObject);
-
+// Server Component - pre-fetches survey data for faster initial render
+export default async function PublicSurveyDetailPage({ params }: PageProps) {
   const { orgId, surveyId } = params;
 
+  const apiClient = await getServerApiClient();
+
+  // Pre-fetch survey data (public, always available)
   let survey: ZetkinSurveyExtended;
   try {
     survey = await apiClient.get<ZetkinSurveyExtended>(
@@ -38,14 +32,13 @@ const Page: FC<Props> = async ({ params }) => {
     }
   }
 
-  let user: ZetkinUser | null;
+  // Try to get user if authenticated (may fail if not logged in)
+  let user: ZetkinUser | null = null;
   try {
     user = await apiClient.get<ZetkinUser>('/api/users/me');
   } catch (e) {
-    user = null;
+    // User not authenticated - that's ok
   }
 
   return <PublicSurveyPage survey={survey} user={user} />;
-};
-
-export default Page;
+}
