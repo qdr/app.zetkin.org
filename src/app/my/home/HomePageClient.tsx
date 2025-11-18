@@ -15,7 +15,7 @@ interface Props {
   userEvents: ZetkinEventWithStatus[];
 }
 
-const HomePageClient: FC<Props> = ({
+const MyHomePageClient: FC<Props> = ({
   areaAssignments,
   callAssignments,
   userEvents,
@@ -43,4 +43,4 @@ const HomePageClient: FC<Props> = ({
   );
 };
 
-export default HomePageClient;
+export default MyHomePageClient;
