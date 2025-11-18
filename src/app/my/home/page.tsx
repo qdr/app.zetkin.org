@@ -25,6 +25,8 @@ export default async function Page() {
     await Promise.all([
       apiClient.get<ZetkinCallAssignment[]>(`/api/users/me/call_assignments`),
       apiClient.get<ZetkinAreaAssignment[]>('/api2/users/me/area_assignments'),
+    ]);
+
   const headersList = headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
@@ -35,14 +37,14 @@ export default async function Page() {
   // Fetch all activities in parallel
   const [areaAssignments, callAssignments, bookedEvents, signedUpEventsData] =
     await Promise.all([
-      apiClient.get<ZetkinAreaAssignment[]>(
-        '/api2/users/me/area_assignments'
-      ),
+      apiClient.get<ZetkinAreaAssignment[]>('/api2/users/me/area_assignments'),
       apiClient.get<ZetkinCallAssignment[]>('/api/users/me/call_assignments'),
       apiClient.get<ZetkinEvent[]>(
         `/api/users/me/actions?filter=end_time>=${today}`
       ),
-      apiClient.get<{ action: ZetkinEvent }[]>(`/api/users/me/action_responses`),
+      apiClient.get<{ action: ZetkinEvent }[]>(
+        `/api/users/me/action_responses`
+      ),
     ]);
 
   // Process events data (same logic as useMyEvents)
@@ -58,7 +60,7 @@ export default async function Page() {
     }
   );
 
-  const signedUpEvents = signups
+  const signedUpEvents = signups;
   const signedUpEvents = signedUpEventsData
     .map<ZetkinEventWithStatus>((signup) => ({
       ...signup.action,
