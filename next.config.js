@@ -14,17 +14,25 @@ module.exports = {
    */
   allowedDevOrigins: [],
 
-  experimental: {
-    // esmExternals: "loose", // Removed: Not supported by Turbopack, deprecated in Next.js 15
-    serverComponentsExternalPackages: ["mjml", "mongoose"],
-  },
-  images: {
-    domains: [
-      `files.${process.env.ZETKIN_API_DOMAIN}`,
+  // Moved from experimental in Next.js 15
+  serverExternalPackages: ["mjml", "mongoose"],
 
-      // localhost added for playwright testing
-      'localhost',
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: `files.${process.env.ZETKIN_API_DOMAIN}`,
+      },
+      {
+        // localhost added for playwright testing
+        protocol: 'http',
+        hostname: 'localhost',
+      },
     ],
+  },
+
+  turbopack: {
+    root: process.cwd(),
   },
   async redirects() {
     return [
