@@ -1,34 +1,37 @@
-'use client';
+import { getServerApiClient } from 'core/api/server';
+import { generateRandomColor } from 'utils/colorUtils';
+import { ZetkinCampaign } from 'utils/types/zetkin';
+import CampaignDetailPageClient from './CampaignDetailPageClient';
 
-import { Box, Grid, Typography } from '@mui/material';
-import { Suspense } from 'react';
+interface PageProps {
+  params: {
+    orgId: string;
+    campId: string;
+  };
+}
 
-import ActivitiesOverview from 'features/campaigns/components/ActivitiesOverview';
-import ActivitiesOverviewSkeleton from 'features/campaigns/components/ActivitiesOverviewSkeleton';
-import useCampaign from 'features/campaigns/hooks/useCampaign';
-import { useNumericRouteParams } from 'core/hooks';
+// Server Component - pre-fetches campaign data for faster initial render
+export default async function CampaignSummaryPage({ params }: PageProps) {
+  const orgId = parseInt(params.orgId);
+  const campId = parseInt(params.campId);
 
-const CampaignSummaryPage = () => {
-  const { orgId, campId } = useNumericRouteParams();
-  const { campaignFuture } = useCampaign(orgId, campId);
-  const campaign = campaignFuture.data;
+  // Pre-fetch campaign data on server
+  const apiClient = await getServerApiClient();
+  const campaign = await apiClient.get<ZetkinCampaign>(
+    `/api/orgs/${orgId}/campaigns/${campId}`
+  );
+
+  // Add color (same as hook does)
+  const campaignWithColor = {
+    ...campaign,
+    color: generateRandomColor(campaign.id.toString()),
+  };
 
   return (
-    <>
-      <Box mb={campaign?.info_text || campaign?.manager ? 2 : 0}>
-        <Grid container spacing={2}>
-          {campaign?.info_text && (
-            <Grid size={{ lg: 6, md: 12, xs: 12 }}>
-              <Typography variant="body1">{campaign?.info_text}</Typography>
-            </Grid>
-          )}
-        </Grid>
-      </Box>
-      <Suspense fallback={<ActivitiesOverviewSkeleton />}>
-        <ActivitiesOverview campaignId={campId} orgId={orgId} />
-      </Suspense>
-    </>
+    <CampaignDetailPageClient
+      campaign={campaignWithColor}
+      campId={campId}
+      orgId={orgId}
+    />
   );
-};
-
-export default CampaignSummaryPage;
+}
