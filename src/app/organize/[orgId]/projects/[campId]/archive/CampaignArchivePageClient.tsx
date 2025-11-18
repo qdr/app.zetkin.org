@@ -3,7 +3,7 @@
 import { FC, ChangeEvent, useState } from 'react';
 import { Box, Grid } from '@mui/material';
 
-import { ACTIVITIES } from 'features/campaigns/types';
+import { ACTIVITIES, CampaignActivity } from 'features/campaigns/types';
 import ActivityList from 'features/campaigns/components/ActivityList';
 import FilterActivities from 'features/campaigns/components/ActivityList/FilterActivities';
 import messageIds from 'features/campaigns/l10n/messageIds';
@@ -18,7 +18,10 @@ interface CampaignArchivePageClientProps {
   campId: number;
 }
 
-const CampaignArchivePageClient: FC<CampaignArchivePageClientProps> = ({ orgId, campId }) => {
+const CampaignArchivePageClient: FC<CampaignArchivePageClientProps> = ({
+  orgId,
+  campId,
+}: CampaignArchivePageClientProps) => {
   const messages = useMessages(messageIds);
   const archivedActivities = useActivityArchive(orgId, campId);
   const [searchString, setSearchString] = useState('');
@@ -34,7 +37,7 @@ const CampaignArchivePageClient: FC<CampaignArchivePageClientProps> = ({ orgId, 
   const onFiltersChange = (evt: ChangeEvent<HTMLInputElement>) => {
     const filter = evt.target.value as ACTIVITIES;
     if (filters.includes(filter)) {
-      setFilters(filters.filter((a) => a !== filter));
+      setFilters(filters.filter((a: ACTIVITIES) => a !== filter));
     } else {
       setFilters([...filters, filter]);
     }
@@ -46,7 +49,7 @@ const CampaignArchivePageClient: FC<CampaignArchivePageClientProps> = ({ orgId, 
     <SingleCampaignLayout>
       <Box>
         <ZUIFuture future={archivedActivities}>
-          {(data) => {
+          {(data: CampaignActivity[]) => {
             if (data.length === 0) {
               return (
                 <ZUIEmptyState
@@ -57,8 +60,10 @@ const CampaignArchivePageClient: FC<CampaignArchivePageClientProps> = ({ orgId, 
               );
             }
 
-            const activityTypes = data?.map((activity) => activity.kind);
-            const filterTypes = [...new Set(activityTypes)];
+            const activityTypes = data?.map(
+              (activity: CampaignActivity) => activity.kind
+            );
+            const filterTypes = [...new Set(activityTypes)] as ACTIVITIES[];
 
             return (
               <Grid container spacing={2}>

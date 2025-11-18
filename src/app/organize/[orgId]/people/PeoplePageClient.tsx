@@ -9,7 +9,9 @@ interface PeoplePageClientProps {
   orgId: string;
 }
 
-const PeoplePageClient: FC<PeoplePageClientProps> = ({ orgId }) => {
+const PeoplePageClient: FC<PeoplePageClientProps> = ({
+  orgId,
+}: PeoplePageClientProps) => {
   return (
     <PeopleLayout>
       <ViewBrowser basePath={`/organize/${orgId}/people`} />

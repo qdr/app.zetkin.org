@@ -19,7 +19,7 @@ interface SharedActivitiesPageClientProps {
 
 const SharedActivitiesPageClient: FC<SharedActivitiesPageClientProps> = ({
   orgId,
-}) => {
+}: SharedActivitiesPageClientProps) => {
   const messages = useMessages(messageIds);
   const parsedOrgId = parseInt(orgId);
   const activitiesFuture = useAcitvityList(parsedOrgId, undefined);
@@ -35,7 +35,7 @@ const SharedActivitiesPageClient: FC<SharedActivitiesPageClientProps> = ({
   const onFiltersChange = (evt: ChangeEvent<HTMLInputElement>) => {
     const filter = evt.target.value as ACTIVITIES;
     if (filters.includes(filter)) {
-      setFilters(filters.filter((a) => a !== filter));
+      setFilters(filters.filter((a: ACTIVITIES) => a !== filter));
     } else {
       setFilters([...filters, filter]);
     }
@@ -47,10 +47,10 @@ const SharedActivitiesPageClient: FC<SharedActivitiesPageClientProps> = ({
     <SharedActivitiesLayout orgId={orgId}>
       <Box>
         <ZUIFuture future={activitiesFuture} skeletonWidth={200}>
-          {(activities) => {
+          {(activities: CampaignActivity[]) => {
             //It only filters shared surveys for now, but there will be more shared activities in the future.
             const data = activities.filter(
-              (item) =>
+              (item: CampaignActivity) =>
                 item.kind === 'survey' &&
                 item.data.org_access === 'suborgs' &&
                 item.data.organization.id != parsedOrgId
@@ -68,7 +68,7 @@ const SharedActivitiesPageClient: FC<SharedActivitiesPageClientProps> = ({
             const activityTypes = data.map(
               (activity: CampaignActivity) => activity.kind
             );
-            const filterTypes = [...new Set(activityTypes)];
+            const filterTypes = [...new Set(activityTypes)] as ACTIVITIES[];
 
             return (
               <Grid container spacing={2}>

@@ -15,7 +15,9 @@ interface JourneysPageClientProps {
   orgId: number;
 }
 
-const JourneysPageClient: FC<JourneysPageClientProps> = ({ orgId }) => {
+const JourneysPageClient: FC<JourneysPageClientProps> = ({
+  orgId,
+}: JourneysPageClientProps) => {
   const messages = useMessages(messageIds);
   const journeysFuture = useJourneys(orgId);
 

@@ -9,7 +9,9 @@ interface SharedPageClientProps {
   orgId: string;
 }
 
-const SharedPageClient: FC<SharedPageClientProps> = ({ orgId }) => {
+const SharedPageClient: FC<SharedPageClientProps> = ({
+  orgId,
+}: SharedPageClientProps) => {
   const parsedOrgId = parseInt(orgId);
 
   return (

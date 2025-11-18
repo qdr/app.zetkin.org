@@ -13,6 +13,7 @@ import useJourneyInstanceMutations from 'features/journeys/hooks/useJourneyInsta
 import { useMessages } from 'core/i18n';
 import useTimelineNote from 'features/journeys/hooks/useTimelineNotes';
 import useTimelineUpdates from 'features/journeys/hooks/useTimelineUpdates';
+import { ZetkinUpdate } from 'utils/types/zetkin';
 import ZUIFuture from 'zui/ZUIFuture';
 import ZUISection from 'zui/ZUISection';
 import ZUITimeline from 'zui/ZUITimeline';
@@ -25,7 +26,7 @@ interface JourneyInstancePageClientProps {
 const JourneyInstancePageClient: FC<JourneyInstancePageClientProps> = ({
   orgId,
   instanceId,
-}) => {
+}: JourneyInstancePageClientProps) => {
   const messages = useMessages(messageIds);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -59,10 +60,10 @@ const JourneyInstancePageClient: FC<JourneyInstancePageClientProps> = ({
           </Box>
           <ZUISection title={messages.instance.sections.timeline()}>
             <ZUIFuture future={timelineUpdatesFuture}>
-              {(updates) => (
+              {(updates: ZetkinUpdate[]) => (
                 <ZUITimeline
                   disabled={isLoading}
-                  onAddNote={async (note) => {
+                  onAddNote={async (note: string) => {
                     setIsLoading(true);
                     await addNote(note);
                     setIsLoading(false);

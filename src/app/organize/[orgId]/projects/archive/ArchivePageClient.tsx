@@ -17,7 +17,9 @@ interface ArchivePageClientProps {
   orgId: number;
 }
 
-const ArchivePageClient: FC<ArchivePageClientProps> = ({ orgId }) => {
+const ArchivePageClient: FC<ArchivePageClientProps> = ({
+  orgId,
+}: ArchivePageClientProps) => {
   const messages = useMessages(messageIds);
   const archivedActivities = useActivityArchive(orgId);
   const [searchString, setSearchString] = useState('');
@@ -32,7 +34,7 @@ const ArchivePageClient: FC<ArchivePageClientProps> = ({ orgId }) => {
   const onFiltersChange = (evt: ChangeEvent<HTMLInputElement>) => {
     const filter = evt.target.value as ACTIVITIES;
     if (filters.includes(filter)) {
-      setFilters(filters.filter((a) => a !== filter));
+      setFilters(filters.filter((a: ACTIVITIES) => a !== filter));
     } else {
       setFilters([...filters, filter]);
     }
@@ -44,7 +46,7 @@ const ArchivePageClient: FC<ArchivePageClientProps> = ({ orgId }) => {
     <AllCampaignsLayout>
       <Box>
         <ZUIFuture future={archivedActivities} skeletonWidth={200}>
-          {(data) => {
+          {(data: CampaignActivity[]) => {
             if (data.length === 0) {
               return (
                 <ZUIEmptyState
@@ -58,7 +60,7 @@ const ArchivePageClient: FC<ArchivePageClientProps> = ({ orgId }) => {
             const activityTypes = data.map(
               (activity: CampaignActivity) => activity.kind
             );
-            const filterTypes = [...new Set(activityTypes)];
+            const filterTypes = [...new Set(activityTypes)] as ACTIVITIES[];
 
             return (
               <Grid container spacing={2}>
