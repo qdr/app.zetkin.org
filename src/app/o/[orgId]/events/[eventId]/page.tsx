@@ -13,7 +13,7 @@ type Props = {
 
 export default async function Page({ params }: Props) {
   const { eventId, orgId } = await params;
-  const headersList = headers();
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);

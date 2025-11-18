@@ -10,7 +10,7 @@ import { ZetkinEventWithStatus } from 'features/home/types';
 export default async function Page() {
   await redirectIfLoginNeeded();
 
-  const headersList = headers();
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);
