@@ -1,10 +1,7 @@
-'use server';
-
-import { FC } from 'react';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
-import PublicSurveyPage from 'features/surveys/pages/PublicSurveyPage';
+import PublicSurveyPageClient from './PublicSurveyPageClient';
 import BackendApiClient from 'core/api/client/BackendApiClient';
 import { ZetkinSurveyExtended, ZetkinUser } from 'utils/types/zetkin';
 import { ApiClientError } from 'core/api/errors';
@@ -16,8 +13,7 @@ type Props = {
   };
 };
 
-// @ts-expect-error https://nextjs.org/docs/app/building-your-application/configuring/typescript#async-server-component-typescript-error
-const Page: FC<Props> = async ({ params }) => {
+export default async function Page({ params }: Props) {
   const headersList = headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
@@ -45,7 +41,5 @@ const Page: FC<Props> = async ({ params }) => {
     user = null;
   }
 
-  return <PublicSurveyPage survey={survey} user={user} />;
-};
-
-export default Page;
+  return <PublicSurveyPageClient survey={survey} user={user} />;
+}
