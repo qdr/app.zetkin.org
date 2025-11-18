@@ -1,73 +1,32 @@
-'use client';
+import { getServerApiClient } from 'core/api/server';
+import SurveyOverviewPageClient from './SurveyOverviewPageClient';
+import { ZetkinSurveyExtended } from 'utils/types/zetkin';
 
-import { Box, Grid } from '@mui/material';
-
-import EmptyOverview from 'features/surveys/components/EmptyOverview';
-import SubmissionChartCard from 'features/surveys/components/SubmissionChartCard';
-import SurveyUnlinkedCard from 'features/surveys/components/SurveyUnlinkedCard';
-import SurveyURLCard from 'features/surveys/components/SurveyURLCard';
-import { useNumericRouteParams } from 'core/hooks';
-import { useParams } from 'next/navigation';
-import useServerSide from 'core/useServerSide';
-import useSurvey from 'features/surveys/hooks/useSurvey';
-import useSurveyElements from 'features/surveys/hooks/useSurveyElements';
-import useSurveyState, {
-  SurveyState,
-} from 'features/surveys/hooks/useSurveyState';
-
-const SurveyPage = () => {
-  const { orgId, surveyId } = useNumericRouteParams();
-  const params = useParams();
-  const campId = params.campId as string;
-  const onServer = useServerSide();
-  const { data: survey } = useSurvey(orgId, surveyId);
-  const state = useSurveyState(orgId, surveyId);
-  const { surveyIsEmpty } = useSurveyElements(orgId, surveyId);
-
-  if (onServer) {
-    return null;
-  }
-
-  const isOpen = state === SurveyState.PUBLISHED;
-
-  if (!survey) {
-    return null;
-  }
-
-  return (
-    <>
-            <Box>
-        {surveyIsEmpty ? (
-          <EmptyOverview campId={campId} orgId={orgId} surveyId={surveyId} />
-        ) : (
-          <Grid container spacing={2}>
-            <Grid size={{ md: 8 }}>
-              <SubmissionChartCard
-                orgId={orgId}
-                surveyId={surveyId}
-              />
-            </Grid>
-            <Grid size={{ md: 4 }}>
-              <SurveyURLCard
-                isOpen={isOpen}
-                orgId={survey.organization.id.toString()}
-                surveyId={surveyId.toString()}
-              />
-              <SurveyUnlinkedCard
-                campId={
-                  campId !== 'shared' && campId !== 'standalone'
-                    ? parseInt(campId)
-                    : campId
-                }
-                orgId={orgId}
-                surveyId={surveyId}
-              />
-            </Grid>
-          </Grid>
-        )}
-      </Box>
-    </>
-  );
+type PageProps = {
+  params: {
+    orgId: string;
+    campId: string;
+    surveyId: string;
+  };
 };
 
-export default SurveyPage;
+export default async function SurveyOverviewPage({ params }: PageProps) {
+  const orgId = parseInt(params.orgId);
+  const campId = params.campId;
+  const surveyId = parseInt(params.surveyId);
+
+  const apiClient = await getServerApiClient();
+
+  const survey = await apiClient.get<ZetkinSurveyExtended>(
+    `/api/orgs/${orgId}/surveys/${surveyId}`
+  );
+
+  return (
+    <SurveyOverviewPageClient
+      campId={campId}
+      orgId={orgId}
+      survey={survey}
+      surveyId={surveyId}
+    />
+  );
+}
