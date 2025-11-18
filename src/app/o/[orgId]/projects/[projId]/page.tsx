@@ -90,7 +90,7 @@ export default async function PublicProjectPage({ params }: PageProps) {
       orgId={orgId}
 =======
 export default async function Page({ params }: Props) {
-  const { orgId, projId } = params;
+  const { orgId, projId } = await params;
   const headersList = headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
