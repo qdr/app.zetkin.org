@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
+<<<<<<< Updated upstream
     "target": "ES2017",
+=======
+    "target": "es5",
+>>>>>>> Stashed changes
     "lib": [
       "es6",
       "dom",
