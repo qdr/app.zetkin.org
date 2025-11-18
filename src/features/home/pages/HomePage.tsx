@@ -1,26 +1,13 @@
 'use client';
 
 import { FC, Suspense } from 'react';
-import { Box } from '@mui/material';
 
 import MyActivitiesList from '../components/MyActivitiesList';
-import ZUILogoLoadingIndicator from 'zui/ZUILogoLoadingIndicator';
+import MyActivitiesListSkeleton from '../components/MyActivitiesListSkeleton';
 
 const HomePage: FC = () => {
   return (
-    <Suspense
-      fallback={
-        <Box
-          alignItems="center"
-          display="flex"
-          flexDirection="column"
-          height="90dvh"
-          justifyContent="center"
-        >
-          <ZUILogoLoadingIndicator />
-        </Box>
-      }
-    >
+    <Suspense fallback={<MyActivitiesListSkeleton />}>
       <MyActivitiesList />
     </Suspense>
   );

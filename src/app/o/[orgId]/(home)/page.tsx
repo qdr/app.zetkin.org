@@ -1,8 +1,9 @@
 'use server';
 
-import { FC } from 'react';
+import { FC, Suspense } from 'react';
 
 import PublicOrgPage from 'features/organizations/pages/PublicOrgPage';
+import PublicOrgPageSkeleton from 'features/organizations/components/PublicOrgPageSkeleton';
 
 type Props = {
   params: {
@@ -11,7 +12,11 @@ type Props = {
 };
 
 const Page: FC<Props> = ({ params }) => {
-  return <PublicOrgPage orgId={params.orgId} />;
+  return (
+    <Suspense fallback={<PublicOrgPageSkeleton />}>
+      <PublicOrgPage orgId={params.orgId} />
+    </Suspense>
+  );
 };
 
 export default Page;
