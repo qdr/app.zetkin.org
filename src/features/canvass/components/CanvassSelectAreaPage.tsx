@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useState } from 'react';
+import { FC, Suspense, useState } from 'react';
 import React from 'react';
 import { ArrowForwardIos } from '@mui/icons-material';
 import {
@@ -136,7 +136,7 @@ type CanvassSelectAreaPageProps = {
   areaAssId: number;
 };
 
-const CanvassSelectAreaPage: FC<CanvassSelectAreaPageProps> = ({
+const CanvassSelectAreaPageInner: FC<CanvassSelectAreaPageProps> = ({
   areaAssId,
 }) => {
   const myAssignments = useMyCanvassAssignments() || [];
@@ -149,6 +149,14 @@ const CanvassSelectAreaPage: FC<CanvassSelectAreaPageProps> = ({
   }
 
   return <Page assignment={assignment} />;
+};
+
+const CanvassSelectAreaPage: FC<CanvassSelectAreaPageProps> = (props) => {
+  return (
+    <Suspense>
+      <CanvassSelectAreaPageInner {...props} />
+    </Suspense>
+  );
 };
 
 export default CanvassSelectAreaPage;

@@ -138,7 +138,7 @@ type CanvassPageProps = {
   areaId: number;
 };
 
-const CanvassPage: FC<CanvassPageProps> = ({ areaAssId, areaId }) => {
+const CanvassPageInner: FC<CanvassPageProps> = ({ areaAssId, areaId }) => {
   const myAssignments = useMyAreaAssignments();
   const assignment = myAssignments.find(
     (assignment) => assignment.id == areaAssId
@@ -148,9 +148,13 @@ const CanvassPage: FC<CanvassPageProps> = ({ areaAssId, areaId }) => {
     return null;
   }
 
+  return <Page areaId={areaId} assignment={assignment} />;
+};
+
+const CanvassPage: FC<CanvassPageProps> = (props) => {
   return (
     <Suspense>
-      <Page areaId={areaId} assignment={assignment} />
+      <CanvassPageInner {...props} />
     </Suspense>
   );
 };
