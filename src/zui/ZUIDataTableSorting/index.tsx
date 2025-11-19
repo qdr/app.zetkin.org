@@ -1,3 +1,5 @@
+'use client';
+
 import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import { Add, Delete, ImportExport } from '@mui/icons-material';

@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, BoxProps, IconButton, Menu, MenuItem } from '@mui/material';
 import {
   DragIndicatorOutlined,

@@ -1,3 +1,5 @@
+'use client';
+
 import { Tooltip } from '@mui/material';
 import { FC, ReactElement } from 'react';
 

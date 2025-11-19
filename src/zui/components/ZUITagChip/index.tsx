@@ -1,3 +1,5 @@
+'use client';
+
 import { Clear } from '@mui/icons-material';
 import { FC, useState } from 'react';
 import { Box, IconButton, lighten, Tooltip, Typography } from '@mui/material';
