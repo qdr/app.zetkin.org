@@ -1,3 +1,5 @@
+'use client';
+
 import { SkipNext } from '@mui/icons-material';
 import { FC, useState } from 'react';
 import { Box } from '@mui/material';

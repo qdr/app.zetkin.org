@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Dialog, useMediaQuery, useTheme } from '@mui/material';
 import { FunctionComponent, useState } from 'react';
 

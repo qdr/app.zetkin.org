@@ -1,3 +1,5 @@
+'use client';
+
 import { FormControl } from '@mui/material';
 import { useState } from 'react';
 

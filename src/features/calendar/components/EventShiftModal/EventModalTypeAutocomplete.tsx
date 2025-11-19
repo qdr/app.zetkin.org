@@ -1,3 +1,5 @@
+'use client';
+
 import Fuse from 'fuse.js';
 import { Add, Clear } from '@mui/icons-material';
 import { Autocomplete, Box, TextField } from '@mui/material';

@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Checkbox, useTheme } from '@mui/material';
 import { FC, KeyboardEvent, useCallback } from 'react';
 import {

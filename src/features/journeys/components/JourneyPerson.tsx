@@ -1,3 +1,5 @@
+'use client';
+
 import { Box } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { grey } from '@mui/material/colors';

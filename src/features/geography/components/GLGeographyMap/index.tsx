@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Button, ButtonGroup } from '@mui/material';
 import { Close, Create, Save } from '@mui/icons-material';
 import Map from '@vis.gl/react-maplibre';

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useContext, useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { ArrowForward, Delete, Headset, People } from '@mui/icons-material';

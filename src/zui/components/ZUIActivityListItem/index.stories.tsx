@@ -1,3 +1,5 @@
+'use client';
+
 import { Meta, StoryObj } from '@storybook/react';
 import { Box } from '@mui/material';
 import { useState } from 'react';

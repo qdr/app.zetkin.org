@@ -1,3 +1,5 @@
+'use client';
+
 import { FC, useEffect, useRef, useState } from 'react';
 import { Stack } from '@mui/material';
 import { LooksOneOutlined } from '@mui/icons-material';

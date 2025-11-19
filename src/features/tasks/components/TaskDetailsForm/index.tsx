@@ -1,3 +1,5 @@
+'use client';
+
 import dayjs, { Dayjs } from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import validator from 'validator';

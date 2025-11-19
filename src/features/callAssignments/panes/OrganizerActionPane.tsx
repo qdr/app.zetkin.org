@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Button, Typography } from '@mui/material';
 import { Check, PriorityHigh } from '@mui/icons-material';
 import { FC, useMemo } from 'react';

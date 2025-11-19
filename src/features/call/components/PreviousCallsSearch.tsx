@@ -1,3 +1,5 @@
+'use client';
+
 import { Search } from '@mui/icons-material';
 import { FC, useState } from 'react';
 

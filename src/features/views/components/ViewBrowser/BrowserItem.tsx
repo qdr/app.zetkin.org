@@ -1,3 +1,5 @@
+'use client';
+
 import { makeStyles } from '@mui/styles';
 import NextLink from 'next/link';
 import { CircularProgress, Link, Theme } from '@mui/material';

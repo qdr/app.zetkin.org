@@ -1,3 +1,5 @@
+'use client';
+
 import { FC, ReactElement, useEffect, useRef, useState } from 'react';
 
 type ZUIAnimatedNumberRenderFunc = (value: string) => ReactElement;

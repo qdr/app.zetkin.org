@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { Box, Chip, MenuItem, Tooltip } from '@mui/material';
 

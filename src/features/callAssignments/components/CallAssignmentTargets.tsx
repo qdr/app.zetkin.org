@@ -1,3 +1,5 @@
+'use client';
+
 import { makeStyles } from '@mui/styles';
 import { Add, Edit } from '@mui/icons-material';
 import { Box, Button, Card, Divider, Typography } from '@mui/material';

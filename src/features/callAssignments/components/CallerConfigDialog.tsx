@@ -1,3 +1,5 @@
+'use client';
+
 import { makeStyles } from '@mui/styles';
 import { Typography } from '@mui/material';
 import { FC, useEffect, useState } from 'react';

@@ -1,3 +1,5 @@
+'use client';
+
 import { AssignmentOutlined } from '@mui/icons-material';
 import { useState } from 'react';
 import { Meta, StoryObj } from '@storybook/react';

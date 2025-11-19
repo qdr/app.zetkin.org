@@ -1,3 +1,5 @@
+'use client';
+
 import dynamic from 'next/dynamic';
 import { InfoOutlined } from '@mui/icons-material';
 import { Box, Dialog, Typography } from '@mui/material';

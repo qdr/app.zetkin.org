@@ -1,3 +1,5 @@
+'use client';
+
 import { MenuItem } from '@mui/material';
 import { FormEvent, useState } from 'react';
 

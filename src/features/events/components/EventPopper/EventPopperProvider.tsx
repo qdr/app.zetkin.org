@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, FC, ReactNode, useContext, useState } from 'react';
 
 import { AnyClusteredEvent } from 'features/calendar/utils/clusterEventsForWeekCalender';

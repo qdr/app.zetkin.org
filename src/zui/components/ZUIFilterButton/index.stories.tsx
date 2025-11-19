@@ -1,3 +1,5 @@
+'use client';
+
 import { Meta, StoryObj } from '@storybook/react';
 import { Close, Event } from '@mui/icons-material';
 import { useState } from 'react';

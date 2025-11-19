@@ -1,3 +1,5 @@
+'use client';
+
 import 'leaflet/dist/leaflet.css';
 import Fuse from 'fuse.js';
 import { FC, useState } from 'react';

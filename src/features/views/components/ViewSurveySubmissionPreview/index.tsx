@@ -1,3 +1,5 @@
+'use client';
+
 import { AssignmentTurnedInOutlined } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import {

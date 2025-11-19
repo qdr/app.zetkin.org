@@ -1,3 +1,5 @@
+'use client';
+
 import { makeStyles } from '@mui/styles';
 import { useRouter } from 'next/router';
 import { Box, Paper, Slide } from '@mui/material';

@@ -1,3 +1,5 @@
+'use client';
+
 /* eslint-disable @next/next/no-img-element*/
 import { Box, Button, Typography } from '@mui/material';
 import { FC, useState } from 'react';

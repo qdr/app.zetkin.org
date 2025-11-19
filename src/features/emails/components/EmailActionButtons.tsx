@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useContext, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { ArrowForward, ContentCopy, Delete, Send } from '@mui/icons-material';

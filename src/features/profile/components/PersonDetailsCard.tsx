@@ -1,3 +1,5 @@
+'use client';
+
 import NextLink from 'next/link';
 import { useState } from 'react';
 import { Button, Card, Link, ListItem, ListItemText } from '@mui/material';

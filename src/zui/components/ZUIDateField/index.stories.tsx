@@ -1,3 +1,5 @@
+'use client';
+
 import { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import dayjs, { Dayjs } from 'dayjs';

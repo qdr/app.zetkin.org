@@ -1,3 +1,5 @@
+'use client';
+
 import { GridColDef } from '@mui/x-data-grid-pro';
 import { useRouter } from 'next/router';
 import { Box, Typography } from '@mui/material';

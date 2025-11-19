@@ -1,3 +1,5 @@
+'use client';
+
 import { AxisProps } from '@nivo/axes';
 import { ResponsiveLine } from '@nivo/line';
 import { linearGradientDef } from '@nivo/core';

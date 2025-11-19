@@ -1,3 +1,5 @@
+'use client';
+
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useState } from 'react';
 import { Box, IconButton, Popover } from '@mui/material';

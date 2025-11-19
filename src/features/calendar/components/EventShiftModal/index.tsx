@@ -1,3 +1,5 @@
+'use client';
+
 import { Close } from '@mui/icons-material';
 import { Box, Button, Dialog, Typography } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';

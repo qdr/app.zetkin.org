@@ -1,3 +1,5 @@
+'use client';
+
 /* eslint-disable sort-keys */
 /* eslint-disable @next/next/no-img-element*/
 import { FC, useState } from 'react';

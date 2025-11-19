@@ -1,3 +1,5 @@
+'use client';
+
 import Autocomplete from '@mui/material/Autocomplete';
 import { Box, Button, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';

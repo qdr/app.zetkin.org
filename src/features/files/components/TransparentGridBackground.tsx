@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, SxProps, useTheme } from '@mui/material';
 import { FC, ReactNode, useState } from 'react';
 

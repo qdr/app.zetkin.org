@@ -1,3 +1,5 @@
+'use client';
+
 import Fuse from 'fuse.js';
 import { lighten } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';

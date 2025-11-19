@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { Alert, Divider, Typography, useTheme } from '@mui/material';
 import {

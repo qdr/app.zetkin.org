@@ -1,3 +1,5 @@
+'use client';
+
 /* eslint-disable sort-keys */
 import { Box } from '@mui/material';
 import { FC, useState } from 'react';

@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect } from 'react';
 import shouldLoad from 'core/caching/shouldLoad';
 import useServerSide from 'core/useServerSide';

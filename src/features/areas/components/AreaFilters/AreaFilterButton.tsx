@@ -1,3 +1,5 @@
+'use client';
+
 import { FC, useContext } from 'react';
 import { Badge, Button } from '@mui/material';
 import { FilterList } from '@mui/icons-material';

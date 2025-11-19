@@ -1,3 +1,5 @@
+'use client';
+
 import timezones from 'timezones-list';
 import { FC, useState } from 'react';
 import {

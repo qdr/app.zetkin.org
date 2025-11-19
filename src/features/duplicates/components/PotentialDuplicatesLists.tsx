@@ -1,3 +1,5 @@
+'use client';
+
 import { FC, useState } from 'react';
 import { Box, Divider, Typography } from '@mui/material';
 

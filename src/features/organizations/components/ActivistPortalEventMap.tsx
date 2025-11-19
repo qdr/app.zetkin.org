@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, SxProps } from '@mui/material';
 import { Layer, Map, Source } from '@vis.gl/react-maplibre';
 import { Map as MapType } from 'maplibre-gl';

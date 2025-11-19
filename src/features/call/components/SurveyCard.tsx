@@ -1,3 +1,5 @@
+'use client';
+
 import { FC, useState } from 'react';
 import { Assignment, GroupWorkOutlined } from '@mui/icons-material';
 import { Box } from '@mui/material';

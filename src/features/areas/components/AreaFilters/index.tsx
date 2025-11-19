@@ -1,3 +1,5 @@
+'use client';
+
 import { FC, useContext, useEffect, useMemo, useState } from 'react';
 import { Box, Checkbox, Typography, useTheme } from '@mui/material';
 

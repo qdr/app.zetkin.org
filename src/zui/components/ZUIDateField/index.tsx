@@ -1,3 +1,5 @@
+'use client';
+
 import { FC, RefObject, useState } from 'react';
 import { Dayjs } from 'dayjs';
 import {

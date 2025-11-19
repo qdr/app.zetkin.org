@@ -1,3 +1,5 @@
+'use client';
+
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import { TimeField } from '@mui/x-date-pickers-pro';

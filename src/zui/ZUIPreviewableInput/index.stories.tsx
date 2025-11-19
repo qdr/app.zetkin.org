@@ -1,3 +1,5 @@
+'use client';
+
 import { HTMLProps, useState } from 'react';
 import { Meta, StoryFn } from '@storybook/react';
 

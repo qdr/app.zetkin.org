@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, IconButton } from '@mui/material';
 import { Delete, RemoveRedEye } from '@mui/icons-material';
 import { FC, useContext } from 'react';

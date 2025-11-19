@@ -1,3 +1,5 @@
+'use client';
+
 import { useContext } from 'react';
 
 import messageIds from '../../calendar/l10n/messageIds';

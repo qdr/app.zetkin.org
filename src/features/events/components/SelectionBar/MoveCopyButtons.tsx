@@ -1,3 +1,5 @@
+'use client';
+
 import { ArrowDropDown } from '@mui/icons-material';
 import { Box, Button, Menu, MenuItem, Typography } from '@mui/material';
 import { FC, useState } from 'react';

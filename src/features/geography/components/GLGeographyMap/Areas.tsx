@@ -1,3 +1,5 @@
+'use client';
+
 import { Layer, Source } from '@vis.gl/react-maplibre';
 import { FC, useMemo } from 'react';
 

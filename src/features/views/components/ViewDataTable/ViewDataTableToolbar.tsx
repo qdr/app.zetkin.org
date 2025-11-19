@@ -1,3 +1,5 @@
+'use client';
+
 import { useContext } from 'react';
 import { Add, Launch, RemoveCircleOutline } from '@mui/icons-material';
 import { Box, Button, CircularProgress, Slide, Tooltip } from '@mui/material';

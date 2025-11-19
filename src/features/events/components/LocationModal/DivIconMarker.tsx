@@ -1,3 +1,5 @@
+'use client';
+
 import { divIcon } from 'leaflet';
 import { FC, useMemo } from 'react';
 import { createPortal } from 'react-dom';

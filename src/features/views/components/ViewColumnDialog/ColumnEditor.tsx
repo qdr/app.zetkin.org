@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Button, Link, Typography } from '@mui/material';
 import { ChevronLeft, Close } from '@mui/icons-material';
 import { FunctionComponent, useState } from 'react';

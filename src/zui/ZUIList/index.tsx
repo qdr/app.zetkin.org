@@ -1,3 +1,5 @@
+'use client';
+
 import { List, ListItem, ListItemText } from '@mui/material';
 import React, { useState } from 'react';
 

@@ -1,3 +1,5 @@
+'use client';
+
 import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
 import { Box, Button, Typography, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';

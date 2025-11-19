@@ -1,3 +1,5 @@
+'use client';
+
 import { Alert, Stack } from '@mui/material';
 import React, { useState } from 'react';
 import {

@@ -1,3 +1,5 @@
+'use client';
+
 import { Add } from '@mui/icons-material';
 import { useState } from 'react';
 import { Button, ClickAwayListener, Divider } from '@mui/material';
