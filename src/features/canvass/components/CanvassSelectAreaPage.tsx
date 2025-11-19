@@ -153,7 +153,7 @@ const CanvassSelectAreaPageInner: FC<CanvassSelectAreaPageProps> = ({
 
 const CanvassSelectAreaPage: FC<CanvassSelectAreaPageProps> = (props) => {
   return (
-    <Suspense>
+    <Suspense fallback={<div style={{ display: 'none' }} />}>
       <CanvassSelectAreaPageInner {...props} />
     </Suspense>
   );

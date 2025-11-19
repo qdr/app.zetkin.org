@@ -1,12 +1,11 @@
 /* eslint-disable react/no-danger */
 'use client';
 
-import { Box, BoxProps } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 
 interface ZUICleanHtmlProps {
   dirtyHtml: string;
-  BoxProps?: BoxProps;
+  BoxProps?: React.HTMLAttributes<HTMLSpanElement>;
 }
 
 type DOMPurifyType = {
@@ -59,11 +58,12 @@ const ZUICleanHtml = ({
   }, [dirtyHtml, DOMPurify]);
 
   if (!DOMPurify) {
-    // Return empty while loading DOMPurify
-    return <Box {...BoxProps} />;
+    // Return empty span while loading DOMPurify to avoid nesting issues
+    return <span {...BoxProps} />;
   }
 
-  return <Box dangerouslySetInnerHTML={{ __html: cleanHtml }} {...BoxProps} />;
+  // Use span instead of div to avoid invalid nesting in paragraphs
+  return <span dangerouslySetInnerHTML={{ __html: cleanHtml }} {...BoxProps} />;
 };
 
 export default ZUICleanHtml;

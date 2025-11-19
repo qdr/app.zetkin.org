@@ -153,7 +153,7 @@ const CanvassInstructionsPageInner: FC<CanvassInstructionsPageProps> = ({
 
 const CanvassInstructionsPage: FC<CanvassInstructionsPageProps> = (props) => {
   return (
-    <Suspense>
+    <Suspense fallback={<div style={{ display: 'none' }} />}>
       <CanvassInstructionsPageInner {...props} />
     </Suspense>
   );

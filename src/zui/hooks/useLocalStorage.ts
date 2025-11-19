@@ -10,7 +10,7 @@ export default function useLocalStorage<T>(
   // Load from localStorage only on client after mount
   useEffect(() => {
     const isBrowser = typeof window !== 'undefined';
-    if (!isBrowser) {
+    if (!isBrowser || isInitialized) {
       return;
     }
 
@@ -28,7 +28,8 @@ export default function useLocalStorage<T>(
     }
 
     setIsInitialized(true);
-  }, [key, defaultValue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
 
   const setValueAndStore = (newValue: T) => {
     if (typeof window !== 'undefined') {
