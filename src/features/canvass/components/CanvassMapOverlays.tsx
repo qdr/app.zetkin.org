@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Button } from '@mui/material';
 import { FC, Suspense, useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
