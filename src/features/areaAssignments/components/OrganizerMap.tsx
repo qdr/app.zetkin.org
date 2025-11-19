@@ -94,11 +94,21 @@ const OrganizerMap: FC<OrganizerMapProps> = ({
 
   const mapRef = useRef<MapType | null>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const mapKeyRef = useRef(`map-${areaAssId}-${Date.now()}`);
   useAutoResizeMap(mapRef.current);
 
-  // Guard against React StrictMode double-mount
+  // Guard against React StrictMode double-mount and ensure cleanup
   useEffect(() => {
     setIsMounted(true);
+
+    return () => {
+      // Cleanup: remove the map instance when unmounting
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+      setIsMounted(false);
+    };
   }, []);
 
   const selectedArea = areas.find((area) => area.id == selectedId);
@@ -372,6 +382,7 @@ const OrganizerMap: FC<OrganizerMapProps> = ({
         )}
         {isMounted && (
           <MapContainer
+            key={mapKeyRef.current}
             ref={mapRef}
             attributionControl={false}
             center={[0, 0]}
