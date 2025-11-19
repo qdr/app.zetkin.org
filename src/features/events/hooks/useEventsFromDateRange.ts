@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { useEffect } from 'react';
 
 import range from 'utils/range';
 import shouldLoad from 'core/caching/shouldLoad';
@@ -28,30 +29,33 @@ export default function useEventsFromDateRange(
     shouldLoad(eventsState.eventsByDate[date.slice(0, 10)])
   );
 
-  if (mustLoad) {
-    dispatch(eventRangeLoad(dateRange));
-    const apiEndDate = new Date(endDate);
-    apiEndDate.setDate(apiEndDate.getDate() + 1);
-    const promise = apiClient
-      .get<ZetkinEvent[]>(
-        `/api/orgs/${orgId}/actions?filter=start_time>${startDate
-          .toISOString()
-          .slice(0, 10)}&filter=end_time<${apiEndDate
-          .toISOString()
-          .slice(0, 10)}`
-      )
-      .then((events) => {
-        dispatch(eventRangeLoaded([events, dateRange]));
-      });
-
-    // This will suspend React from rendering this branch
-    // until the promise resolves.
-    throw promise;
-  }
+  useEffect(() => {
+    if (mustLoad) {
+      dispatch(eventRangeLoad(dateRange));
+      const apiEndDate = new Date(endDate);
+      apiEndDate.setDate(apiEndDate.getDate() + 1);
+      apiClient
+        .get<ZetkinEvent[]>(
+          `/api/orgs/${orgId}/actions?filter=start_time>${startDate
+            .toISOString()
+            .slice(0, 10)}&filter=end_time<${apiEndDate
+            .toISOString()
+            .slice(0, 10)}`
+        )
+        .then((events) => {
+          dispatch(eventRangeLoaded([events, dateRange]));
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mustLoad]);
 
   const events = dateRange.flatMap((date) => {
     const dateStr = date.slice(0, 10);
-    return eventsState.eventsByDate[dateStr].items
+    const dateEvents = eventsState.eventsByDate[dateStr];
+    if (!dateEvents || !dateEvents.items) {
+      return [];
+    }
+    return dateEvents.items
       .filter((item) => !!item.data && !item.deleted)
       .map((item) => item.data) as ZetkinEvent[];
   });

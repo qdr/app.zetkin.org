@@ -92,9 +92,12 @@ export default async function handle(
     });
     if (session.tokenData) {
       z.setTokenData(session.tokenData);
+      console.log('[API Proxy] Session token found, making authenticated request to:', pathStr);
+    } else {
+      console.log('[API Proxy] No session token found, making unauthenticated request to:', pathStr);
     }
   } catch (err) {
-    // No problem if the session could not be found
+    console.error('[API Proxy] Failed to get session:', err);
   }
 
   try {
@@ -122,7 +125,11 @@ export default async function handle(
       res.status(errRes.httpStatus).json(errRes.data);
     } else {
       // Not an API error, i.e. this is a bug!
-      throw err;
+      console.error('API proxy error:', err);
+      res.status(500).json({
+        error: 'Internal server error',
+        message: err instanceof Error ? err.message : 'Unknown error',
+      });
     }
   }
 }

@@ -1,6 +1,8 @@
+'use client';
+
 import { HeadsetMic } from '@mui/icons-material';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 import {
   Avatar,
   ListItem,
@@ -16,8 +18,8 @@ import { Msg } from 'core/i18n';
 const CallassigmentListItem: React.FunctionComponent<{
   callAssignment: ZetkinCallAssignment;
 }> = ({ callAssignment }) => {
-  const router = useRouter();
-  const { orgId } = router.query as { orgId: string };
+  const params = useParams();
+  const { orgId } = params as { orgId: string };
   return (
     <Link
       href={`/organize/${orgId}/projects/${

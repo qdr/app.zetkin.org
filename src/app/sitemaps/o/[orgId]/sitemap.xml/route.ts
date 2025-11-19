@@ -19,7 +19,8 @@ export async function GET(
   _: Request,
   { params }: { params: { orgId: number } }
 ) {
-  const headersList = headers();
+  const { orgId } = await params;
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);
@@ -30,27 +31,27 @@ export async function GET(
 
   const [events, projects, surveys] = await Promise.all([
     apiClient
-      .get<ZetkinEvent[]>(`/api/orgs/${params.orgId}/actions`)
+      .get<ZetkinEvent[]>(`/api/orgs/${orgId}/actions`)
       .catch(() => [] as ZetkinEvent[]),
     apiClient
-      .get<ZetkinCampaign[]>(`/api/orgs/${params.orgId}/campaigns`)
+      .get<ZetkinCampaign[]>(`/api/orgs/${orgId}/campaigns`)
       .catch(() => [] as ZetkinCampaign[]),
     apiClient
-      .get<ZetkinSurvey[]>(`/api/orgs/${params.orgId}/surveys`)
+      .get<ZetkinSurvey[]>(`/api/orgs/${orgId}/surveys`)
       .catch(() => [] as ZetkinSurvey[]),
   ]);
 
   const urls =
     getUrlsXml(
-      [`${baseUrl}/o/${params.orgId}`, `${baseUrl}/o/${params.orgId}/suborgs`],
+      [`${baseUrl}/o/${orgId}`, `${baseUrl}/o/${orgId}/suborgs`],
       (str) => str
     ) +
-    getUrlsXml(events, (e) => `${baseUrl}/o/${params.orgId}/events/${e.id}`) +
+    getUrlsXml(events, (e) => `${baseUrl}/o/${orgId}/events/${e.id}`) +
     getUrlsXml(
       projects,
-      (p) => `${baseUrl}/o/${params.orgId}/projects/${p.id}`
+      (p) => `${baseUrl}/o/${orgId}/projects/${p.id}`
     ) +
-    getUrlsXml(surveys, (s) => `${baseUrl}/o/${params.orgId}/surveys/${s.id}`);
+    getUrlsXml(surveys, (s) => `${baseUrl}/o/${orgId}/surveys/${s.id}`);
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

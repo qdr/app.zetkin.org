@@ -20,7 +20,7 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { orgId, surveyId } = params;
+  const { orgId, surveyId } = await params;
   const apiClient = new BackendApiClient({});
 
   let survey: ZetkinSurveyExtended;
@@ -51,12 +51,11 @@ const SurveyLayout: FC<Props> = async ({
   children,
   params,
 }): Promise<ReactElement> => {
-  const headersList = headers();
+  const { orgId, surveyId } = await params;
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);
-
-  const { orgId, surveyId } = params;
 
   let survey: ZetkinSurveyExtended;
   try {

@@ -1,3 +1,5 @@
+'use client';
+
 import { MenuItem, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 

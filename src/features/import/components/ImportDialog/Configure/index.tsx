@@ -1,3 +1,5 @@
+'use client';
+
 import { CompareArrows } from '@mui/icons-material';
 import { Box, CircularProgress, Typography, useTheme } from '@mui/material';
 import { FC, useState } from 'react';

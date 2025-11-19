@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import shouldLoad from 'core/caching/shouldLoad';
 import { ZetkinSmartSearchFilter } from '../components/types';
 import { ZetkinSmartSearchFilterStats } from '../types';
@@ -20,19 +21,22 @@ export default function useSmartSearchStats(
   );
   const dispatch = useAppDispatch();
 
-  if (shouldLoad(statsItem)) {
-    dispatch(statsLoad(key));
-    apiClient
-      .post<
-        ZetkinSmartSearchFilterStats[],
-        { filter_spec: ZetkinSmartSearchFilter[] }
-      >(`/api/orgs/${orgId}/people/queries/ephemeral/stats`, {
-        filter_spec: filters,
-      })
-      .then((stats) => {
-        dispatch(statsLoaded([key, stats]));
-      });
-  }
+  useEffect(() => {
+    if (shouldLoad(statsItem)) {
+      dispatch(statsLoad(key));
+      apiClient
+        .post<
+          ZetkinSmartSearchFilterStats[],
+          { filter_spec: ZetkinSmartSearchFilter[] }
+        >(`/api/orgs/${orgId}/people/queries/ephemeral/stats`, {
+          filter_spec: filters,
+        })
+        .then((stats) => {
+          dispatch(statsLoaded([key, stats]));
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldLoad(statsItem), key]);
 
   return statsItem?.data?.stats ?? null;
 }

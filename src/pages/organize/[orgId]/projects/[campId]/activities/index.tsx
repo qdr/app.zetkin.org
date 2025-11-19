@@ -1,4 +1,5 @@
-import { GetServerSideProps } from 'next';
+'use client';
+
 import { useState } from 'react';
 import { Box, Grid } from '@mui/material';
 
@@ -6,9 +7,6 @@ import { ACTIVITIES } from 'features/campaigns/types';
 import ActivityList from 'features/campaigns/components/ActivityList';
 import FilterActivities from 'features/campaigns/components/ActivityList/FilterActivities';
 import messageIds from 'features/campaigns/l10n/messageIds';
-import { PageWithLayout } from 'utils/types';
-import { scaffold } from 'utils/next';
-import SingleCampaignLayout from 'features/campaigns/layout/SingleCampaignLayout';
 import useActivityList from 'features/campaigns/hooks/useActivityList';
 import { useMessages } from 'core/i18n';
 import { useNumericRouteParams } from 'core/hooks';
@@ -16,31 +14,7 @@ import useServerSide from 'core/useServerSide';
 import ZUIEmptyState from 'zui/ZUIEmptyState';
 import ZUIFuture from 'zui/ZUIFuture';
 
-export const getServerSideProps: GetServerSideProps = scaffold(
-  async (ctx) => {
-    const { campId, orgId } = ctx.params!;
-
-    return {
-      props: {
-        campId,
-        orgId,
-      },
-    };
-  },
-  {
-    authLevelRequired: 2,
-    localeScope: ['layout.organize.surveys', 'pages.organizeSurvey'],
-  }
-);
-
-interface CampaignActivitiesPageProps {
-  campId: string;
-  orgId: string;
-}
-
-const CampaignActivitiesPage: PageWithLayout<
-  CampaignActivitiesPageProps
-> = () => {
+const CampaignActivitiesPage = () => {
   const messages = useMessages(messageIds);
   const onServer = useServerSide();
   const { orgId, campId } = useNumericRouteParams();
@@ -107,10 +81,6 @@ const CampaignActivitiesPage: PageWithLayout<
       </ZUIFuture>
     </Box>
   );
-};
-
-CampaignActivitiesPage.getLayout = function getLayout(page) {
-  return <SingleCampaignLayout>{page}</SingleCampaignLayout>;
 };
 
 export default CampaignActivitiesPage;

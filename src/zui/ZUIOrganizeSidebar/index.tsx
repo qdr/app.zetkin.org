@@ -1,6 +1,8 @@
+'use client';
+
 import makeStyles from '@mui/styles/makeStyles';
 import NextLink from 'next/link';
-import { useRouter } from 'next/router';
+import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
 import {
   Architecture,
@@ -89,8 +91,13 @@ const ZUIOrganizeSidebar = (): JSX.Element => {
   const classes = useStyles();
   const user = useCurrentUser();
   const router = useRouter();
+  const pathname = usePathname();
   const { orgId } = useNumericRouteParams();
-  const key = orgId ? router.pathname.split('[orgId]')[1] : 'organize';
+  // Extract the part after /organize/{orgId} from pathname
+  // e.g. /organize/1/projects -> /projects
+  const key = orgId
+    ? pathname.replace(`/organize/${orgId}`, '') || '/organize'
+    : 'organize';
 
   const [checked, setChecked] = useState(false);
   const [lastOpen, setLastOpen] = useLocalStorage('orgSidebarOpen', true);

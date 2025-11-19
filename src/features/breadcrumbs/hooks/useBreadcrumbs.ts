@@ -1,4 +1,6 @@
-import { NextRouter, useRouter } from 'next/router';
+'use client';
+
+import { useParams, usePathname, useSearchParams } from 'next/navigation';
 
 import { BreadcrumbElement } from 'pages/api/breadcrumbs';
 import { loadItemIfNecessary } from 'core/caching/cacheUtils';
@@ -8,14 +10,15 @@ import { useApiClient, useAppDispatch, useAppSelector } from 'core/hooks';
 export default function useBreadcrumbElements() {
   const apiClient = useApiClient();
   const dispatch = useAppDispatch();
-  const router = useRouter();
-  const { pathname, asPath: path } = router;
-  const pathWithoutQueryString = path.split('?')[0];
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const params = useParams();
+  const pathWithoutQueryString = pathname;
   const crumbsItem = useAppSelector(
     (state) => state.breadcrumbs.crumbsByPath[pathWithoutQueryString]
   );
 
-  const query = getPathParameters(router);
+  const query = getPathParameters(pathname, params);
 
   const future = loadItemIfNecessary(crumbsItem, dispatch, {
     actionOnLoad: () => crumbsLoad(pathWithoutQueryString),
@@ -32,11 +35,11 @@ export default function useBreadcrumbElements() {
   return future.data?.elements ?? [];
 }
 
-const getPathParameters = function (router: NextRouter): string {
+const getPathParameters = function (pathname: string, params: ReturnType<typeof useParams>): string {
   // Only use parameters that are part of the path (e.g. [personId])
   // and not ones that are part of the actual querystring (e.g. ?filter_*)
-  return Object.entries(router.query)
-    .filter(([key]) => router.pathname.includes(`[${key}]`))
+  return Object.entries(params)
+    .filter(([key]) => pathname.includes(`[${key}]`))
     .map(([key, val]) => `${key}=${val}`)
     .join('&');
 };

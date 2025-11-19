@@ -88,7 +88,7 @@ const CanvassMapOverlays: FC<Props> = ({
       >
         {showViewLocationButton && (
           <Box onClick={() => setExpanded(true)} p={2}>
-            <Suspense>
+            <Suspense fallback={null}>
               <ContractedHeader
                 assignment={assignment}
                 location={selectedLocation}
@@ -97,7 +97,7 @@ const CanvassMapOverlays: FC<Props> = ({
           </Box>
         )}
         {selectedLocation && expanded && (
-          <Suspense>
+          <Suspense fallback={null}>
             <LocationDialog
               assignment={assignment}
               location={selectedLocation}

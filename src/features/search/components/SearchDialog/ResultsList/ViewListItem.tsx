@@ -1,6 +1,8 @@
+'use client';
+
 import { InsertDriveFileOutlined } from '@mui/icons-material';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 import {
   Avatar,
   ListItem,
@@ -17,8 +19,8 @@ const ViewListItem: React.FunctionComponent<{ view: ZetkinView }> = ({
   view,
 }) => {
   const messages = useMessages(messageIds);
-  const router = useRouter();
-  const { orgId } = router.query as { orgId: string };
+  const params = useParams();
+  const { orgId } = params as { orgId: string };
 
   const elements = [messages.results.people()];
   if (view.folder) {

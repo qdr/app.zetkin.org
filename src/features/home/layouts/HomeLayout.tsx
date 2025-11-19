@@ -1,7 +1,7 @@
 'use client';
 
 import { Box } from '@mui/material';
-import { FC, ReactNode } from 'react';
+import { FC, ReactNode, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 import { useMessages } from 'core/i18n';
@@ -43,9 +43,15 @@ const HomeLayout: FC<Props> = ({ children, title }) => {
   const user = useUser();
   const memberships = useMemberships().data || [];
   const isOfficial = memberships.find((membership) => membership.role != null);
+  const [isMounted, setIsMounted] = useState(false);
 
   const path = usePathname();
   const lastSegment = path?.split('/').pop() ?? 'home';
+
+  // Only render dynamic content after mount to avoid hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <Box
@@ -54,7 +60,7 @@ const HomeLayout: FC<Props> = ({ children, title }) => {
         maxWidth: 960,
       }}
     >
-      {isOfficial && user && <NewLandingPageAlert userId={user.id} />}
+      {isMounted && isOfficial && user && <NewLandingPageAlert userId={user.id} />}
       <ActivistPortalHeader
         selectedTab={lastSegment}
         tabs={[

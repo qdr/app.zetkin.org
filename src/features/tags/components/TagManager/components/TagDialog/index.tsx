@@ -1,3 +1,5 @@
+'use client';
+
 /* eslint-disable jsx-a11y/no-autofocus */
 import { Box, Button, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';

@@ -1,3 +1,5 @@
+'use client';
+
 import { Box } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { FunctionComponent, useState } from 'react';
@@ -37,12 +39,12 @@ const DefaultLayout: FunctionComponent<DefaultLayoutProps> = ({
       <Box
         ref={(div: HTMLDivElement) => setContainer(div)}
         display="flex"
+        flex={1}
         flexDirection="column"
         height="100vh"
         onScroll={onScroll}
         overflow="auto"
         position="relative"
-        width={1}
       >
         <PageContainerContext.Provider value={{ container }}>
           {children}

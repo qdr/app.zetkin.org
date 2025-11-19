@@ -1,3 +1,5 @@
+'use client';
+
 import { ChevronLeft } from '@mui/icons-material';
 import {
   Box,

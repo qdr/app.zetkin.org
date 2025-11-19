@@ -289,6 +289,8 @@ const SurveySubmissionsList = ({
     (sub) => sub.id == createPersonOpen
   );
 
+  const empty = sortedSubmissions.length === 0;
+
   return (
     <Box
       sx={{
@@ -298,7 +300,8 @@ const SurveySubmissionsList = ({
       }}
     >
       <DataGridPro
-        autoHeight
+        autoHeight={empty}
+        columnBuffer={3}
         columns={gridColumns}
         disableColumnFilter
         disableColumnMenu
@@ -319,9 +322,15 @@ const SurveySubmissionsList = ({
         }}
         pageSizeOptions={[100, 250, 500]}
         pagination
+        rowBuffer={5}
         rows={sortedSubmissions}
+        rowThreshold={5}
         style={{
           border: 'none',
+          ...(!empty && {
+            height: 'calc(100vh - 280px)',
+            minHeight: 400,
+          }),
         }}
       />
       {creatingFromSubmission && (

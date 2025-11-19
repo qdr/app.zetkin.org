@@ -1,8 +1,9 @@
-'use server';
+import { headers } from 'next/headers';
 
-import { FC } from 'react';
-
-import SubOrgsPage from 'features/organizations/pages/SubOrgsPage';
+import BackendApiClient from 'core/api/client/BackendApiClient';
+import SubOrgsPageClient from './SubOrgsPageClient';
+import { ZetkinSubOrganization } from 'utils/types/zetkin';
+import flattenSubOrgs from 'features/organizations/utils/flattenSubOrgs';
 
 type Props = {
   params: {
@@ -10,8 +11,18 @@ type Props = {
   };
 };
 
-const Page: FC<Props> = ({ params }) => {
-  return <SubOrgsPage orgId={params.orgId} />;
-};
+export default async function Page({ params }: Props) {
+  const { orgId } = await params;
+  const headersList = await headers();
+  const headersEntries = headersList.entries();
+  const headersObject = Object.fromEntries(headersEntries);
+  const apiClient = new BackendApiClient(headersObject);
 
-export default Page;
+  const subOrgsData = await apiClient.get<ZetkinSubOrganization[]>(
+    `/api/orgs/${orgId}/sub_organizations?recursive`
+  );
+
+  const subOrgs = flattenSubOrgs(subOrgsData);
+
+  return <SubOrgsPageClient orgId={orgId} subOrgs={subOrgs} />;
+}

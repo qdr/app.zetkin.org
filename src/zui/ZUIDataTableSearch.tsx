@@ -1,3 +1,5 @@
+'use client';
+
 import { Fade, IconButton, TextField } from '@mui/material';
 import { Close, Search } from '@mui/icons-material';
 import {

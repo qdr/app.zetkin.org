@@ -1,5 +1,7 @@
+'use client';
+
 import { FC } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { Box, Button, Dialog, Typography } from '@mui/material';
 import { People } from '@mui/icons-material';
 

@@ -154,6 +154,8 @@ const pinnedColumns = {
 
 const style = {
   border: 'none',
+  height: 'calc(100vh - 280px)', // Fixed height for virtualization
+  minHeight: 400,
 };
 
 type Row = Record<string, unknown> & {
@@ -729,6 +731,9 @@ const ViewDataTable: FunctionComponent<ViewDataTableProps> = ({
         pinnedColumns={pinnedColumns}
         processRowUpdate={processRowUpdate}
         rows={gridRows}
+        rowBuffer={5}
+        columnBuffer={3}
+        rowThreshold={5}
         slotProps={componentsProps}
         slots={slots}
         style={style}

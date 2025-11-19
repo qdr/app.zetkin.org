@@ -1,10 +1,8 @@
-'use server';
-
 import { headers } from 'next/headers';
 
 import BackendApiClient from 'core/api/client/BackendApiClient';
 import { ZetkinEvent } from 'utils/types/zetkin';
-import { PublicEventPage } from 'features/organizations/pages/PublicEventPage';
+import PublicEventPageClient from './PublicEventPageClient';
 
 type Props = {
   params: {
@@ -13,8 +11,9 @@ type Props = {
   };
 };
 
-export default async function Page({ params: { eventId, orgId } }: Props) {
-  const headersList = headers();
+export default async function Page({ params }: Props) {
+  const { eventId, orgId } = await params;
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);
@@ -23,5 +22,11 @@ export default async function Page({ params: { eventId, orgId } }: Props) {
     `/api/orgs/${orgId}/actions/${eventId}`
   );
 
-  return <PublicEventPage eventId={event.id} orgId={event.organization.id} />;
+  return (
+    <PublicEventPageClient
+      event={event}
+      eventId={event.id}
+      orgId={event.organization.id}
+    />
+  );
 }

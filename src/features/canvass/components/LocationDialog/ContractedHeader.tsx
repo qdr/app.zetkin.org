@@ -23,7 +23,7 @@ const ContractedHeader: FC<Props> = ({ assignment, location }) => {
         </IconButton>
       }
       subtitle={
-        <Suspense>
+        <Suspense fallback={null}>
           <ContractedHeaderStats assignment={assignment} location={location} />
         </Suspense>
       }

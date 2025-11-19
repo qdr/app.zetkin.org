@@ -1,5 +1,8 @@
+'use client';
+
 import { CheckBox } from '@mui/icons-material';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 
 import TaskDetailsForm from 'features/tasks/components/TaskDetailsForm';
 import { ZetkinTaskRequestBody } from 'features/tasks/components/types';
@@ -11,7 +14,8 @@ const DialogContent: React.FunctionComponent<DialogContentBaseProps> = ({
   closeDialog,
 }) => {
   const router = useRouter();
-  const { campId, orgId } = router.query as { campId: string; orgId: string };
+  const params = useParams();
+  const { campId, orgId } = params as { campId: string; orgId: string };
 
   const createTask = useCreateTask(parseInt(orgId as string));
   //createTask function in hook async,

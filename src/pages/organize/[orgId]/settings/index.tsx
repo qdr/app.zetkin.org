@@ -1,46 +1,40 @@
-import { GetServerSideProps } from 'next';
+'use client';
+
+import { useEffect } from 'react';
 import { OpenInNew } from '@mui/icons-material';
 import { Box, Grid, Link, Typography } from '@mui/material';
 
 import AddOfficialButton from 'features/settings/components/AddOfficialButton';
 import messageIds from 'features/settings/l10n/messageIds';
 import OfficialList from 'features/settings/components/OfficialList';
-import { PageWithLayout } from 'utils/types';
-import { scaffold } from 'utils/next';
-import SettingsLayout from 'features/settings/layout/SettingsLayout';
-import { useEnv } from 'core/hooks';
-import useNumericRouteParams from 'core/hooks/useNumericRouteParams';
-import useOfficialMemberships from 'features/settings/hooks/useOfficialMemberships';
-import useServerSide from 'core/useServerSide';
+import { officialMembershipsLoaded } from 'features/settings/store';
+import { useAppDispatch, useEnv } from 'core/hooks';
 import ZUICard from 'zui/ZUICard';
 import ZUITextfieldToClipboard from 'zui/ZUITextfieldToClipboard';
 import { Msg, useMessages } from 'core/i18n';
+import { ZetkinMembership } from 'utils/types/zetkin';
 
-export const getServerSideProps: GetServerSideProps = scaffold(
-  async () => {
-    return {
-      props: {},
-    };
-  },
-  {
-    authLevelRequired: 2,
-  }
-);
+interface SettingsPageClientProps {
+  memberships: ZetkinMembership[];
+  orgId: number;
+}
 
-const SettingsPage: PageWithLayout = () => {
-  const onServer = useServerSide();
-  const { orgId } = useNumericRouteParams();
-  const listFuture = useOfficialMemberships(orgId).data || [];
+export default function SettingsPageClient({
+  memberships,
+  orgId,
+}: SettingsPageClientProps) {
+  const dispatch = useAppDispatch();
   const messages = useMessages(messageIds);
   const env = useEnv();
+
+  useEffect(() => {
+    dispatch(officialMembershipsLoaded(memberships));
+  }, [memberships, dispatch]);
+
   const publicOrgUrl = `${env.vars.ZETKIN_APP_DOMAIN}/o/${orgId}`;
 
-  const adminList = listFuture.filter((user) => user.role === 'admin');
-  const organizerList = listFuture.filter((user) => user.role === 'organizer');
-
-  if (onServer) {
-    return null;
-  }
+  const adminList = memberships.filter((user) => user.role === 'admin');
+  const organizerList = memberships.filter((user) => user.role === 'organizer');
 
   return (
     <Grid container spacing={2}>
@@ -113,10 +107,4 @@ const SettingsPage: PageWithLayout = () => {
       </Grid>
     </Grid>
   );
-};
-
-SettingsPage.getLayout = function getLayout(page) {
-  return <SettingsLayout>{page}</SettingsLayout>;
-};
-
-export default SettingsPage;
+}

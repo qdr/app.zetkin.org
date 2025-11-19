@@ -1,6 +1,8 @@
+'use client';
+
 import { FC } from 'react';
 import { makeStyles } from '@mui/styles';
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 import { Box, Button, Link, Typography } from '@mui/material';
 
 import { Msg } from 'core/i18n';
@@ -31,7 +33,8 @@ const ShareViewDialogDownloadTab: FC<ShareViewDialogDownloadTabProps> = ({
   onAbort,
 }) => {
   const styles = useStyles();
-  const { orgId, viewId } = useRouter().query;
+  const params = useParams();
+  const { orgId, viewId } = params;
 
   return (
     <Box className={styles.container}>

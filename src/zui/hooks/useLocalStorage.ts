@@ -1,19 +1,28 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function useLocalStorage<T>(
   key: string,
   defaultValue: T
 ): [T, (newValue: T) => void] {
-  const state = useState<T>(getLocalStorageValue(key, defaultValue));
-  const setValue = state[1];
+  // Always start with defaultValue on both server and first client render
+  const [value, setValue] = useState<T>(defaultValue);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  return [
-    getLocalStorageValue(key, defaultValue),
-    (newValue: T) => {
+  // Only access localStorage on the client after hydration
+  useEffect(() => {
+    const storedValue = getLocalStorageValue(key, defaultValue);
+    setValue(storedValue);
+    setIsInitialized(true);
+  }, [key, defaultValue]);
+
+  const setStoredValue = (newValue: T) => {
+    if (typeof window !== 'undefined') {
       localStorage.setItem(key, JSON.stringify(newValue));
-      setValue(newValue);
-    },
-  ];
+    }
+    setValue(newValue);
+  };
+
+  return [value, setStoredValue];
 }
 
 function getLocalStorageValue<T>(key: string, defaultValue: T): T {

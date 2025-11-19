@@ -1,3 +1,5 @@
+'use client';
+
 import {
   FC,
   startTransition,
@@ -8,7 +10,7 @@ import {
 } from 'react';
 import { latLngBounds, Map as MapType } from 'leaflet';
 import { MapContainer } from 'react-leaflet';
-import { useRouter } from 'next/router';
+import { useSearchParams } from 'next/navigation';
 import {
   Box,
   Button,
@@ -87,13 +89,19 @@ const OrganizerMap: FC<OrganizerMapProps> = ({
   const { onAssigneesFilterChange } = useContext(assigneesFilterContext);
   const { setActiveGroupIds, setActiveTagIdsByGroup } =
     useContext(areaFilterContext);
-  const router = useRouter();
+  const searchParams = useSearchParams();
   const navigateToAreaId = parseInt(
-    router.query.navigateToAreaId?.toString() ?? '0'
+    searchParams.get('navigateToAreaId') ?? '0'
   );
 
   const mapRef = useRef<MapType | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
   useAutoResizeMap(mapRef.current);
+
+  // Guard against React StrictMode double-mount
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const selectedArea = areas.find((area) => area.id == selectedId);
 
@@ -364,31 +372,34 @@ const OrganizerMap: FC<OrganizerMapProps> = ({
             )}
           </Paper>
         )}
-        <MapContainer
-          ref={mapRef}
-          attributionControl={false}
-          center={[0, 0]}
-          style={{ height: '100%', width: '100%' }}
-          zoom={2}
-          zoomControl={false}
-        >
-          <OrganizerMapRenderer
-            areas={filteredAreas}
-            areaStats={areaStats}
-            areaStyle={mapStyle.area}
-            locations={locations}
-            locationStyle={mapStyle.location}
-            onSelectedIdChange={(newId) => {
-              startTransition(() => {
-                setSelectedId(newId);
-                setSettingsOpen(newId ? 'select' : null);
-              });
-            }}
-            overlayStyle={mapStyle.overlay}
-            selectedId={selectedId}
-            sessions={sessions}
-          />
-        </MapContainer>
+        {isMounted && (
+          <MapContainer
+            ref={mapRef}
+            attributionControl={false}
+            center={[0, 0]}
+            style={{ height: '100%', width: '100%' }}
+            zoom={2}
+            zoomControl={false}
+          >
+            <OrganizerMapRenderer
+              areas={filteredAreas}
+              areaStats={areaStats}
+              areaStyle={mapStyle.area}
+              locations={locations}
+              locationStyle={mapStyle.location}
+              navigateToAreaId={navigateToAreaId}
+              onSelectedIdChange={(newId) => {
+                startTransition(() => {
+                  setSelectedId(newId);
+                  setSettingsOpen(newId ? 'select' : null);
+                });
+              }}
+              overlayStyle={mapStyle.overlay}
+              selectedId={selectedId}
+              sessions={sessions}
+            />
+          </MapContainer>
+        )}
       </Box>
     </Box>
   );

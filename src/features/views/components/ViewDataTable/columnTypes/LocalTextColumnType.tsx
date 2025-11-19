@@ -1,3 +1,5 @@
+'use client';
+
 import { makeStyles } from '@mui/styles';
 import { Box, InputBase, InputBaseProps, Paper, Popper } from '@mui/material';
 import { FC, useCallback, useState } from 'react';

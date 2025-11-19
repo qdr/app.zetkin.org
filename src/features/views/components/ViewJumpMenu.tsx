@@ -1,9 +1,10 @@
 /* eslint-disable jsx-a11y/no-autofocus */
+'use client';
 
 import { ExpandMore } from '@mui/icons-material';
 import Link from 'next/link';
 import useAutocomplete from '@mui/material/useAutocomplete';
-import { useRouter } from 'next/router';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   Box,
   IconButton,
@@ -30,6 +31,7 @@ const ViewJumpMenu: FunctionComponent = () => {
   const messages = useMessages(messageIds);
   const listRef = useRef<HTMLUListElement>(null);
   const router = useRouter();
+  const pathname = usePathname();
   const { orgId, viewId } = useNumericRouteParams();
   const [jumpMenuAnchor, setJumpMenuAnchor] = useState<Element | null>(null);
   const [activeIndex, setActiveIndex] = useState<number>(Infinity);
@@ -52,18 +54,10 @@ const ViewJumpMenu: FunctionComponent = () => {
     options: views,
   });
 
-  // Set up event listeners to close menu when navigating away
+  // Close menu when pathname changes (navigation)
   useEffect(() => {
-    const closeMenu = () => {
-      setJumpMenuAnchor(null);
-    };
-
-    router.events.on('routeChangeStart', closeMenu);
-
-    return () => {
-      router.events.off('routeChangeStart', closeMenu);
-    };
-  }, [router]);
+    setJumpMenuAnchor(null);
+  }, [pathname]);
 
   // Scroll (if necessary) when navigating using keyboard
   useEffect(() => {

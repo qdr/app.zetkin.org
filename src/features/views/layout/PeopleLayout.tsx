@@ -1,3 +1,5 @@
+'use client';
+
 import PeopleActionButton from '../components/PeopleActionButton';
 import { useMessages } from 'core/i18n';
 import useServerSide from 'core/useServerSide';

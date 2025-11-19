@@ -152,18 +152,29 @@ const OfficialList: FC<OfficialListProps> = ({ orgId, officialList }) => {
     },
   ];
 
+  const empty = sortedOfficialList.length === 0;
+
   return (
     <DataGridPro
-      autoHeight
+      autoHeight={empty}
       checkboxSelection={false}
+      columnBuffer={3}
       columns={columns}
       disableRowSelectionOnClick
       hideFooter
+      rowBuffer={5}
       rows={sortedOfficialList || []}
+      rowThreshold={5}
       slots={{
         columnHeaders: () => null,
       }}
-      sx={{ backgroundColor: 'white' }}
+      sx={{
+        backgroundColor: 'white',
+        ...(!empty && {
+          height: 'calc(100vh - 280px)',
+          minHeight: 400,
+        }),
+      }}
     />
   );
 };

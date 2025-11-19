@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import shouldLoad from 'core/caching/shouldLoad';
 import { ViewTreeData } from 'pages/api/views/tree';
 import { allItemsLoad, allItemsLoaded } from '../store';
@@ -14,15 +15,22 @@ export default function useViewTree(orgId: number): IFuture<ViewTreeData> {
   const views = useAppSelector((state) => state.views);
   const dispatch = useAppDispatch();
 
-  if (shouldLoad(views.folderList) || shouldLoad(views.viewList)) {
-    dispatch(allItemsLoad());
-    const promise = apiClient
-      .get<ViewTreeData>(`/api/views/tree?orgId=${orgId}`)
-      .then((items) => {
-        dispatch(allItemsLoaded(items));
-        return items;
-      });
-    return new PromiseFuture(promise);
+  const needsLoad = shouldLoad(views.folderList) || shouldLoad(views.viewList);
+
+  useEffect(() => {
+    if (needsLoad) {
+      dispatch(allItemsLoad());
+      apiClient
+        .get<ViewTreeData>(`/api/views/tree?orgId=${orgId}`)
+        .then((items) => {
+          dispatch(allItemsLoaded(items));
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [needsLoad, orgId]);
+
+  if (needsLoad) {
+    return new LoadingFuture();
   } else if (
     (views.viewList.isLoading && !views.viewList.loaded) ||
     (views.folderList.isLoading && !views.folderList.loaded)
