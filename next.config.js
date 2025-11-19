@@ -22,7 +22,7 @@ module.exports = {
   poweredByHeader: false,
 
   // Moved from experimental in Next.js 15
-  serverExternalPackages: ['mjml', 'mongoose', 'canvas'],
+  serverExternalPackages: ['mjml', 'mongoose', 'canvas', 'jsdom', 'isomorphic-dompurify'],
 
   // Turbopack configuration
   turbopack: {
