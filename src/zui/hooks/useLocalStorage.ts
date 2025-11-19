@@ -1,35 +1,41 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function useLocalStorage<T>(
   key: string,
   defaultValue: T
 ): [T, (newValue: T) => void] {
-  const state = useState<T>(getLocalStorageValue(key, defaultValue));
-  const setValue = state[1];
+  const [value, setValue] = useState<T>(defaultValue);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  return [
-    getLocalStorageValue(key, defaultValue),
-    (newValue: T) => {
-      localStorage.setItem(key, JSON.stringify(newValue));
-      setValue(newValue);
-    },
-  ];
-}
-
-function getLocalStorageValue<T>(key: string, defaultValue: T): T {
-  const isBrowser = typeof window !== 'undefined';
-  const stringValue = isBrowser ? localStorage.getItem(key) : null;
-
-  if (stringValue === null || stringValue.length == 0) {
-    if (isBrowser) {
-      localStorage.setItem(key, JSON.stringify(defaultValue));
+  // Load from localStorage only on client after mount
+  useEffect(() => {
+    const isBrowser = typeof window !== 'undefined';
+    if (!isBrowser) {
+      return;
     }
-    return defaultValue;
-  }
 
-  try {
-    return JSON.parse(stringValue);
-  } catch (err) {
-    return defaultValue;
-  }
+    const stringValue = localStorage.getItem(key);
+
+    if (stringValue === null || stringValue.length === 0) {
+      localStorage.setItem(key, JSON.stringify(defaultValue));
+      setValue(defaultValue);
+    } else {
+      try {
+        setValue(JSON.parse(stringValue));
+      } catch (err) {
+        setValue(defaultValue);
+      }
+    }
+
+    setIsInitialized(true);
+  }, [key, defaultValue]);
+
+  const setValueAndStore = (newValue: T) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(key, JSON.stringify(newValue));
+    }
+    setValue(newValue);
+  };
+
+  return [value, setValueAndStore];
 }
