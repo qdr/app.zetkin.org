@@ -21,9 +21,12 @@ module.exports = {
   compress: true,
   poweredByHeader: false,
 
-  experimental: {
-    // esmExternals: "loose", // Removed: Not supported by Turbopack, deprecated in Next.js 15
-    serverComponentsExternalPackages: ['mjml', 'mongoose', 'canvas'],
+  // Moved from experimental in Next.js 15
+  serverExternalPackages: ['mjml', 'mongoose', 'canvas'],
+
+  // Turbopack configuration
+  turbopack: {
+    root: __dirname,
   },
 
   images: {
