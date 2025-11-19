@@ -1,5 +1,8 @@
+'use client';
+
 import {
   FC,
+  Suspense,
   useCallback,
   useContext,
   useEffect,
@@ -143,16 +146,17 @@ const LocationDialog: FC<LocationDialogProps> = ({
           onHouseholds={(useNew) => goto(useNew ? 'households2' : 'households')}
           onVisit={() => goto('locationVisit')}
         />
-        <EditLocationPage
-          key="edit"
-          location={location}
-          onBack={() => back()}
-          onClose={onClose}
-          onSave={async (title, description) => {
-            await updateLocation({ description, title });
-            back();
-          }}
-        />
+        <Suspense fallback={<div />} key="edit">
+          <EditLocationPage
+            location={location}
+            onBack={() => back()}
+            onClose={onClose}
+            onSave={async (title, description) => {
+              await updateLocation({ description, title });
+              back();
+            }}
+          />
+        </Suspense>
         <HouseholdsPage2
           key="households2"
           assignment={assignment}
