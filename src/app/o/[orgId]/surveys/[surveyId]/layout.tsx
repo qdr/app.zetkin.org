@@ -2,7 +2,7 @@
 
 import { headers } from 'next/headers';
 import { Metadata } from 'next';
-import { FC, ReactElement, ReactNode } from 'react';
+import { FC, ReactElement, ReactNode, Suspense } from 'react';
 import { notFound } from 'next/navigation';
 
 import BackendApiClient from 'core/api/client/BackendApiClient';
@@ -72,7 +72,9 @@ const SurveyLayout: FC<Props> = async ({
 
   return (
     <HomeThemeProvider>
-      <PublicSurveyLayout survey={survey}>{children}</PublicSurveyLayout>
+      <Suspense fallback={<div />}>
+        <PublicSurveyLayout survey={survey}>{children}</PublicSurveyLayout>
+      </Suspense>
     </HomeThemeProvider>
   );
 };
