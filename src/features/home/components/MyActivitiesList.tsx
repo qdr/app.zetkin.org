@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Box, Fade } from '@mui/material';
 import { GroupWorkOutlined, Hotel } from '@mui/icons-material';
 
@@ -19,7 +19,16 @@ const MyActivitiesList: FC = () => {
   const activities = useMyActivities();
   const messages = useMessages(messageIds);
   const [filteredKinds, setFilteredKinds] = useState<string[]>([]);
+  const [isMounted, setIsMounted] = useState(false);
   const nextDelay = useIncrementalDelay();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return <div style={{ display: 'none' }} />;
+  }
 
   const kinds = Array.from(
     new Set(activities.map((activity) => activity.kind))
