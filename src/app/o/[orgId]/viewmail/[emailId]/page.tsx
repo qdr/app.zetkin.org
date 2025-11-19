@@ -10,10 +10,10 @@ import renderEmailHtml from 'features/emails/utils/rendering/renderEmailHtml';
 import { ZetkinEmail } from 'utils/types/zetkin';
 
 type PageProps = {
-  params: {
+  params: Promise<{
     emailId: string;
     orgId: string;
-  };
+  }>;
 };
 
 export default async function Page({ params }: PageProps) {

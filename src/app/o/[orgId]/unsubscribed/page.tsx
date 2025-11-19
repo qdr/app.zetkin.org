@@ -6,12 +6,13 @@ import UnsubscribedPage from 'features/emails/pages/UnsubscribedPage';
 import { ZetkinOrganization } from 'utils/types/zetkin';
 
 type PageProps = {
-  params: {
+  params: Promise<{
     orgId: string;
-  };
+  }>;
 };
 
 export default async function Page({ params }: PageProps) {
+  const { orgId } = await params;
   const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
@@ -19,7 +20,7 @@ export default async function Page({ params }: PageProps) {
 
   try {
     const org = await apiClient.get<ZetkinOrganization>(
-      `/api/orgs/${params.orgId}`
+      `/api/orgs/${orgId}`
     );
 
     return <UnsubscribedPage org={org} />;

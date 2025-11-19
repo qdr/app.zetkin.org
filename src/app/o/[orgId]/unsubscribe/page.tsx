@@ -6,12 +6,12 @@ import UnsubscribePage from 'features/emails/pages/UnsubscribePage';
 import { ZetkinOrganization } from 'utils/types/zetkin';
 
 type PageProps = {
-  params: {
+  params: Promise<{
     orgId: string;
-  };
-  searchParams: {
+  }>;
+  searchParams: Promise<{
     unsub?: string;
-  };
+  }>;
 };
 
 export default async function Page({ params, searchParams }: PageProps) {

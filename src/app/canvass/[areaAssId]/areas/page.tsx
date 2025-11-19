@@ -6,13 +6,13 @@ import { ZetkinOrganization } from 'utils/types/zetkin';
 import CanvassSelectAreaPage from 'features/canvass/components/CanvassSelectAreaPage';
 
 interface PageProps {
-  params: {
-    areaAssId: number;
-  };
+  params: Promise<{
+    areaAssId: string;
+  }>;
 }
 
 export default async function Page({ params }: PageProps) {
-  const { areaAssId } = params;
+  const { areaAssId } = await params;
   const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
