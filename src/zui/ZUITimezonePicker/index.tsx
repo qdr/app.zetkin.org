@@ -1,3 +1,5 @@
+'use client';
+
 import timezones from 'timezones-list';
 import { useState } from 'react';
 import { Autocomplete, Divider, TextField, Typography } from '@mui/material';
