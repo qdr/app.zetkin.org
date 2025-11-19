@@ -37,14 +37,19 @@ import BulkHouseholdVisitsPage from './pages/BulkHouseholdVisitsPage';
 
 // Dynamic imports to prevent TextField hydration errors
 const EditLocationPage = dynamic(() => import('./pages/EditLocationPage'), {
+  loading: () => <div style={{ display: 'none' }} />,
   ssr: false,
 });
 const EditHouseholdPage = dynamic(() => import('./pages/EditHouseholdPage'), {
+  loading: () => <div style={{ display: 'none' }} />,
   ssr: false,
 });
 const BulkEditHouseholdsPage = dynamic(
   () => import('./pages/BulkEditHouseholdsPage'),
-  { ssr: false }
+  {
+    loading: () => <div style={{ display: 'none' }} />,
+    ssr: false,
+  }
 );
 import useEditHouseholds from 'features/canvass/hooks/useEditHouseholds';
 import HouseholdsPage2 from './pages/HouseholdsPage2';
