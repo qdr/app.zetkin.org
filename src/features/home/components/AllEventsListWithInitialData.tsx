@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useEffect, useState } from 'react';
+import { FC, useLayoutEffect, useState } from 'react';
 
 import { ZetkinEvent } from 'utils/types/zetkin';
 import { ZetkinEventWithStatus } from '../types';
@@ -19,17 +19,17 @@ const AllEventsListWithInitialData: FC<Props> = ({
   userEvents,
 }) => {
   const dispatch = useAppDispatch();
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [isReady, setIsReady] = useState(false);
 
-  useEffect(() => {
-    const sorted = allEvents.sort(sortEventsByStartTime);
+  useLayoutEffect(() => {
+    const sorted = [...allEvents].sort(sortEventsByStartTime);
     dispatch(allEventsLoaded(sorted));
     dispatch(userEventsLoaded(userEvents));
-    setIsHydrated(true);
-  }, [allEvents, userEvents, dispatch]);
+    setIsReady(true);
+  }, []);
 
-  if (!isHydrated) {
-    return null;
+  if (!isReady) {
+    return <div style={{ display: 'none' }} />;
   }
 
   return <AllEventsList />;
