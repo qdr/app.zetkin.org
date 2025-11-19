@@ -62,6 +62,10 @@ function lineDataFromInsights(
     return [];
   }
 
+  if (!insights.opensByDate || !Array.isArray(insights.opensByDate)) {
+    return [];
+  }
+
   return insights.opensByDate.map((openEvent) => ({
     x:
       (new Date(openEvent.date).getTime() - new Date(startTime).getTime()) /
