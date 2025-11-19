@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, Suspense, useState } from 'react';
+import { FC, Suspense, useEffect, useState } from 'react';
 import { Avatar, Box, IconButton, Typography } from '@mui/material';
 import { Menu } from '@mui/icons-material';
 import { ArrowLeftIcon } from '@mui/x-date-pickers';
@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation';
 
 import useOrganization from 'features/organizations/hooks/useOrganization';
 import ZUIFutures from 'zui/ZUIFutures';
-import useServerSide from 'core/useServerSide';
 import useMyAreaAssignments from '../hooks/useMyAreaAssignments';
 import CanvassSidebar from './CanvassSidebar';
 import { ZetkinAreaAssignment } from 'features/areaAssignments/types';
@@ -23,10 +22,14 @@ const Page: FC<{ areaId: number; assignment: ZetkinAreaAssignment }> = ({
   const orgFuture = useOrganization(assignment.organization_id);
   const selectedArea = areas.find((area) => area.id == areaId);
   const router = useRouter();
-  const isServer = useServerSide();
   const [showMenu, setShowMenu] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
-  if (isServer) {
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
     return <div style={{ display: 'none' }} />;
   }
 
