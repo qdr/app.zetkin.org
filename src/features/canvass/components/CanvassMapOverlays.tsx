@@ -110,15 +110,17 @@ const CanvassMapOverlays: FC<Props> = ({
         )}
         {isCreating && (
           <Box p={2}>
-            <CreateLocationCard
-              onClose={() => {
-                onToggleCreating(false);
-              }}
-              onCreate={(title) => {
-                onCreate(title);
-              }}
-              suggestions={suggestions}
-            />
+            <Suspense fallback={<div />}>
+              <CreateLocationCard
+                onClose={() => {
+                  onToggleCreating(false);
+                }}
+                onCreate={(title) => {
+                  onCreate(title);
+                }}
+                suggestions={suggestions}
+              />
+            </Suspense>
           </Box>
         )}
       </Box>
