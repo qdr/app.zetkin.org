@@ -21,12 +21,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);
 
-  const org = await apiClient.get<ZetkinOrganization>(`/api/orgs/${orgId}`);
+  try {
+    const org = await apiClient.get<ZetkinOrganization>(`/api/orgs/${orgId}`);
 
-  return {
-    icons: [{ url: '/logo-zetkin.png' }],
-    title: org.title,
-  };
+    return {
+      icons: [{ url: '/logo-zetkin.png' }],
+      title: org.title,
+    };
+  } catch (err) {
+    return {
+      icons: [{ url: '/logo-zetkin.png' }],
+      title: 'Organization',
+    };
+  }
 }
 
 // @ts-expect-error https://nextjs.org/docs/app/building-your-application/configuring/typescript#async-server-component-typescript-error
