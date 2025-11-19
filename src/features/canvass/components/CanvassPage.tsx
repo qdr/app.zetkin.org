@@ -27,7 +27,7 @@ const Page: FC<{ areaId: number; assignment: ZetkinAreaAssignment }> = ({
   const [showMenu, setShowMenu] = useState(false);
 
   if (isServer) {
-    return null;
+    return <div style={{ display: 'none' }} />;
   }
 
   return (
