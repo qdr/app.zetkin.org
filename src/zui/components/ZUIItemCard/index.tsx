@@ -1,3 +1,5 @@
+'use client';
+
 import { FC, PropsWithChildren } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import Image from 'next/image';

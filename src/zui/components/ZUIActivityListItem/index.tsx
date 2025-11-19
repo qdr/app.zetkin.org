@@ -1,3 +1,5 @@
+'use client';
+
 import { FC, MouseEvent as ReactMouseEvent } from 'react';
 import NextLink from 'next/link';
 import { Box, Checkbox, ListItem, Typography } from '@mui/material';

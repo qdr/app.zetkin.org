@@ -1,3 +1,5 @@
+'use client';
+
 import { FormControl, FormGroup, FormLabel, Typography } from '@mui/material';
 import { FC, useId } from 'react';
 
