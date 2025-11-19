@@ -1,3 +1,5 @@
+'use client';
+
 import copy from 'copy-to-clipboard';
 import { Box, Fade, IconButton } from '@mui/material';
 import React, { useContext, useState } from 'react';

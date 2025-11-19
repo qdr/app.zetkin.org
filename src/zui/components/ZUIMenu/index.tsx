@@ -1,3 +1,5 @@
+'use client';
+
 import { FC } from 'react';
 import { ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 

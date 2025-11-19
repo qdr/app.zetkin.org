@@ -1,3 +1,5 @@
+'use client';
+
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Snackbar } from '@mui/material';
 import { Alert, AlertColor } from '@mui/material';

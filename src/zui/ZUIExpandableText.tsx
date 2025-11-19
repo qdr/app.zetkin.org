@@ -1,3 +1,5 @@
+'use client';
+
 import { MouseEvent, useState } from 'react';
 import { Box, Link, Typography } from '@mui/material';
 

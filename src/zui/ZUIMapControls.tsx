@@ -1,3 +1,5 @@
+'use client';
+
 import CircularProgress from '@mui/material/CircularProgress';
 import React, { useState } from 'react';
 import { Box, Button, ButtonGroup, useTheme } from '@mui/material';

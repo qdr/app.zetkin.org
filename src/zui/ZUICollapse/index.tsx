@@ -1,3 +1,5 @@
+'use client';
+
 import { Button, Collapse } from '@mui/material';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { useCallback, useState } from 'react';

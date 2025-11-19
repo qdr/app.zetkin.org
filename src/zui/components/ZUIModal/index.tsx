@@ -1,3 +1,5 @@
+'use client';
+
 import { FC, ReactNode } from 'react';
 import { useMediaQuery, useTheme } from '@mui/material';
 
