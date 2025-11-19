@@ -23,12 +23,29 @@ const ZUICleanHtml = ({
     // Dynamically import DOMPurify only on client side
     import('isomorphic-dompurify')
       .then((module) => {
-        // isomorphic-dompurify default export is the DOMPurify instance
-        const purify = module.default;
-        if (purify && typeof purify.sanitize === 'function') {
+        // Try different ways to access the DOMPurify instance
+        let purify = null;
+
+        // Try module.default first (ES module)
+        if (module.default && typeof module.default.sanitize === 'function') {
+          purify = module.default;
+        }
+        // Try module directly (CommonJS)
+        else if (typeof module.sanitize === 'function') {
+          purify = module as any;
+        }
+        // Try module.default() if it's a function that returns DOMPurify
+        else if (typeof module.default === 'function') {
+          const result = module.default();
+          if (result && typeof result.sanitize === 'function') {
+            purify = result;
+          }
+        }
+
+        if (purify) {
           setDOMPurify(purify);
         } else {
-          console.error('DOMPurify.sanitize is not a function:', purify);
+          console.error('Could not find DOMPurify.sanitize in module:', module);
         }
       })
       .catch((err) => {
