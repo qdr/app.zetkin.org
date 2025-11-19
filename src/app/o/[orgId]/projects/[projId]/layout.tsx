@@ -10,20 +10,21 @@ import PublicProjectLayout from 'features/campaigns/layout/PublicProjectLayout';
 
 type Props = {
   children: ReactNode;
-  params: {
+  params: Promise<{
     orgId: string;
     projId: string;
-  };
+  }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { orgId, projId } = await params;
   const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);
 
   const campaign = await apiClient.get<ZetkinCampaign>(
-    `/api/orgs/${params.orgId}/campaigns/${params.projId}`
+    `/api/orgs/${orgId}/campaigns/${projId}`
   );
 
   return {
@@ -34,6 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // @ts-expect-error https://nextjs.org/docs/app/building-your-application/configuring/typescript#async-server-component-typescript-error
 const MyHomeLayout: FC<Props> = async ({ children, params }) => {
+  const { orgId, projId } = await params;
   const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
@@ -41,7 +43,7 @@ const MyHomeLayout: FC<Props> = async ({ children, params }) => {
 
   try {
     const campaign = await apiClient.get<ZetkinCampaign>(
-      `/api/orgs/${params.orgId}/campaigns/${params.projId}`
+      `/api/orgs/${orgId}/campaigns/${projId}`
     );
 
     return (
