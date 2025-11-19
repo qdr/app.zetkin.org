@@ -10,9 +10,9 @@ import {
   useState,
 } from 'react';
 import { Box } from '@mui/material';
+import dynamic from 'next/dynamic';
 
 import HouseholdVisitPage from './pages/HouseholdVisitPage';
-import EditLocationPage from './pages/EditLocationPage';
 import LocationPage from './pages/LocationPage';
 import HouseholdPage from './pages/HouseholdPage';
 import {
@@ -20,7 +20,6 @@ import {
   ZetkinLocation,
 } from 'features/areaAssignments/types';
 import ZUINavStack from 'zui/ZUINavStack';
-import EditHouseholdPage from './pages/EditHouseholdPage';
 import CreateHouseholdsPage from './pages/CreateHouseholdsPage';
 import LocationVisitPage from './pages/LocationVisitPage';
 import HouseholdsPage from './pages/HouseholdsPage';
@@ -35,7 +34,18 @@ import messageIds from 'features/canvass/l10n/messageIds';
 import { useMessages } from 'core/i18n';
 import sortMetrics from 'features/canvass/utils/sortMetrics';
 import BulkHouseholdVisitsPage from './pages/BulkHouseholdVisitsPage';
-import BulkEditHouseholdsPage from './pages/BulkEditHouseholdsPage';
+
+// Dynamic imports to prevent TextField hydration errors
+const EditLocationPage = dynamic(() => import('./pages/EditLocationPage'), {
+  ssr: false,
+});
+const EditHouseholdPage = dynamic(() => import('./pages/EditHouseholdPage'), {
+  ssr: false,
+});
+const BulkEditHouseholdsPage = dynamic(
+  () => import('./pages/BulkEditHouseholdsPage'),
+  { ssr: false }
+);
 import useEditHouseholds from 'features/canvass/hooks/useEditHouseholds';
 import HouseholdsPage2 from './pages/HouseholdsPage2';
 
@@ -146,17 +156,16 @@ const LocationDialog: FC<LocationDialogProps> = ({
           onHouseholds={(useNew) => goto(useNew ? 'households2' : 'households')}
           onVisit={() => goto('locationVisit')}
         />
-        <Suspense fallback={<div />} key="edit">
-          <EditLocationPage
-            location={location}
-            onBack={() => back()}
-            onClose={onClose}
-            onSave={async (title, description) => {
-              await updateLocation({ description, title });
-              back();
-            }}
-          />
-        </Suspense>
+        <EditLocationPage
+          key="edit"
+          location={location}
+          onBack={() => back()}
+          onClose={onClose}
+          onSave={async (title, description) => {
+            await updateLocation({ description, title });
+            back();
+          }}
+        />
         <HouseholdsPage2
           key="households2"
           assignment={assignment}

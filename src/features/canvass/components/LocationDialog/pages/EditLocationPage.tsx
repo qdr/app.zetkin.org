@@ -26,20 +26,11 @@ const EditLocationPage: FC<EditLocationPageProps> = ({
   const [title, setTitle] = useState(location.title || '');
   const [description, setDescription] = useState(location.description || '');
   const [isLoading, setIsLoading] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setTitle(location.title || '');
     setDescription(location.description || '');
   }, [location]);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) {
-    return <div style={{ display: 'none' }} />;
-  }
 
   const nothingHasBeenEdited =
     title == location.title &&
