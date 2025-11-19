@@ -6,9 +6,9 @@ import { ZetkinEvent, ZetkinOrganization } from 'utils/types/zetkin';
 import { ZetkinEventWithStatus } from 'features/home/types';
 
 type Props = {
-  params: {
-    orgId: number;
-  };
+  params: Promise<{
+    orgId: string;
+  }>;
 };
 
 export default async function Page({ params }: Props) {

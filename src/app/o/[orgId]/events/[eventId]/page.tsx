@@ -5,10 +5,10 @@ import { ZetkinEvent } from 'utils/types/zetkin';
 import PublicEventPageClient from './PublicEventPageClient';
 
 type Props = {
-  params: {
+  params: Promise<{
     eventId: string;
-    orgId: number;
-  };
+    orgId: string;
+  }>;
 };
 
 export default async function Page({ params }: Props) {

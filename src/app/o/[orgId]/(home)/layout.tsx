@@ -10,7 +10,7 @@ import { ZetkinOrganization } from 'utils/types/zetkin';
 type Props = {
   children: ReactNode;
   params: {
-    orgId: number;
+    orgId: string;
   };
 };
 

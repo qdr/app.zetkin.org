@@ -11,8 +11,8 @@ import PublicProjectLayout from 'features/campaigns/layout/PublicProjectLayout';
 type Props = {
   children: ReactNode;
   params: {
-    orgId: number;
-    projId: number;
+    orgId: string;
+    projId: string;
   };
 };
 

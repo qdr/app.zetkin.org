@@ -6,9 +6,9 @@ import { ZetkinSubOrganization } from 'utils/types/zetkin';
 import flattenSubOrgs from 'features/organizations/utils/flattenSubOrgs';
 
 type Props = {
-  params: {
-    orgId: number;
-  };
+  params: Promise<{
+    orgId: string;
+  }>;
 };
 
 export default async function Page({ params }: Props) {

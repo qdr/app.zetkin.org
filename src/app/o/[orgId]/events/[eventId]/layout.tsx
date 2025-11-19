@@ -10,10 +10,10 @@ import { ZetkinEvent } from 'utils/types/zetkin';
 import { getBrowserLanguage, getMessages } from 'utils/locale';
 
 type Props = PropsWithChildren<{
-  params: {
-    eventId: number;
-    orgId: number;
-  };
+  params: Promise<{
+    eventId: string;
+    orgId: string;
+  }>;
 }>;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

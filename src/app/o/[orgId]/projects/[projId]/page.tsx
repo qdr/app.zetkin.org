@@ -9,10 +9,10 @@ import getEventState from 'features/events/utils/getEventState';
 import { EventState } from 'features/events/hooks/useEventState';
 
 type Props = {
-  params: {
-    orgId: number;
-    projId: number;
-  };
+  params: Promise<{
+    orgId: string;
+    projId: string;
+  }>;
 };
 
 export default async function Page({ params }: Props) {
