@@ -93,7 +93,13 @@ const OrganizerMap: FC<OrganizerMapProps> = ({
   );
 
   const mapRef = useRef<MapType | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
   useAutoResizeMap(mapRef.current);
+
+  // Guard against React StrictMode double-mount
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const selectedArea = areas.find((area) => area.id == selectedId);
 
@@ -364,31 +370,34 @@ const OrganizerMap: FC<OrganizerMapProps> = ({
             )}
           </Paper>
         )}
-        <MapContainer
-          ref={mapRef}
-          attributionControl={false}
-          center={[0, 0]}
-          style={{ height: '100%', width: '100%' }}
-          zoom={2}
-          zoomControl={false}
-        >
-          <OrganizerMapRenderer
-            areas={filteredAreas}
-            areaStats={areaStats}
-            areaStyle={mapStyle.area}
-            locations={locations}
-            locationStyle={mapStyle.location}
-            onSelectedIdChange={(newId) => {
-              startTransition(() => {
-                setSelectedId(newId);
-                setSettingsOpen(newId ? 'select' : null);
-              });
-            }}
-            overlayStyle={mapStyle.overlay}
-            selectedId={selectedId}
-            sessions={sessions}
-          />
-        </MapContainer>
+        {isMounted && (
+          <MapContainer
+            ref={mapRef}
+            attributionControl={false}
+            center={[0, 0]}
+            style={{ height: '100%', width: '100%' }}
+            zoom={2}
+            zoomControl={false}
+          >
+            <OrganizerMapRenderer
+              areas={filteredAreas}
+              areaStats={areaStats}
+              areaStyle={mapStyle.area}
+              locations={locations}
+              locationStyle={mapStyle.location}
+              navigateToAreaId={navigateToAreaId}
+              onSelectedIdChange={(newId) => {
+                startTransition(() => {
+                  setSelectedId(newId);
+                  setSettingsOpen(newId ? 'select' : null);
+                });
+              }}
+              overlayStyle={mapStyle.overlay}
+              selectedId={selectedId}
+              sessions={sessions}
+            />
+          </MapContainer>
+        )}
       </Box>
     </Box>
   );
