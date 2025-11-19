@@ -26,7 +26,7 @@ const SettingsPageClient: FC<Props> = ({ user }) => {
         </Box>
       }
     >
-      <SettingsPageWithInitialData user={user} />
+      <SettingsPageWithInitialData key={user.id} user={user} />
     </Suspense>
   );
 };

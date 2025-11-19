@@ -1,7 +1,7 @@
 'use client';
 
 import { Box } from '@mui/material';
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 
 import { useMessages } from 'core/i18n';
 import { ZetkinUser } from 'utils/types/zetkin';
@@ -17,11 +17,20 @@ type Props = {
 };
 
 const AccountSettings: FC<Props> = ({ user }) => {
+  const [isMounted, setIsMounted] = useState(false);
   const [email, setEmail] = useState(user.email || '');
   const [error, setError] = useState(false);
   const [savingEmail, setSavingEmail] = useState(false);
   const messages = useMessages(messageIds);
   const { updateUser } = useUserMutations();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <Box

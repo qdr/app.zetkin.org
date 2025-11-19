@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 
 import useUserMutations from '../hooks/useUserMutations';
@@ -20,6 +20,7 @@ type Props = {
 
 const AppPreferences: FC<Props> = ({ user }) => {
   const messages = useMessages(messageIds);
+  const [isMounted, setIsMounted] = useState(false);
   const languageOptions: Record<SupportedLanguage, string> = {
     da: 'Dansk',
     de: 'Deutsch',
@@ -33,6 +34,14 @@ const AppPreferences: FC<Props> = ({ user }) => {
   const [selectedLanguage, setSelectedLanguage] = useState<ZetkinUserLanguage>(
     user?.lang as ZetkinUserLanguage
   );
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <Box
