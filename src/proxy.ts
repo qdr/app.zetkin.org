@@ -7,7 +7,7 @@ import { AppSession } from 'utils/types';
 
 const protectedRoutes = ['/my'];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const headers = new Headers(request.headers);
   headers.set('x-requested-path', request.nextUrl.pathname);
 
