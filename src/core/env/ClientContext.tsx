@@ -3,7 +3,7 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { IntlProvider } from 'react-intl';
 import { Provider as ReduxProvider } from 'react-redux';
-import { FC, ReactNode, Suspense, useRef } from 'react';
+import { FC, ReactNode, useRef } from 'react';
 import {
   StyledEngineProvider,
   Theme,
@@ -84,7 +84,7 @@ const ClientContext: FC<ClientContextProps> = ({
                     >
                       <ZUIConfirmDialogProvider>
                         <CssBaseline />
-                        <Suspense>{children}</Suspense>
+                        {children}
                       </ZUIConfirmDialogProvider>
                     </IntlProvider>
                   </ZUISnackbarProvider>
