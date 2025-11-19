@@ -21,7 +21,8 @@ export default function useLocations(
   // Load data in useEffect to avoid dispatching during render
   useEffect(() => {
     const loadIsNecessary = shouldLoad(locationList);
-    if (!locationList || loadIsNecessary) {
+    // Only load if necessary and not already loading
+    if ((!locationList || loadIsNecessary) && !locationList?.isLoading) {
       loadList(dispatch, {
         actionOnLoad: () => locationsLoad(key),
         actionOnSuccess: (data) => locationsLoaded([key, data]),
