@@ -94,7 +94,7 @@ const ClientContext: FC<ClientContextProps> = ({
                       >
                         <ZUIConfirmDialogProvider>
                           <CssBaseline />
-                          <Suspense>{children}</Suspense>
+                          <Suspense fallback={null}>{children}</Suspense>
                         </ZUIConfirmDialogProvider>
                       </IntlProvider>
                     </ZUISnackbarProvider>
