@@ -1,5 +1,4 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+module.exports = {
   /**
    * Block cross-origin requests during development.
    *
@@ -15,47 +14,6 @@ const nextConfig = {
    */
   allowedDevOrigins: [],
 
-  // Performance optimizations
-  // Note: compiler.removeConsole is not compatible with Turbopack
-  // Use a babel plugin or eslint rule to remove console logs if needed
-
-  // Optimize imports for Material-UI and other large libraries
-  // Note: modularizeImports can cause issues with re-exported utilities
-  // Using optimizePackageImports in experimental section instead
-  modularizeImports: {
-    lodash: {
-      transform: 'lodash/{{member}}',
-    },
-  },
-
-  // Enable SWC minification (faster than Terser)
-  swcMinify: true,
-
-  experimental: {
-    // Note: esmExternals is not compatible with Turbopack
-    // If you need to disable Turbopack, uncomment the line below:
-    // esmExternals: "loose",
-    serverComponentsExternalPackages: ["mjml", "mongoose"],
-
-    // Optimize package imports (reduces bundle size and improves HMR)
-    optimizePackageImports: ['@mui/material', '@mui/icons-material', 'lodash'],
-
-    // Turbopack-specific optimizations
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      },
-    },
-  },
-  images: {
-    domains: [
-      `files.${process.env.ZETKIN_API_DOMAIN}`,
-  // Moved from experimental in Next.js 15
-  serverExternalPackages: ['mjml', 'mongoose', 'canvas'],
-
   // Enable React strict mode for better development experience
   reactStrictMode: true,
 
@@ -63,7 +21,14 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
 
-  // Image optimization
+  // Moved from experimental in Next.js 15
+  serverExternalPackages: ['mjml', 'mongoose', 'canvas'],
+
+  // Turbopack configuration
+  turbopack: {
+    root: __dirname,
+  },
+
   images: {
     remotePatterns: [
       {
@@ -82,48 +47,6 @@ const nextConfig = {
     ],
     formats: ['image/avif', 'image/webp'],
   },
-
-  // Turbopack configuration for faster development
-  turbopack: {
-    root: process.cwd(),
-  },
-
-  // Webpack configuration for production optimization
-  webpack: (config, { isServer }) => {
-    // Optimize production builds
-    if (!isServer) {
-      config.optimization = {
-        ...config.optimization,
-        moduleIds: 'deterministic',
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            default: false,
-            vendors: false,
-            // Vendor chunk for node_modules
-            vendor: {
-              name: 'vendor',
-              chunks: 'all',
-              test: /node_modules/,
-              priority: 20,
-            },
-            // Common chunk for shared code
-            common: {
-              name: 'common',
-              minChunks: 2,
-              chunks: 'all',
-              priority: 10,
-              reuseExistingChunk: true,
-              enforce: true,
-            },
-          },
-        },
-      };
-    }
-    return config;
-  },
-
-  // Redirects
   async redirects() {
     return [
       {
@@ -192,5 +115,3 @@ const nextConfig = {
     ];
   },
 };
-
-module.exports = nextConfig;

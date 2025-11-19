@@ -62,6 +62,10 @@ function lineDataFromInsights(
     return [];
   }
 
+  if (!insights.opensByDate || !Array.isArray(insights.opensByDate)) {
+    return [];
+  }
+
   return insights.opensByDate.map((openEvent) => ({
     x:
       (new Date(openEvent.date).getTime() - new Date(startTime).getTime()) /
@@ -174,6 +178,10 @@ const OpenedInsightsSection: FC<Props> = ({ email, secondaryEmailId }) => {
                 secondaryStats,
               },
             }) => {
+              if (!mainInsights) {
+                return null;
+              }
+
               const lineData = [
                 {
                   data: lineDataFromInsights(
@@ -194,6 +202,23 @@ const OpenedInsightsSection: FC<Props> = ({ email, secondaryEmailId }) => {
                   ),
                   id: 'secondary',
                 });
+              }
+
+              // Don't render chart if there's no data
+              const hasData = lineData.some((series) => series.data.length > 0);
+              if (!hasData) {
+                return (
+                  <Box
+                    alignItems="center"
+                    display="flex"
+                    height="100%"
+                    justifyContent="center"
+                  >
+                    <Typography color="text.secondary" variant="body2">
+                      No data available
+                    </Typography>
+                  </Box>
+                );
               }
 
               return (
