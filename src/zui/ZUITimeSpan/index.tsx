@@ -1,4 +1,6 @@
-import { FC, Fragment } from 'react';
+'use client';
+
+import { FC, Fragment, useMemo } from 'react';
 import { FormattedDate, FormattedTime } from 'react-intl';
 
 import { isAllDay } from 'features/calendar/components/utils';
@@ -11,9 +13,12 @@ type ZUITimeSpanProps = {
 };
 
 const ZUITimeSpan: FC<ZUITimeSpanProps> = ({ end, start }) => {
-  const isToday = start.toDateString() === new Date().toDateString();
+  // Memoize "today" to prevent hydration mismatches and avoid recalculating on every render
+  const today = useMemo(() => new Date().toDateString(), []);
+
+  const isToday = start.toDateString() === today;
   const endsOnSameDay = start.toDateString() === end.toDateString();
-  const endsOnToday = end.toDateString() === new Date().toDateString();
+  const endsOnToday = end.toDateString() === today;
 
   const startTime = <FormattedTime key="start-time" value={start} />;
   const endTime = <FormattedTime key="end-time" value={end} />;
