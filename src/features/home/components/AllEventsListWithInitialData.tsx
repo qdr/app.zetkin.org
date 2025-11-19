@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useLayoutEffect, useState } from 'react';
+import { FC, useLayoutEffect, useRef, useState } from 'react';
 
 import { ZetkinEvent } from 'utils/types/zetkin';
 import { ZetkinEventWithStatus } from '../types';
@@ -20,13 +20,17 @@ const AllEventsListWithInitialData: FC<Props> = ({
 }) => {
   const dispatch = useAppDispatch();
   const [isReady, setIsReady] = useState(false);
+  const hasLoadedRef = useRef(false);
 
   useLayoutEffect(() => {
-    const sorted = [...allEvents].sort(sortEventsByStartTime);
-    dispatch(allEventsLoaded(sorted));
-    dispatch(userEventsLoaded(userEvents));
-    setIsReady(true);
-  }, []);
+    if (!hasLoadedRef.current) {
+      const sorted = [...allEvents].sort(sortEventsByStartTime);
+      dispatch(allEventsLoaded(sorted));
+      dispatch(userEventsLoaded(userEvents));
+      hasLoadedRef.current = true;
+      setIsReady(true);
+    }
+  }, [allEvents, userEvents, dispatch]);
 
   if (!isReady) {
     return <div style={{ display: 'none' }} />;
