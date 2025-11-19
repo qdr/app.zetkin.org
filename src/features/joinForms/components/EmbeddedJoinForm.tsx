@@ -1,13 +1,13 @@
 'use client';
 
 import { FC, useEffect } from 'react';
-// Type definitions for the new experimental stuff like useFormState in
-// react-dom are lagging behind the implementation so it's necessary to silence
+// Type definitions for the new experimental stuff like useActionState in
+// react are lagging behind the implementation so it's necessary to silence
 // the TypeScript error about the lack of type definitions here in order to
 // import this.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react';
 
 import { EmbeddedJoinFormData, EmbeddedJoinFormStatus } from '../types';
 import { Msg, useMessages } from 'core/i18n';
@@ -24,7 +24,7 @@ type Props = {
 const EmbeddedJoinForm: FC<Props> = ({ encrypted, fields }) => {
   const globalMessages = useMessages(globalMessageIds);
 
-  const [status, action] = useFormState<EmbeddedJoinFormStatus>(
+  const [status, action] = useActionState<EmbeddedJoinFormStatus>(
     submitJoinForm,
     'editing'
   );
