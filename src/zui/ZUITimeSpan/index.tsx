@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, Fragment } from 'react';
 import { FormattedDate, FormattedTime } from 'react-intl';
 
 import { isAllDay } from 'features/calendar/components/utils';
@@ -15,11 +15,15 @@ const ZUITimeSpan: FC<ZUITimeSpanProps> = ({ end, start }) => {
   const endsOnSameDay = start.toDateString() === end.toDateString();
   const endsOnToday = end.toDateString() === new Date().toDateString();
 
-  const startTime = <FormattedTime value={start} />;
-  const endTime = <FormattedTime value={end} />;
+  const startTime = <FormattedTime key="start-time" value={start} />;
+  const endTime = <FormattedTime key="end-time" value={end} />;
 
-  const startDate = <FormattedDate dateStyle="medium" value={start} />;
-  const endDate = <FormattedDate dateStyle="medium" value={end} />;
+  const startDate = (
+    <FormattedDate key="start-date" dateStyle="medium" value={start} />
+  );
+  const endDate = (
+    <FormattedDate key="end-date" dateStyle="medium" value={end} />
+  );
 
   if (isToday && isAllDay(start.toISOString(), end.toDateString())) {
     return <Msg id={messageIds.timeSpan.singleDayAllDay} />;
@@ -28,7 +32,7 @@ const ZUITimeSpan: FC<ZUITimeSpanProps> = ({ end, start }) => {
   return (
     <>
       {isToday && (
-        <>
+        <Fragment key="today">
           {endsOnSameDay && (
             <Msg
               id={messageIds.timeSpan.singleDayToday}
@@ -45,10 +49,10 @@ const ZUITimeSpan: FC<ZUITimeSpanProps> = ({ end, start }) => {
               }}
             />
           )}
-        </>
+        </Fragment>
       )}
       {!isToday && (
-        <>
+        <Fragment key="not-today">
           {endsOnSameDay && (
             <Msg
               id={messageIds.timeSpan.singleDay}
@@ -60,7 +64,7 @@ const ZUITimeSpan: FC<ZUITimeSpanProps> = ({ end, start }) => {
             />
           )}
           {!endsOnSameDay && (
-            <>
+            <Fragment key="multi-day">
               {endsOnToday && (
                 <Msg
                   id={messageIds.timeSpan.multiDayEndsToday}
@@ -82,9 +86,9 @@ const ZUITimeSpan: FC<ZUITimeSpanProps> = ({ end, start }) => {
                   }}
                 />
               )}
-            </>
+            </Fragment>
           )}
-        </>
+        </Fragment>
       )}
     </>
   );
