@@ -22,6 +22,8 @@
     "playwright": "cross-env NODE_ENV=production playwright test",
     "playwright:skipbuild": "cross-env NODE_ENV=production SKIP_BUILD=1 playwright test",
     "playwright:ci": "cross-env NODE_ENV=production playwright test",
+    "playwright:migration": "playwright test integrationTesting/tests/migration-checker.spec.ts",
+    "discover-routes": "ts-node scripts/discover-routes.ts",
     "storybook": "storybook dev -p 6006",
     "make-yaml": "ts-node src/tools/make-yaml.ts"
   },
