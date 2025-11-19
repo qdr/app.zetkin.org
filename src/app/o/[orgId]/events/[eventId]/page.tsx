@@ -1,4 +1,5 @@
 import { headers } from 'next/headers';
+import { notFound } from 'next/navigation';
 
 import BackendApiClient from 'core/api/client/BackendApiClient';
 import { ZetkinEvent } from 'utils/types/zetkin';
@@ -18,9 +19,16 @@ export default async function Page({ params }: Props) {
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);
 
-  const event = await apiClient.get<ZetkinEvent>(
-    `/api/orgs/${orgId}/actions/${eventId}`
-  );
+  // Fetch event data and handle errors BEFORE rendering client component
+  let event: ZetkinEvent;
+
+  try {
+    event = await apiClient.get<ZetkinEvent>(
+      `/api/orgs/${orgId}/actions/${eventId}`
+    );
+  } catch (err) {
+    return notFound();
+  }
 
   return (
     <PublicEventPageClient
