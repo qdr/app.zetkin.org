@@ -27,6 +27,17 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
   return (
     <ZUIFuture future={statsFuture}>
       {(data) => {
+        // Defensive check: ensure data has the expected structure
+        if (
+          !data ||
+          !data.submissionsByDay ||
+          !Array.isArray(data.submissionsByDay) ||
+          typeof data.submissionCount !== 'number' ||
+          typeof data.id !== 'number'
+        ) {
+          return null;
+        }
+
         const hasChartData = data.submissionsByDay.length > 1;
 
         return (
