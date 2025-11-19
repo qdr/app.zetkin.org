@@ -1,4 +1,5 @@
 import { headers } from 'next/headers';
+import { notFound } from 'next/navigation';
 
 import BackendApiClient from 'core/api/client/BackendApiClient';
 import PublicProjPageClient from './PublicProjPageClient';
@@ -25,15 +26,22 @@ export default async function Page({ params }: Props) {
   const now = new Date();
   const today = now.toISOString().slice(0, 10);
 
-  // Fetch campaign and events in parallel
-  const [campaignData, campEvents] = await Promise.all([
-    apiClient.get<ZetkinCampaign>(
-      `/api/orgs/${orgId}/campaigns/${projId}`
-    ),
-    apiClient.get<ZetkinEvent[]>(
-      `/api/orgs/${orgId}/campaigns/${projId}/actions?filter=end_time>=${today}`
-    ),
-  ]);
+  // Fetch campaign and events in parallel, handle errors before rendering
+  let campaignData: ZetkinCampaign;
+  let campEvents: ZetkinEvent[];
+
+  try {
+    [campaignData, campEvents] = await Promise.all([
+      apiClient.get<ZetkinCampaign>(
+        `/api/orgs/${orgId}/campaigns/${projId}`
+      ),
+      apiClient.get<ZetkinEvent[]>(
+        `/api/orgs/${orgId}/campaigns/${projId}/actions?filter=end_time>=${today}`
+      ),
+    ]);
+  } catch (err) {
+    return notFound();
+  }
 
   // Add color to campaign
   const campaign = {
