@@ -79,7 +79,7 @@ const BulkEditHouseholdsPage: FC<Props> = ({
             label={messages.households.bulkEditHouseholds.floorLabel()}
             onChange={(ev) => setFloor(parseInt(ev.target.value))}
             type="number"
-            value={floor}
+            value={floor ?? ''}
           />
           <HouseholdColorPicker
             onChange={(newColor) => setcolor(newColor)}
