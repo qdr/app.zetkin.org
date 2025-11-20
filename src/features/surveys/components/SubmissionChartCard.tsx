@@ -91,14 +91,16 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
             ? data.submissionsByDay
             : [];
 
-        // Extra validation: ensure all items in the array are valid
-        const validSubmissionsByDay = submissionsByDay.filter(
-          (day) =>
-            day &&
-            typeof day === 'object' &&
-            day.date &&
-            typeof day.accumulatedSubmissions === 'number'
-        );
+        // Memoize the filtered valid submissions to prevent new array references
+        const validSubmissionsByDay = useMemo(() => {
+          return submissionsByDay.filter(
+            (day) =>
+              day &&
+              typeof day === 'object' &&
+              day.date &&
+              typeof day.accumulatedSubmissions === 'number'
+          );
+        }, [submissionsByDay]);
 
         const hasChartData = validSubmissionsByDay.length > 1;
 
