@@ -50,61 +50,78 @@ export default function useFilteredOrgEvents(orgId: number) {
       dispatch(filtersUpdated({ eventTypesToFilterBy: newArray })),
   });
 
-  const filteredEvents = allEvents
-    .filter((event) => {
-      if (orgIdsToFilterBy.length == 0) {
-        return true;
-      }
-      return orgIdsToFilterBy.includes(event.organization.id);
-    })
-    .filter((event) => {
-      if (
-        !dateFilterState ||
-        (dateFilterState == 'custom' && !customDatesToFilterBy[0])
-      ) {
-        return true;
-      }
+  const filteredEvents = useMemo(
+    () =>
+      allEvents
+        .filter((event) => {
+          if (orgIdsToFilterBy.length == 0) {
+            return true;
+          }
+          return orgIdsToFilterBy.includes(event.organization.id);
+        })
+        .filter((event) => {
+          if (
+            !dateFilterState ||
+            (dateFilterState == 'custom' && !customDatesToFilterBy[0])
+          ) {
+            return true;
+          }
 
-      const [start, end] = getDateRange();
-      const eventStart = dayjs(event.start_time);
-      const eventEnd = dayjs(event.end_time);
+          const [start, end] = getDateRange();
+          const eventStart = dayjs(event.start_time);
+          const eventEnd = dayjs(event.end_time);
 
-      if (!end) {
-        const isOngoing = eventStart.isBefore(start) && eventEnd.isAfter(start);
-        const startsOnSelectedDay = eventStart.isSame(start, 'day');
-        const endsOnSelectedDay = eventEnd.isSame(start, 'day');
-        return isOngoing || startsOnSelectedDay || endsOnSelectedDay;
-      } else {
-        const isOngoing =
-          eventStart.isBefore(start, 'day') && eventEnd.isAfter(end, 'day');
-        const startsInPeriod =
-          (eventStart.isSame(start, 'day') ||
-            eventStart.isAfter(start, 'day')) &&
-          (eventStart.isSame(end, 'day') || eventStart.isBefore(end, 'day'));
-        const endsInPeriod =
-          (eventEnd.isSame(start, 'day') || eventEnd.isAfter(start, 'day')) &&
-          (eventEnd.isBefore(end, 'day') || eventEnd.isSame(end, 'day'));
-        return isOngoing || startsInPeriod || endsInPeriod;
-      }
-    })
-    .filter(eventTypeFilter.getShouldShowEvent);
+          if (!end) {
+            const isOngoing =
+              eventStart.isBefore(start) && eventEnd.isAfter(start);
+            const startsOnSelectedDay = eventStart.isSame(start, 'day');
+            const endsOnSelectedDay = eventEnd.isSame(start, 'day');
+            return isOngoing || startsOnSelectedDay || endsOnSelectedDay;
+          } else {
+            const isOngoing =
+              eventStart.isBefore(start, 'day') && eventEnd.isAfter(end, 'day');
+            const startsInPeriod =
+              (eventStart.isSame(start, 'day') ||
+                eventStart.isAfter(start, 'day')) &&
+              (eventStart.isSame(end, 'day') ||
+                eventStart.isBefore(end, 'day'));
+            const endsInPeriod =
+              (eventEnd.isSame(start, 'day') ||
+                eventEnd.isAfter(start, 'day')) &&
+              (eventEnd.isBefore(end, 'day') || eventEnd.isSame(end, 'day'));
+            return isOngoing || startsInPeriod || endsInPeriod;
+          }
+        })
+        .filter(eventTypeFilter.getShouldShowEvent),
+    [
+      allEvents,
+      orgIdsToFilterBy,
+      dateFilterState,
+      customDatesToFilterBy,
+      eventTypeFilter.getShouldShowEvent,
+    ]
+  );
 
-  const locationEvents = filteredEvents.filter((event) => {
-    if (geojsonToFilterBy.length === 0) {
-      return true;
-    }
+  const locationEvents = useMemo(
+    () =>
+      filteredEvents.filter((event) => {
+        if (geojsonToFilterBy.length === 0) {
+          return true;
+        }
 
-    if (!event?.location) {
-      return false;
-    }
+        if (!event?.location) {
+          return false;
+        }
 
-    const features = getGeoJSONFeaturesAtLocations(
-      geojsonToFilterBy,
-      event.location
-    );
+        const features = getGeoJSONFeaturesAtLocations(
+          geojsonToFilterBy,
+          event.location
+        );
 
-    return features.length > 0;
-  });
+        return features.length > 0;
+      }),
+    [filteredEvents, geojsonToFilterBy]
+  );
 
   return {
     allEvents,
