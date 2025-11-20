@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, FC, useContext } from 'react';
 
 import { ZetkinObjectAccess } from 'core/api/types';

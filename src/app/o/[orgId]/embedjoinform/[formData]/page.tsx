@@ -5,62 +5,66 @@ import EmbeddedJoinForm from 'features/joinForms/components/EmbeddedJoinForm';
 import { EmbeddedJoinFormData } from 'features/joinForms/types';
 
 type PageProps = {
-  params: {
+  params: Promise<{
     formData: string;
     orgId: string;
-  };
-  searchParams: {
+  }>;
+  searchParams: Promise<{
     stylesheet?: string;
-  };
+  }>;
 };
 
 export default async function Page({ params, searchParams }: PageProps) {
-  const { formData } = params;
+  const { formData } = await params;
+  const { stylesheet } = await searchParams;
+
+  // Decrypt and validate formData BEFORE rendering any components
+  let formDataObj: EmbeddedJoinFormData;
+  let formDataStr: string;
 
   try {
-    const formDataStr = decodeURIComponent(formData);
-    const formDataObj = (await Iron.unseal(
+    formDataStr = decodeURIComponent(formData);
+    formDataObj = (await Iron.unseal(
       formDataStr,
       process.env.SESSION_PASSWORD || '',
       Iron.defaults
     )) as EmbeddedJoinFormData;
-
-    return (
-      <div>
-        <EmbeddedJoinForm encrypted={formDataStr} fields={formDataObj.fields} />
-        {searchParams.stylesheet && (
-          <style>{`@import url(${searchParams.stylesheet})`}</style>
-        )}
-        {!searchParams.stylesheet && (
-          <style>{`
-            body {
-              padding: 0.5rem;
-            }
-
-            .zetkin-joinform__field {
-              margin-bottom: 1rem;
-            }
-
-            .zetkin-joinform__field input[type="text"], .zetkin-joinform__field select {
-              width: 100%;
-              max-width: 600px;
-              padding: 0.3rem;
-              font-size: 1.5rem;
-            }
-
-            .zetkin-joinform__submit-button {
-              border-width: 0;
-              font-size: 1.5rem;
-              background-color: black;
-              color: white;
-              padding: 0.5rem 1rem;
-              border-radius: 0.2rem;
-            }
-          `}</style>
-        )}
-      </div>
-    );
   } catch (err) {
+    // Return 404 before rendering any client components
     return notFound();
   }
+
+  return (
+    <div>
+      <EmbeddedJoinForm encrypted={formDataStr} fields={formDataObj.fields} />
+      {stylesheet && <style>{`@import url(${stylesheet})`}</style>}
+      {!stylesheet && (
+        <style>{`
+          body {
+            padding: 0.5rem;
+          }
+
+          .zetkin-joinform__field {
+            margin-bottom: 1rem;
+          }
+
+          .zetkin-joinform__field input[type="text"], .zetkin-joinform__field select {
+            width: 100%;
+            max-width: 600px;
+            padding: 0.3rem;
+            font-size: 1.5rem;
+          }
+
+          .zetkin-joinform__submit-button {
+            border-width: 0;
+            font-size: 1.5rem;
+            background-color: black;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.2rem;
+          }
+        `}</style>
+      )}
+    </div>
+  );
 }

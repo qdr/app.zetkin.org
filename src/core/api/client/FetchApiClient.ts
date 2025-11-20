@@ -26,11 +26,24 @@ export default class FetchApiClient implements IApiClient {
 
   async get<DataType>(path: string): Promise<DataType> {
     const res = await this._fetch(path);
-    const body = await res.json();
 
     assertOk(res);
 
-    return body.data;
+    // Check if response has content
+    const contentType = res.headers.get('content-type');
+    const contentLength = res.headers.get('content-length');
+
+    if (contentLength === '0' || !contentType?.includes('application/json')) {
+      return null as unknown as DataType;
+    }
+
+    try {
+      const body = await res.json();
+      return body.data;
+    } catch (err) {
+      // Response might be empty or not JSON
+      return null as unknown as DataType;
+    }
   }
 
   async patch<DataType, InputType = Partial<DataType>>(

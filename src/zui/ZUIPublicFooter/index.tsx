@@ -1,3 +1,5 @@
+'use client';
+
 import { FC, useMemo } from 'react';
 import { Box, List, ListItem, Typography } from '@mui/material';
 import Image from 'next/image';

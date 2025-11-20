@@ -1,3 +1,5 @@
+'use client';
+
 import { Box } from '@mui/material';
 import EventIcon from '@mui/icons-material/Event';
 import PeopleIcon from '@mui/icons-material/People';

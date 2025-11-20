@@ -1,3 +1,5 @@
+'use client';
+
 import { Badge } from '@mui/material';
 import { FC, ReactNode } from 'react';
 

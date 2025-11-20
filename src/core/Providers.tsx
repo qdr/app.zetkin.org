@@ -1,3 +1,5 @@
+'use client';
+
 import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';

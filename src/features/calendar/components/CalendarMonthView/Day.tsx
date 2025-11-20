@@ -1,3 +1,5 @@
+'use client';
+
 import dayjs from 'dayjs';
 import { FormattedDate } from 'react-intl';
 import { Box, Typography } from '@mui/material';

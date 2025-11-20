@@ -20,17 +20,18 @@ type RouteMeta = {
 };
 
 export async function GET(request: NextRequest, { params }: RouteMeta) {
+  const { orgId, locationId, householdId } = await params;
   await mongoose.connect(process.env.MONGODB_URL || '');
   const headers: IncomingHttpHeaders = {};
   request.headers.forEach((value, key) => (headers[key] = value));
   const apiClient = new BackendApiClient(headers);
 
   const household = await apiClient.get<Zetkin2Household>(
-    `/api2/orgs/${params.orgId}/locations/${params.locationId}/households/${params.householdId}`
+    `/api2/orgs/${orgId}/locations/${locationId}/households/${householdId}`
   );
 
   const householdColorModel = await HouseholdColorModel.findOne({
-    householdId: params.householdId,
+    householdId: householdId,
   });
 
   const householdWithColor: HouseholdWithColor = {
@@ -42,6 +43,7 @@ export async function GET(request: NextRequest, { params }: RouteMeta) {
 }
 
 export async function PATCH(request: NextRequest, { params }: RouteMeta) {
+  const { orgId, locationId, householdId } = await params;
   await mongoose.connect(process.env.MONGODB_URL || '');
 
   const payload = await request.json();
@@ -49,7 +51,7 @@ export async function PATCH(request: NextRequest, { params }: RouteMeta) {
 
   if (color) {
     await HouseholdColorModel.findOneAndUpdate(
-      { householdId: params.householdId },
+      { householdId: householdId },
       {
         color: payload.color,
       },
@@ -64,11 +66,11 @@ export async function PATCH(request: NextRequest, { params }: RouteMeta) {
   const household =
     Object.keys(zetkinPayload).length > 0
       ? await apiClient.patch<Zetkin2Household, HouseholdPatchBody>(
-          `/api2/orgs/${params.orgId}/locations/${params.locationId}/households/${params.householdId}`,
+          `/api2/orgs/${orgId}/locations/${locationId}/households/${householdId}`,
           zetkinPayload
         )
       : await apiClient.get<Zetkin2Household>(
-          `/api2/orgs/${params.orgId}/locations/${params.locationId}/households/${params.householdId}`
+          `/api2/orgs/${orgId}/locations/${locationId}/households/${householdId}`
         );
 
   const householdWithColor: HouseholdWithColor = {

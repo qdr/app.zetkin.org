@@ -1,3 +1,5 @@
+'use client';
+
 import { DoorFront, Place } from '@mui/icons-material';
 import {
   AttributionControl,

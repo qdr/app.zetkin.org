@@ -1,3 +1,5 @@
+'use client';
+
 import { FC } from 'react';
 import { FormControlLabel, FormControlLabelProps } from '@mui/material';
 

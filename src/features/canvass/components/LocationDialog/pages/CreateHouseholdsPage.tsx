@@ -1,3 +1,5 @@
+'use client';
+
 import { range } from 'lodash';
 import { Box, Button, Slide } from '@mui/material';
 import { FC, useCallback, useState } from 'react';

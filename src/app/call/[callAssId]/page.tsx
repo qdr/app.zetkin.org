@@ -8,9 +8,9 @@ import BackendApiClient from 'core/api/client/BackendApiClient';
 import { ZetkinCallAssignment } from 'utils/types/zetkin';
 
 type Props = {
-  params: {
+  params: Promise<{
     callAssId: string;
-  };
+  }>;
 };
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -21,8 +21,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page({ params }: Props) {
+  const { callAssId } = await params;
   await redirectIfLoginNeeded();
-  const headersList = headers();
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);
@@ -30,7 +31,7 @@ export default async function Page({ params }: Props) {
     '/api/users/me/call_assignments'
   );
   const assignment = assignments.find(
-    (assignment) => assignment.id == parseInt(params.callAssId)
+    (assignment) => assignment.id == parseInt(callAssId)
   );
 
   if (!assignment) {
@@ -38,10 +39,10 @@ export default async function Page({ params }: Props) {
   }
 
   if (hasFeature(CALL, assignment.organization.id, process.env)) {
-    return redirect(`/call?assignment=${params.callAssId}`);
+    return redirect(`/call?assignment=${callAssId}`);
   } else {
     const callUrl = process.env.ZETKIN_GEN2_CALL_URL;
-    const assignmentUrl = `${callUrl}/assignments/${params.callAssId}/call`;
+    const assignmentUrl = `${callUrl}/assignments/${callAssId}/call`;
     redirect(assignmentUrl);
   }
 }

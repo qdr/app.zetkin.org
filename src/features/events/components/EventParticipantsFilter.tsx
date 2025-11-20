@@ -1,3 +1,5 @@
+'use client';
+
 import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
 import { useState } from 'react';

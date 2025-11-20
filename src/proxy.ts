@@ -7,7 +7,7 @@ import { AppSession } from 'utils/types';
 
 const protectedRoutes = ['/my'];
 
-export async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const headers = new Headers(request.headers);
   headers.set('x-requested-path', request.nextUrl.pathname);
 
@@ -16,7 +16,7 @@ export async function middleware(request: NextRequest) {
     return path.startsWith(route);
   });
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   const session = await getIronSession<AppSession>(cookieStore, {
     cookieName: 'zsid',

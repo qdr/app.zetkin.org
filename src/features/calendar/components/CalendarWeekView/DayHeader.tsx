@@ -1,3 +1,5 @@
+'use client';
+
 import { FormattedDate } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 import { useMemo } from 'react';

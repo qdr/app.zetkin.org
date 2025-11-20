@@ -1,3 +1,5 @@
+'use client';
+
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Layer, LngLatLike, Map, Source } from '@vis.gl/react-maplibre';
 import { Box } from '@mui/material';

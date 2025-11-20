@@ -1,3 +1,5 @@
+'use client';
+
 import { ArrowDropDown } from '@mui/icons-material';
 import { Button, Popper } from '@mui/material';
 import { FC, useState } from 'react';

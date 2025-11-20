@@ -1,3 +1,5 @@
+'use client';
+
 /* eslint-disable jsx-a11y/no-autofocus */
 import { isEqual } from 'lodash';
 import { makeStyles } from '@mui/styles';

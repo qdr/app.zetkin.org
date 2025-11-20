@@ -1,3 +1,5 @@
+'use client';
+
 import { Add } from '@mui/icons-material';
 import { Box, Button, Popover } from '@mui/material';
 import { FC, useState } from 'react';

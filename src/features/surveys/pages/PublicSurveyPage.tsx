@@ -11,12 +11,12 @@ import {
 } from '@mui/material';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 // TODO: Remove comment once we upgrade to React 19
-// Type definitions for useFormState don't exist in React 18
+// Type definitions for useActionState don't exist in React 18
 // because it's an experimental feature. That's why we silence
 // the Typescript warning.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react';
 
 import { Msg, useMessages } from 'core/i18n';
 import SurveyForm from 'features/surveys/components/SurveyForm';
@@ -48,7 +48,7 @@ const PublicSurveyPage: FC<PublicSurveyPageProps> = ({ survey, user }) => {
   const [signatureType, setSignatureType] = useState<
     ZetkinSurveySignatureType | undefined
   >(undefined);
-  const [status, action] = useFormState<ZetkinSurveyFormStatus>(
+  const [status, action] = useActionState<ZetkinSurveyFormStatus>(
     submit,
     'editing'
   );

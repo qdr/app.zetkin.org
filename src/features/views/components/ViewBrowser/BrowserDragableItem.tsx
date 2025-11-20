@@ -1,3 +1,5 @@
+'use client';
+
 import { Box } from '@mui/material';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useDrag } from 'react-dnd';

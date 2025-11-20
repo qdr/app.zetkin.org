@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Button, TextField } from '@mui/material';
 import { FC, useEffect, useState } from 'react';
 
@@ -79,7 +81,7 @@ const BulkEditHouseholdsPage: FC<Props> = ({
             label={messages.households.bulkEditHouseholds.floorLabel()}
             onChange={(ev) => setFloor(parseInt(ev.target.value))}
             type="number"
-            value={floor}
+            value={floor ?? ''}
           />
           <HouseholdColorPicker
             onChange={(newColor) => setcolor(newColor)}

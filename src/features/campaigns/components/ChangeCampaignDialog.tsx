@@ -1,3 +1,5 @@
+'use client';
+
 import { Architecture, Close, Search } from '@mui/icons-material';
 import {
   Alert,

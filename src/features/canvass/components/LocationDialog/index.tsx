@@ -1,5 +1,8 @@
+'use client';
+
 import {
   FC,
+  Suspense,
   useCallback,
   useContext,
   useEffect,
@@ -7,9 +10,9 @@ import {
   useState,
 } from 'react';
 import { Box } from '@mui/material';
+import dynamic from 'next/dynamic';
 
 import HouseholdVisitPage from './pages/HouseholdVisitPage';
-import EditLocationPage from './pages/EditLocationPage';
 import LocationPage from './pages/LocationPage';
 import HouseholdPage from './pages/HouseholdPage';
 import {
@@ -17,7 +20,6 @@ import {
   ZetkinLocation,
 } from 'features/areaAssignments/types';
 import ZUINavStack from 'zui/ZUINavStack';
-import EditHouseholdPage from './pages/EditHouseholdPage';
 import CreateHouseholdsPage from './pages/CreateHouseholdsPage';
 import LocationVisitPage from './pages/LocationVisitPage';
 import HouseholdsPage from './pages/HouseholdsPage';
@@ -32,7 +34,23 @@ import messageIds from 'features/canvass/l10n/messageIds';
 import { useMessages } from 'core/i18n';
 import sortMetrics from 'features/canvass/utils/sortMetrics';
 import BulkHouseholdVisitsPage from './pages/BulkHouseholdVisitsPage';
-import BulkEditHouseholdsPage from './pages/BulkEditHouseholdsPage';
+
+// Dynamic imports to prevent TextField hydration errors
+const EditLocationPage = dynamic(() => import('./pages/EditLocationPage'), {
+  loading: () => <div style={{ display: 'none' }} />,
+  ssr: false,
+});
+const EditHouseholdPage = dynamic(() => import('./pages/EditHouseholdPage'), {
+  loading: () => <div style={{ display: 'none' }} />,
+  ssr: false,
+});
+const BulkEditHouseholdsPage = dynamic(
+  () => import('./pages/BulkEditHouseholdsPage'),
+  {
+    loading: () => <div style={{ display: 'none' }} />,
+    ssr: false,
+  }
+);
 import useEditHouseholds from 'features/canvass/hooks/useEditHouseholds';
 import HouseholdsPage2 from './pages/HouseholdsPage2';
 

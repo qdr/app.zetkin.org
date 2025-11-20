@@ -1,5 +1,8 @@
+'use client';
+
 import { Box, Button, TextField } from '@mui/material';
 import { FC, useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 
 import PageBase from './PageBase';
 import { ZetkinLocation } from 'features/areaAssignments/types';
@@ -12,6 +15,19 @@ type EditLocationPageProps = {
   onClose: () => void;
   onSave: (title: string, description: string) => void;
 };
+
+// Wrapper to ensure client-only rendering
+const TextFieldClientOnly = dynamic(
+  () => Promise.resolve(({ value, onChange, label, ...props }: any) => (
+    <TextField
+      {...props}
+      label={label}
+      onChange={onChange}
+      value={value}
+    />
+  )),
+  { ssr: false }
+);
 
 const EditLocationPage: FC<EditLocationPageProps> = ({
   onClose,
@@ -66,17 +82,17 @@ const EditLocationPage: FC<EditLocationPageProps> = ({
         }}
       >
         <Box display="flex" flexDirection="column" gap={2} height="100%">
-          <TextField
+          <TextFieldClientOnly
             fullWidth
             label={messages.location.edit.titleLabel()}
-            onChange={(ev) => setTitle(ev.target.value)}
+            onChange={(ev: any) => setTitle(ev.target.value)}
             value={title}
           />
-          <TextField
+          <TextFieldClientOnly
             fullWidth
             label={messages.location.edit.descriptionLabel()}
             multiline
-            onChange={(ev) => setDescription(ev.target.value)}
+            onChange={(ev: any) => setDescription(ev.target.value)}
             rows={5}
             value={description}
           />

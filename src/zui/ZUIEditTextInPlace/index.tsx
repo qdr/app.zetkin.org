@@ -1,3 +1,5 @@
+'use client';
+
 import { lighten, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { FormControl, InputBase, Theme, Tooltip } from '@mui/material';

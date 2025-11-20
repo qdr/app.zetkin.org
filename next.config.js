@@ -14,17 +14,38 @@ module.exports = {
    */
   allowedDevOrigins: [],
 
-  experimental: {
-    esmExternals: "loose",
-    serverComponentsExternalPackages: ["mjml", "mongoose"],
-  },
-  images: {
-    domains: [
-      `files.${process.env.ZETKIN_API_DOMAIN}`,
+  // Enable React strict mode for better development experience
+  reactStrictMode: true,
 
-      // localhost added for playwright testing
-      'localhost',
+  // Optimize production builds
+  compress: true,
+  poweredByHeader: false,
+
+  // Moved from experimental in Next.js 15
+  serverExternalPackages: ['mjml', 'mongoose', 'canvas', 'jsdom', 'isomorphic-dompurify'],
+
+  // Turbopack configuration
+  turbopack: {
+    root: __dirname,
+  },
+
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.zetkin.org',
+      },
+      {
+        protocol: 'http',
+        hostname: '**.zetkin.org',
+      },
+      {
+        // localhost added for playwright testing
+        protocol: 'http',
+        hostname: 'localhost',
+      },
     ],
+    formats: ['image/avif', 'image/webp'],
   },
   async redirects() {
     return [

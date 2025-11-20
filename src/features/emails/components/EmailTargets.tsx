@@ -1,3 +1,5 @@
+'use client';
+
 import { makeStyles } from '@mui/styles';
 import { Add, Edit, Lock, LockOpen, Visibility } from '@mui/icons-material';
 import {

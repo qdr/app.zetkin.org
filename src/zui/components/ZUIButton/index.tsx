@@ -1,3 +1,5 @@
+'use client';
+
 import { alpha, Box, Button, CircularProgress } from '@mui/material';
 import {
   CSSProperties,

@@ -1,3 +1,5 @@
+'use client';
+
 import { alpha } from '@mui/material/styles';
 import { Add } from '@mui/icons-material';
 import Button from '@mui/material/Button';

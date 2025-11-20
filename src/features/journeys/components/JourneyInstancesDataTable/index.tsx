@@ -1,3 +1,5 @@
+'use client';
+
 import { DataGridPro, DataGridProProps } from '@mui/x-data-grid-pro';
 import { FunctionComponent, useState } from 'react';
 

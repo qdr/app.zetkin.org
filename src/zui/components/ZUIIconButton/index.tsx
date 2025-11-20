@@ -1,3 +1,5 @@
+'use client';
+
 import { FC } from 'react';
 import { alpha, Button, CircularProgress } from '@mui/material';
 

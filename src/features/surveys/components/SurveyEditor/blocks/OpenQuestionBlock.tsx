@@ -1,3 +1,5 @@
+'use client';
+
 import AbcIcon from '@mui/icons-material/Abc';
 import SortIcon from '@mui/icons-material/Sort';
 import { BaseSyntheticEvent, FC, useState } from 'react';

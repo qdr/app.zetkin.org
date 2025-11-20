@@ -1,3 +1,5 @@
+'use client';
+
 import { TimeField } from '@mui/x-date-pickers-pro';
 import { Add, Close } from '@mui/icons-material';
 import { Box, Button, IconButton, Typography, useTheme } from '@mui/material';

@@ -1,3 +1,5 @@
+'use client';
+
 import { GetServerSideProps } from 'next';
 import { Box, Grid } from '@mui/material';
 import { ChangeEvent, useState } from 'react';

@@ -2,7 +2,7 @@
 
 import { headers } from 'next/headers';
 import { Metadata } from 'next';
-import { FC, ReactElement, ReactNode } from 'react';
+import { FC, ReactElement, ReactNode, Suspense } from 'react';
 import { notFound } from 'next/navigation';
 
 import BackendApiClient from 'core/api/client/BackendApiClient';
@@ -13,14 +13,14 @@ import { ApiClientError } from 'core/api/errors';
 
 type Props = {
   children: ReactNode;
-  params: {
+  params: Promise<{
     orgId: string;
     surveyId: string;
-  };
+  }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { orgId, surveyId } = params;
+  const { orgId, surveyId } = await params;
   const apiClient = new BackendApiClient({});
 
   let survey: ZetkinSurveyExtended;
@@ -51,12 +51,11 @@ const SurveyLayout: FC<Props> = async ({
   children,
   params,
 }): Promise<ReactElement> => {
-  const headersList = headers();
+  const { orgId, surveyId } = await params;
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);
-
-  const { orgId, surveyId } = params;
 
   let survey: ZetkinSurveyExtended;
   try {
@@ -73,7 +72,9 @@ const SurveyLayout: FC<Props> = async ({
 
   return (
     <HomeThemeProvider>
-      <PublicSurveyLayout survey={survey}>{children}</PublicSurveyLayout>
+      <Suspense fallback={<div />}>
+        <PublicSurveyLayout survey={survey}>{children}</PublicSurveyLayout>
+      </Suspense>
     </HomeThemeProvider>
   );
 };

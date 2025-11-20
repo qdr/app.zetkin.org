@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { FormattedDate } from 'react-intl';
 import { linearGradientDef } from '@nivo/core';
 import { ResponsiveLine } from '@nivo/line';
@@ -27,23 +27,96 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
   return (
     <ZUIFuture future={statsFuture}>
       {(data) => {
-        const hasChartData = data.submissionsByDay.length > 1;
+        // DEBUG: Log what we're receiving
+        console.log('[SubmissionChartCard] Data received:', {
+          data,
+          hasData: !!data,
+          dataType: typeof data,
+          hasSubmissionsByDay: data
+            ? 'submissionsByDay' in data
+            : 'data is falsy',
+          submissionsByDayType: data?.submissionsByDay
+            ? typeof data.submissionsByDay
+            : 'undefined',
+          isArray: data?.submissionsByDay
+            ? Array.isArray(data.submissionsByDay)
+            : false,
+          length: data?.submissionsByDay?.length,
+        });
+
+        // Early return if data is completely missing
+        if (!data || typeof data !== 'object') {
+          console.log('[SubmissionChartCard] No valid data, showing placeholder');
+          return (
+            <ZUICard header={messages.chart.header()}>
+              <Box height={400}>
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  height="100%"
+                  justifyContent="center"
+                  width="100%"
+                >
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    marginBottom={2}
+                    width="100%"
+                  >
+                    <PlaceholderVisual />
+                  </Box>
+                  <Typography
+                    sx={{
+                      color: theme.palette.text.disabled,
+                      textAlign: 'center',
+                    }}
+                  >
+                    <Msg id={messageIds.chart.placeholder} />
+                  </Typography>
+                </Box>
+              </Box>
+            </ZUICard>
+          );
+        }
+
+        // Defensive: filter out invalid items instead of hiding the entire card
+        // This way we show the placeholder when there's no valid data
+        const submissionCount =
+          typeof data.submissionCount === 'number' ? data.submissionCount : 0;
+        const chartSurveyId = typeof data.id === 'number' ? data.id : surveyId;
+
+        // Use the raw submissionsByDay array if valid, empty array otherwise
+        const submissionsByDay =
+          data.submissionsByDay && Array.isArray(data.submissionsByDay)
+            ? data.submissionsByDay
+            : [];
+
+        const hasChartData = submissionsByDay.length > 1;
+
+        console.log('[SubmissionChartCard] Chart rendering:', {
+          submissionCount,
+          chartSurveyId,
+          submissionsByDayLength: submissionsByDay.length,
+          hasChartData,
+          firstItem: submissionsByDay[0],
+          lastItem: submissionsByDay[submissionsByDay.length - 1],
+        });
 
         return (
           <ZUICard
             header={messages.chart.header()}
             status={
-              !!data.submissionCount && (
+              !!submissionCount && (
                 <ZUINumberChip
                   color={theme.palette.grey[200]}
-                  value={data.submissionCount}
+                  value={submissionCount}
                 />
               )
             }
             subheader={
-              data.submissionCount
+              submissionCount
                 ? messages.chart.subheader({
-                    days: data.submissionsByDay.length,
+                    days: submissionsByDay.length,
                   })
                 : undefined
             }
@@ -85,11 +158,12 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
                   curve="basis"
                   data={[
                     {
-                      data: data.submissionsByDay.map((day) => ({
-                        x: day.date,
-                        y: day.accumulatedSubmissions,
-                      })),
-                      id: data.id,
+                      data:
+                        submissionsByDay?.map((day) => ({
+                          x: day?.date,
+                          y: day?.accumulatedSubmissions,
+                        })) || [],
+                      id: chartSurveyId,
                     },
                   ]}
                   defs={[
@@ -111,11 +185,24 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
                     // Calculate the left margin from the number of digits
                     // in the submission count, to make sure the axis labels
                     // will fit inside the clipping rectangle.
-                    left: 8 + data.submissionCount.toString().length * 8,
+                    left: 8 + submissionCount.toString().length * 8,
                     top: 20,
                   }}
                   sliceTooltip={(props) => {
+                    // Defensive: check if points array exists and has items
+                    if (
+                      !props.slice?.points ||
+                      !Array.isArray(props.slice.points) ||
+                      props.slice.points.length === 0
+                    ) {
+                      return null;
+                    }
+
                     const dataPoint = props.slice.points[0];
+                    if (!dataPoint?.data?.xFormatted) {
+                      return null;
+                    }
+
                     const date = new Date(dataPoint.data.xFormatted);
 
                     return (

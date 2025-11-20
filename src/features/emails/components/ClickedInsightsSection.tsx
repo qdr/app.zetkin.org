@@ -1,3 +1,5 @@
+'use client';
+
 import DOMPurify from 'dompurify';
 import { OpenInNew } from '@mui/icons-material';
 import { FC, useState } from 'react';

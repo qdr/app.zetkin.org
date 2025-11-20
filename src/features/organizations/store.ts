@@ -80,8 +80,20 @@ const OrganizationsSlice = createSlice({
       action: PayloadAction<[number, ZetkinEvent[]]>
     ) => {
       const [orgId, events] = action.payload;
-      state.eventsByOrgId[orgId] = remoteList(events);
+
+      if (!state.eventsByOrgId[orgId]) {
+        state.eventsByOrgId[orgId] = remoteList();
+      }
+
+      state.eventsByOrgId[orgId].items = events.map((event) => ({
+        data: event,
+        id: event.id,
+        isLoading: false,
+        isStale: false,
+        loaded: new Date().toISOString(),
+      }));
       state.eventsByOrgId[orgId].loaded = new Date().toISOString();
+      state.eventsByOrgId[orgId].isLoading = false;
     },
     orgFollowed: (state, action: PayloadAction<ZetkinMembership>) => {
       const membership = action.payload;
@@ -143,7 +155,17 @@ const OrganizationsSlice = createSlice({
     ) => {
       const [orgId, subOrgs] = action.payload;
 
-      state.subOrgsByOrgId[orgId] = remoteList(subOrgs);
+      if (!state.subOrgsByOrgId[orgId]) {
+        state.subOrgsByOrgId[orgId] = remoteList();
+      }
+
+      state.subOrgsByOrgId[orgId].items = subOrgs.map((subOrg) => ({
+        data: subOrg,
+        id: subOrg.id,
+        isLoading: false,
+        isStale: false,
+        loaded: new Date().toISOString(),
+      }));
       state.subOrgsByOrgId[orgId].loaded = new Date().toISOString();
       state.subOrgsByOrgId[orgId].isLoading = false;
     },

@@ -1,3 +1,5 @@
+'use client';
+
 import makeStyles from '@mui/styles/makeStyles';
 import {
   Card,

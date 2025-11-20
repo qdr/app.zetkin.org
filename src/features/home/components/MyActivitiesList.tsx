@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Box, Fade } from '@mui/material';
 import { GroupWorkOutlined, Hotel } from '@mui/icons-material';
 
@@ -15,11 +15,29 @@ import ZUIText from 'zui/components/ZUIText';
 import ZUIFilterButton from 'zui/components/ZUIFilterButton';
 import AreaAssignmentListItem from './AreaAssignmentListItem';
 
+const INITIAL_PAGE_SIZE = 20;
+const PAGE_INCREMENT = 20;
+
 const MyActivitiesList: FC = () => {
   const activities = useMyActivities();
   const messages = useMessages(messageIds);
   const [filteredKinds, setFilteredKinds] = useState<string[]>([]);
+  const [isMounted, setIsMounted] = useState(false);
+  const [itemsToShow, setItemsToShow] = useState(INITIAL_PAGE_SIZE);
   const nextDelay = useIncrementalDelay();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setItemsToShow(INITIAL_PAGE_SIZE);
+  }, [filteredKinds]);
+
+  if (!isMounted) {
+    return <div style={{ display: 'none' }} />;
+  }
 
   const kinds = Array.from(
     new Set(activities.map((activity) => activity.kind))
@@ -29,6 +47,9 @@ const MyActivitiesList: FC = () => {
     const notFiltering = filteredKinds.length == 0;
     return notFiltering || filteredKinds.includes(activity.kind);
   });
+
+  const visibleActivities = filteredActivities.slice(0, itemsToShow);
+  const hasMore = filteredActivities.length > itemsToShow;
 
   return (
     <Box display="flex" flexDirection="column" gap={1} m={1}>
@@ -73,7 +94,7 @@ const MyActivitiesList: FC = () => {
           <Hotel color="secondary" fontSize="large" />
         </Box>
       )}
-      {filteredActivities.map((activity) => {
+      {visibleActivities.map((activity) => {
         let elem, href;
 
         if (activity.kind == 'call') {
@@ -121,6 +142,15 @@ const MyActivitiesList: FC = () => {
           </Fade>
         );
       })}
+      {hasMore && (
+        <Box display="flex" justifyContent="center" mt={2}>
+          <ZUIButton
+            label={messages.activityList.loadMore?.() || 'Load More'}
+            onClick={() => setItemsToShow((prev) => prev + PAGE_INCREMENT)}
+            variant="secondary"
+          />
+        </Box>
+      )}
     </Box>
   );
 };

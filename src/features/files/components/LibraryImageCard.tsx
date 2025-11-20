@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { FC, useState } from 'react';
 

@@ -1,3 +1,5 @@
+'use client';
+
 import { FC, ReactElement, useEffect, useRef, useState } from 'react';
 
 interface ZUIResponsiveContainerProps {

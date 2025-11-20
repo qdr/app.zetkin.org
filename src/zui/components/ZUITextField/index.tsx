@@ -1,10 +1,12 @@
+'use client';
+
 import {
   IconButton,
   InputAdornment,
   SvgIconTypeMap,
   TextField,
 } from '@mui/material';
-import { FC, HTMLInputTypeAttribute, RefObject } from 'react';
+import { FC, HTMLInputTypeAttribute, RefObject, useEffect, useState } from 'react';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 
 import { ZUILarge, ZUIMedium } from '../types';
@@ -152,8 +154,19 @@ const ZUITextField: FC<ZUITextFieldProps> = ({
   startIcon: StartIcon,
   type,
   value,
-}) => (
-  <TextField
+}) => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
+
+  return (
+    <TextField
     defaultValue={initialValue}
     disabled={disabled}
     error={error}
@@ -256,6 +269,7 @@ const ZUITextField: FC<ZUITextFieldProps> = ({
     value={value}
     variant="outlined"
   />
-);
+  );
+};
 
 export default ZUITextField;

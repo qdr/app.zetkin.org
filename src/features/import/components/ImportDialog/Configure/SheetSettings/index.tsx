@@ -1,3 +1,5 @@
+'use client';
+
 import { ExpandMore } from '@mui/icons-material';
 import {
   AccordionDetails,

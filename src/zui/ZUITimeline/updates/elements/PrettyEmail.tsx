@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import makeStyles from '@mui/styles/makeStyles';
 import {

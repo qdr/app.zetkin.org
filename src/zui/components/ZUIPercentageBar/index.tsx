@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, useTheme } from '@mui/material';
 
 import { ZUISize } from '../types';

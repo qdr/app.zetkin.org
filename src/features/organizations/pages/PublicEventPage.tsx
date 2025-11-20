@@ -346,6 +346,7 @@ const DateAndLocation: FC<{
             values={{
               projectLink: (
                 <ZUILink
+                  key="project-link"
                   href={`/o/${event.organization.id}/projects/${event.campaign.id}`}
                   text={event.campaign.title}
                 />

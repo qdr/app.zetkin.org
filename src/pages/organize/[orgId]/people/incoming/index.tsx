@@ -1,3 +1,5 @@
+'use client';
+
 import { GetServerSideProps } from 'next';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useState } from 'react';

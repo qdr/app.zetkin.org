@@ -1,3 +1,5 @@
+'use client';
+
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { Box, Chip, Grid, Typography, useTheme } from '@mui/material';

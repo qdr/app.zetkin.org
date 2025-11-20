@@ -1,3 +1,5 @@
+'use client';
+
 import { Add, MoreHoriz, Remove } from '@mui/icons-material';
 import { Box, IconButton } from '@mui/material';
 import { FC, useEffect, useState } from 'react';

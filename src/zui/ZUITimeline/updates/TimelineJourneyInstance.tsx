@@ -1,3 +1,5 @@
+'use client';
+
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box, Button, Typography } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';

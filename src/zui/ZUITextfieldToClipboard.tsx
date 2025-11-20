@@ -1,3 +1,5 @@
+'use client';
+
 import copy from 'copy-to-clipboard';
 import { Box, Button, TextField } from '@mui/material';
 import React, { useState } from 'react';

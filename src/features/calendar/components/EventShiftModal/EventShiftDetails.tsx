@@ -1,3 +1,5 @@
+'use client';
+
 import { DatePicker } from '@mui/x-date-pickers-pro';
 import { Add, Map } from '@mui/icons-material';
 import {

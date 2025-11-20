@@ -1,3 +1,5 @@
+'use client';
+
 import { Delete, Edit } from '@mui/icons-material';
 import { FC, ReactNode, useState } from 'react';
 import { Grid, IconButton, ListItem, Typography } from '@mui/material';

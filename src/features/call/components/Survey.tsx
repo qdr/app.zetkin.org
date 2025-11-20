@@ -1,3 +1,5 @@
+'use client';
+
 import { Box } from '@mui/system';
 import { FC, useRef } from 'react';
 import { ChevronLeft } from '@mui/icons-material';

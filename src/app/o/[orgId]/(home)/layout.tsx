@@ -9,41 +9,48 @@ import { ZetkinOrganization } from 'utils/types/zetkin';
 
 type Props = {
   children: ReactNode;
-  params: {
-    orgId: number;
-  };
+  params: Promise<{
+    orgId: string;
+  }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const headersList = headers();
+  const { orgId } = await params;
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);
 
-  const org = await apiClient.get<ZetkinOrganization>(
-    `/api/orgs/${params.orgId}`
-  );
+  try {
+    const org = await apiClient.get<ZetkinOrganization>(`/api/orgs/${orgId}`);
 
-  return {
-    icons: [{ url: '/logo-zetkin.png' }],
-    title: org.title,
-  };
+    return {
+      icons: [{ url: '/logo-zetkin.png' }],
+      title: org.title,
+    };
+  } catch (err) {
+    return {
+      icons: [{ url: '/logo-zetkin.png' }],
+      title: 'Organization',
+    };
+  }
 }
 
 // @ts-expect-error https://nextjs.org/docs/app/building-your-application/configuring/typescript#async-server-component-typescript-error
 const OrgLayout: FC<Props> = async ({ children, params }) => {
-  const headersList = headers();
+  const { orgId } = await params;
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);
 
-  const org = await apiClient.get<ZetkinOrganization>(
-    `/api/orgs/${params.orgId}`
-  );
+  const org = await apiClient.get<ZetkinOrganization>(`/api/orgs/${orgId}`);
 
   return (
     <HomeThemeProvider>
-      <PublicOrgLayout org={org}>{children}</PublicOrgLayout>
+      <PublicOrgLayout key={org.id} org={org}>
+        {children}
+      </PublicOrgLayout>
     </HomeThemeProvider>
   );
 };

@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Button } from '@mui/material';
 import { FC, Suspense, useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
@@ -88,7 +90,7 @@ const CanvassMapOverlays: FC<Props> = ({
       >
         {showViewLocationButton && (
           <Box onClick={() => setExpanded(true)} p={2}>
-            <Suspense>
+            <Suspense fallback={<div />}>
               <ContractedHeader
                 assignment={assignment}
                 location={selectedLocation}
@@ -97,7 +99,7 @@ const CanvassMapOverlays: FC<Props> = ({
           </Box>
         )}
         {selectedLocation && expanded && (
-          <Suspense>
+          <Suspense fallback={<div />}>
             <LocationDialog
               assignment={assignment}
               location={selectedLocation}
@@ -110,15 +112,17 @@ const CanvassMapOverlays: FC<Props> = ({
         )}
         {isCreating && (
           <Box p={2}>
-            <CreateLocationCard
-              onClose={() => {
-                onToggleCreating(false);
-              }}
-              onCreate={(title) => {
-                onCreate(title);
-              }}
-              suggestions={suggestions}
-            />
+            <Suspense fallback={<div />}>
+              <CreateLocationCard
+                onClose={() => {
+                  onToggleCreating(false);
+                }}
+                onCreate={(title) => {
+                  onCreate(title);
+                }}
+                suggestions={suggestions}
+              />
+            </Suspense>
           </Box>
         )}
       </Box>

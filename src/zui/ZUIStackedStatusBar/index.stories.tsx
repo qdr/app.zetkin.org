@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from '@storybook/preview-api';
 import { Box, Button } from '@mui/material';
 import { Meta, StoryFn } from '@storybook/react';

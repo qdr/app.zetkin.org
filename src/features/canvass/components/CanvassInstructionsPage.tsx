@@ -1,6 +1,6 @@
 'use client';
 
-import { FC } from 'react';
+import { FC, Suspense } from 'react';
 import { HomeWork } from '@mui/icons-material';
 import { Avatar, Box, Button, Card, Divider, Typography } from '@mui/material';
 
@@ -136,7 +136,7 @@ type CanvassInstructionsPageProps = {
   areaAssId: number;
 };
 
-const CanvassInstructionsPage: FC<CanvassInstructionsPageProps> = ({
+const CanvassInstructionsPageInner: FC<CanvassInstructionsPageProps> = ({
   areaAssId,
 }) => {
   const myAssignments = useMyCanvassAssignments() || [];
@@ -149,6 +149,14 @@ const CanvassInstructionsPage: FC<CanvassInstructionsPageProps> = ({
   }
 
   return <Page assignment={assignment} />;
+};
+
+const CanvassInstructionsPage: FC<CanvassInstructionsPageProps> = (props) => {
+  return (
+    <Suspense fallback={<div style={{ display: 'none' }} />}>
+      <CanvassInstructionsPageInner {...props} />
+    </Suspense>
+  );
 };
 
 export default CanvassInstructionsPage;

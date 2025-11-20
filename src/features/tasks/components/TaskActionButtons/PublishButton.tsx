@@ -1,3 +1,5 @@
+'use client';
+
 import dayjs from 'dayjs';
 import { useContext } from 'react';
 import { Button, Tooltip } from '@mui/material';

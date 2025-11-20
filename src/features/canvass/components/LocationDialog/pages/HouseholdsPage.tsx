@@ -1,3 +1,5 @@
+'use client';
+
 import { FC, useState } from 'react';
 import {
   Box,
@@ -217,7 +219,13 @@ const HouseholdsPage: FC<Props> = ({
                   <ListItemText
                     primary={household.title}
                     secondary={
-                      <Box alignItems="center" display="flex" gap={0.5}>
+                      <span
+                        style={{
+                          alignItems: 'center',
+                          display: 'flex',
+                          gap: '4px',
+                        }}
+                      >
                         {mostRecentVisit && (
                           <>
                             {isSuccessful && (
@@ -232,7 +240,7 @@ const HouseholdsPage: FC<Props> = ({
                             </Typography>
                           </>
                         )}
-                      </Box>
+                      </span>
                     }
                   />
                   {household.color !== 'clear' && (

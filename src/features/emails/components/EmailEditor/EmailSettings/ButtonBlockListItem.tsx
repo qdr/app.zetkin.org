@@ -1,3 +1,5 @@
+'use client';
+
 import NextLink from 'next/link';
 import { Box, IconButton, Link, TextField, Typography } from '@mui/material';
 import { Close, OpenInNew } from '@mui/icons-material';

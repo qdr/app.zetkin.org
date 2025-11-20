@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Collapse, Typography } from '@mui/material';
 import React, { FormEvent, useEffect, useState } from 'react';
 

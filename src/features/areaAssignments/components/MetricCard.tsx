@@ -1,3 +1,5 @@
+'use client';
+
 import { Close, LinearScale, SwitchLeft } from '@mui/icons-material';
 import React, { FC, useEffect, useState } from 'react';
 import {

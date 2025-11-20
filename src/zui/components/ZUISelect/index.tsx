@@ -1,4 +1,6 @@
-import { FC } from 'react';
+'use client';
+
+import { FC, useEffect, useState } from 'react';
 import {
   FormControl,
   InputLabel,
@@ -81,8 +83,19 @@ const ZUISelect: FC<ZUISelectProps> = ({
   items,
   size = 'medium',
   selectedOption,
-}) => (
-  <FormControl
+}) => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
+
+  return (
+    <FormControl
     disabled={disabled}
     error={error}
     fullWidth={fullWidth}
@@ -170,6 +183,7 @@ const ZUISelect: FC<ZUISelectProps> = ({
       })}
     </Select>
   </FormControl>
-);
+  );
+};
 
 export default ZUISelect;

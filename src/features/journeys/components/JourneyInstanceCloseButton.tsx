@@ -1,3 +1,5 @@
+'use client';
+
 import ArchiveIcon from '@mui/icons-material/Archive';
 import dayjs from 'dayjs';
 import { useState } from 'react';

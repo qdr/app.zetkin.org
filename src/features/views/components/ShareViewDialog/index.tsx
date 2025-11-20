@@ -1,3 +1,5 @@
+'use client';
+
 import { makeStyles } from '@mui/styles';
 import { Tab } from '@mui/material';
 import { FC, useState } from 'react';

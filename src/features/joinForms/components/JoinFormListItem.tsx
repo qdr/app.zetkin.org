@@ -1,3 +1,5 @@
+'use client';
+
 import { useContext } from 'react';
 import { FormatListBulleted, OpenInNew } from '@mui/icons-material';
 import makeStyles from '@mui/styles/makeStyles';

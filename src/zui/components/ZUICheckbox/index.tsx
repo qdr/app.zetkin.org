@@ -1,3 +1,5 @@
+'use client';
+
 import { FormControlLabel, Typography } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import { FC } from 'react';

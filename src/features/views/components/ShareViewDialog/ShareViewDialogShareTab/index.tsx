@@ -1,3 +1,5 @@
+'use client';
+
 import NextLink from 'next/link';
 import { Box, FormControlLabel, Link, Switch } from '@mui/material';
 import { useRef, useState } from 'react';

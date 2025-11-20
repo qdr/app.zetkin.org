@@ -10,6 +10,7 @@ export default function useMyAreaAssignments() {
   const assignments = useRemoteList(list, {
     actionOnLoad: () => myAssignmentsLoad(),
     actionOnSuccess: (data) => myAssignmentsLoaded(data),
+    cacheKey: '/api2/users/me/area_assignments',
     loader: () =>
       apiClient.get<ZetkinAreaAssignment[]>('/api2/users/me/area_assignments'),
   });

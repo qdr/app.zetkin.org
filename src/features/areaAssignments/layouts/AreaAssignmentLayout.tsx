@@ -1,3 +1,5 @@
+'use client';
+
 import { Box } from '@mui/system';
 import router, { useRouter } from 'next/router';
 import { Button, Typography } from '@mui/material';

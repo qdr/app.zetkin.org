@@ -1,3 +1,5 @@
+'use client';
+
 import DOMPurify from 'dompurify';
 import { Box, Collapse, Typography, useTheme } from '@mui/material';
 import { ExpandLess, ExpandMore, Warning } from '@mui/icons-material';

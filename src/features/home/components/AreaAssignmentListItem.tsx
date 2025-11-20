@@ -22,6 +22,12 @@ const AreaAssignmentListItem: FC<Props> = ({ assignment, href }) => {
   const organization = useOrganization(assignment.organization_id);
   const messages = useMessages(messageIds);
 
+  // Handle campaign loading errors gracefully (e.g., deleted campaigns)
+  // Accessing .error acknowledges the error and prevents it from showing in React error overlay
+  const campaignTitle = campaign.campaignFuture.error
+    ? undefined
+    : campaign.campaignFuture.data?.title;
+
   return (
     <MyActivityListItem
       actions={[
@@ -36,10 +42,9 @@ const AreaAssignmentListItem: FC<Props> = ({ assignment, href }) => {
       info={[
         {
           Icon: GroupWorkOutlined,
-          labels: [
-            campaign.campaignFuture.data?.title,
-            organization.data?.title,
-          ].filter((label) => !!label) as string[],
+          labels: [campaignTitle, organization.data?.title].filter(
+            (label) => !!label
+          ) as string[],
         },
       ]}
       title={assignment.title || messages.defaultTitles.areaAssignment()}

@@ -1,3 +1,5 @@
+'use client';
+
 import { GetServerSideProps } from 'next';
 import { useContext, useState } from 'react';
 import { Box, Button, Link, Paper, Typography } from '@mui/material';

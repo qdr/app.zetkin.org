@@ -746,9 +746,9 @@ feat:
     households:
       bulkEditHouseholds:
         floorLabel: Etage bearbeiten
-        header: Bearbeite {numHouseholds, plural, one {1 household} andere {#
+        header: Bearbeite {numHouseholds, plural, one {1 household} other {#
           households}}
-        saveButtonLabel: Speichern {numHouseholds, plural, one {1 household} andere {#
+        saveButtonLabel: Speichern {numHouseholds, plural, one {1 household} other {#
           households}}
       colorPicker:
         colorNames:
@@ -884,9 +884,9 @@ feat:
         submitReportButtonLabel: Bericht einreichen
         yesButtonLabel: Ja
       location:
-        average: '{numHouseholds, plural,one {1 household} andere {# households}},
+        average: '{numHouseholds, plural,one {1 household} other {# households}},
           {avgFixed} durchschnittlich'
-        completed: '{numHouseholds, plural,one {1 household} andere {# households}},
+        completed: '{numHouseholds, plural,one {1 household} other {# households}},
           {numYes} ja'
         header: Berichte der Besuche hier
         noInputLabel: Nein
@@ -1293,7 +1293,7 @@ feat:
       unknown: Unbekannt
     filterButtonLabels:
       eventTypes: '{numEventTypes, plural,=0 {Event types} =1 {{singleEventType}}
-        andere {# event types}}'
+        other {# event types}}'
     list:
       events: Aktionen
       noEvents: Keine Aktionen
@@ -1943,7 +1943,7 @@ feat:
         removeFiltersButton: Filter entfernen
       filterButtonLabels:
         locations: '{count} Orte'
-        organizations: '{numOrgs, plural,=0 {Organizations} =1 {1 organization} andere
+        organizations: '{numOrgs, plural,=0 {Organizations} =1 {1 organization} other
           {# organizations}}'
         thisWeek: Diese Woche
         today: Heute

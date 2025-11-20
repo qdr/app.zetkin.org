@@ -1,3 +1,5 @@
+'use client';
+
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, IconButton } from '@mui/material';
 import { FC, useState } from 'react';

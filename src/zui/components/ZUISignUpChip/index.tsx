@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, useTheme } from '@mui/material';
 import { FC } from 'react';
 

@@ -1,3 +1,5 @@
+'use client';
+
 import { Clear, FilterList } from '@mui/icons-material';
 import { IconButton, InputAdornment, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';

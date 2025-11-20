@@ -1,3 +1,5 @@
+'use client';
+
 import { OpenInNew } from '@mui/icons-material';
 import { useMemo } from 'react';
 import { Box, Link, useTheme } from '@mui/material';

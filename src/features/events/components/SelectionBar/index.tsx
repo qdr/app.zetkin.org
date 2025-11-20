@@ -1,3 +1,5 @@
+'use client';
+
 import { CheckBoxOutlined } from '@mui/icons-material';
 import { useState } from 'react';
 import { Badge, Box, Button, Divider, Paper, Typography } from '@mui/material';

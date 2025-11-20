@@ -1,3 +1,5 @@
+'use client';
+
 import EditorJS from '@editorjs/editorjs';
 import { OutputBlockData } from '@editorjs/editorjs';
 import { Box, Divider, Stack, Tab } from '@mui/material';

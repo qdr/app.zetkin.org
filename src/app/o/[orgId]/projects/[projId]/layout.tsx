@@ -10,38 +10,47 @@ import PublicProjectLayout from 'features/campaigns/layout/PublicProjectLayout';
 
 type Props = {
   children: ReactNode;
-  params: {
-    orgId: number;
-    projId: number;
-  };
+  params: Promise<{
+    orgId: string;
+    projId: string;
+  }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const headersList = headers();
-  const headersEntries = headersList.entries();
-  const headersObject = Object.fromEntries(headersEntries);
-  const apiClient = new BackendApiClient(headersObject);
-
-  const campaign = await apiClient.get<ZetkinCampaign>(
-    `/api/orgs/${params.orgId}/campaigns/${params.projId}`
-  );
-
-  return {
-    icons: [{ url: '/logo-zetkin.png' }],
-    title: campaign.title,
-  };
-}
-
-// @ts-expect-error https://nextjs.org/docs/app/building-your-application/configuring/typescript#async-server-component-typescript-error
-const MyHomeLayout: FC<Props> = async ({ children, params }) => {
-  const headersList = headers();
+  const { orgId, projId } = await params;
+  const headersList = await headers();
   const headersEntries = headersList.entries();
   const headersObject = Object.fromEntries(headersEntries);
   const apiClient = new BackendApiClient(headersObject);
 
   try {
     const campaign = await apiClient.get<ZetkinCampaign>(
-      `/api/orgs/${params.orgId}/campaigns/${params.projId}`
+      `/api/orgs/${orgId}/campaigns/${projId}`
+    );
+
+    return {
+      icons: [{ url: '/logo-zetkin.png' }],
+      title: campaign.title,
+    };
+  } catch (err) {
+    return {
+      icons: [{ url: '/logo-zetkin.png' }],
+      title: 'Project',
+    };
+  }
+}
+
+// @ts-expect-error https://nextjs.org/docs/app/building-your-application/configuring/typescript#async-server-component-typescript-error
+const MyHomeLayout: FC<Props> = async ({ children, params }) => {
+  const { orgId, projId } = await params;
+  const headersList = await headers();
+  const headersEntries = headersList.entries();
+  const headersObject = Object.fromEntries(headersEntries);
+  const apiClient = new BackendApiClient(headersObject);
+
+  try {
+    const campaign = await apiClient.get<ZetkinCampaign>(
+      `/api/orgs/${orgId}/campaigns/${projId}`
     );
 
     return (

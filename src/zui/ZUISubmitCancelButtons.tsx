@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Button, ButtonProps } from '@mui/material';
 
 import { Msg } from 'core/i18n';

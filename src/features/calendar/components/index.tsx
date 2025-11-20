@@ -1,3 +1,5 @@
+'use client';
+
 import { Box } from '@mui/system';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
