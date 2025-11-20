@@ -91,15 +91,25 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
             ? data.submissionsByDay
             : [];
 
-        const hasChartData = submissionsByDay.length > 1;
+        // Extra validation: ensure all items in the array are valid
+        const validSubmissionsByDay = submissionsByDay.filter(
+          (day) =>
+            day &&
+            typeof day === 'object' &&
+            day.date &&
+            typeof day.accumulatedSubmissions === 'number'
+        );
+
+        const hasChartData = validSubmissionsByDay.length > 1;
 
         console.log('[SubmissionChartCard] Chart rendering:', {
           submissionCount,
           chartSurveyId,
-          submissionsByDayLength: submissionsByDay.length,
+          originalLength: submissionsByDay.length,
+          validLength: validSubmissionsByDay.length,
           hasChartData,
-          firstItem: submissionsByDay[0],
-          lastItem: submissionsByDay[submissionsByDay.length - 1],
+          firstItem: validSubmissionsByDay[0],
+          lastItem: validSubmissionsByDay[validSubmissionsByDay.length - 1],
         });
 
         return (
@@ -116,7 +126,7 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
             subheader={
               submissionCount
                 ? messages.chart.subheader({
-                    days: submissionsByDay.length,
+                    days: validSubmissionsByDay.length,
                   })
                 : undefined
             }
@@ -158,11 +168,10 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
                   curve="basis"
                   data={[
                     {
-                      data:
-                        submissionsByDay?.map((day) => ({
-                          x: day?.date,
-                          y: day?.accumulatedSubmissions,
-                        })) || [],
+                      data: validSubmissionsByDay.map((day) => ({
+                        x: day.date,
+                        y: day.accumulatedSubmissions,
+                      })),
                       id: chartSurveyId,
                     },
                   ]}
