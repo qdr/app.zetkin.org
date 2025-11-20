@@ -96,11 +96,13 @@ const OrganizerMap: FC<OrganizerMapProps> = ({
 
   const mapRef = useRef<MapType | null>(null);
   const [isMounted, setIsMounted] = useState(false);
-  const mapKeyRef = useRef(`map-${areaAssId}-${Date.now()}`);
+  const [mapKey, setMapKey] = useState(`map-${areaAssId}-${Date.now()}`);
   useAutoResizeMap(mapRef.current);
 
   // Guard against React StrictMode double-mount and ensure cleanup
   useEffect(() => {
+    // Generate a new unique key for each mount
+    setMapKey(`map-${areaAssId}-${Date.now()}`);
     setIsMounted(true);
 
     return () => {
@@ -111,7 +113,7 @@ const OrganizerMap: FC<OrganizerMapProps> = ({
       }
       setIsMounted(false);
     };
-  }, []);
+  }, [areaAssId]);
 
   const selectedArea = areas.find((area) => area.id == selectedId);
 
@@ -384,7 +386,7 @@ const OrganizerMap: FC<OrganizerMapProps> = ({
         )}
         {isMounted && (
           <MapContainer
-            key={mapKeyRef.current}
+            key={mapKey}
             ref={mapRef}
             attributionControl={false}
             center={[0, 0]}
