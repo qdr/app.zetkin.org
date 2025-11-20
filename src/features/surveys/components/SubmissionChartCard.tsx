@@ -25,7 +25,7 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
   const statsFuture = useSurveyStats(orgId, surveyId);
 
   return (
-    <ZUIFuture future={statsFuture}>
+    <ZUIFuture future={statsFuture} ignoreDataWhileLoading>
       {(data) => {
         // Defensive check: ensure data has the expected structure
         if (
