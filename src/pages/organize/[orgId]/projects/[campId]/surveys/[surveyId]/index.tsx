@@ -79,10 +79,6 @@ const SurveyPage: PageWithLayout<SurveyPageProps> = ({
 
   const isOpen = state === SurveyState.PUBLISHED;
 
-  if (!survey) {
-    return null;
-  }
-
   return (
     <>
       <Head>
@@ -102,7 +98,7 @@ const SurveyPage: PageWithLayout<SurveyPageProps> = ({
             <Grid size={{ md: 4 }}>
               <SurveyURLCard
                 isOpen={isOpen}
-                orgId={survey.organization.id.toString()}
+                orgId={survey?.organization.id.toString() ?? orgId}
                 surveyId={surveyId}
               />
               <SurveyUnlinkedCard
