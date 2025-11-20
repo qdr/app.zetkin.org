@@ -31,12 +31,6 @@ const PublicOrgLayout: FC<Props> = ({ children, org }) => {
   const dispatch = useAppDispatch();
   const { showSnackbar } = useContext(ZUISnackbarContext);
 
-  // Debug logging
-  console.log('[PublicOrgLayout DEBUG]', {
-    orgId: org.id,
-    orgTitle: org.title,
-  });
-
   const messages = useMessages(messageIds);
   const subOrgs = usePublicSubOrgs(org.id);
   const { filteredEvents } = useFilteredOrgEvents(org.id);

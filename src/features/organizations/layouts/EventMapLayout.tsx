@@ -60,15 +60,6 @@ const EventMapLayout: FC<Props> = ({
   const showMapDesktop = !isMobile && showMap;
   const shouldMountMap = useDelayOnTrue(transitionDuration, showMapDesktop);
 
-  // Debug logging
-  console.log('[EventMapLayout DEBUG]', {
-    isMobile,
-    showMap,
-    showMapDesktop,
-    shouldMountMap,
-    eventsLength: events.length,
-  });
-
   return (
     <Box
       display="flex"
