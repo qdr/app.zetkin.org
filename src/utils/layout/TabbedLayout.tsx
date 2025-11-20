@@ -79,7 +79,7 @@ const TabbedLayout: FunctionComponent<TabbedLayoutProps> = ({
   const currentTab =
     router.asPath.split('?')[0] === baseHref
       ? defaultTab
-      : `/${router.pathname.split('/').pop()}`;
+      : `/${router.asPath.split('?')[0].split('/').pop()}`;
 
   const selectTab = (selected: string): void => {
     const href = tabs.find((tab) => tab.href === selected)?.href;
