@@ -69,13 +69,16 @@ const PublicOrgLayout: FC<Props> = ({ children, org }) => {
     (state) => state.organizations.filters
   );
 
-  const setLocationFilter = (geojsonToFilterBy: GeoJSON.Feature[]) => {
-    dispatch(
-      filtersUpdated({
-        geojsonToFilterBy,
-      })
-    );
-  };
+  const setLocationFilter = useCallback(
+    (geojsonToFilterBy: GeoJSON.Feature[]) => {
+      dispatch(
+        filtersUpdated({
+          geojsonToFilterBy,
+        })
+      );
+    },
+    [dispatch]
+  );
 
   const onLocationFilterChange = useCallback(
     (geojsonToFilterBy: GeoJSON.Feature[]) => {
@@ -84,7 +87,7 @@ const PublicOrgLayout: FC<Props> = ({ children, org }) => {
         router.push(`/o/${org.id}`);
       }
     },
-    [setLocationFilter, lastSegment, router.push, org.id]
+    [setLocationFilter, lastSegment, org.id]
   );
 
   return (
