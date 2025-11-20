@@ -85,42 +85,22 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
           typeof data.submissionCount === 'number' ? data.submissionCount : 0;
         const chartSurveyId = typeof data.id === 'number' ? data.id : surveyId;
 
-        // Filter submissionsByDay to only include valid items
-        const validSubmissions = Array.isArray(data.submissionsByDay)
-          ? data.submissionsByDay.filter(
-              (day) =>
-                day &&
-                typeof day === 'object' &&
-                'date' in day &&
-                'accumulatedSubmissions' in day &&
-                typeof day.accumulatedSubmissions === 'number' &&
-                typeof day.date === 'string'
-            )
-          : [];
+        // Use the raw submissionsByDay array if valid, empty array otherwise
+        const submissionsByDay =
+          data.submissionsByDay && Array.isArray(data.submissionsByDay)
+            ? data.submissionsByDay
+            : [];
 
-        console.log('[SubmissionChartCard] Processed data:', {
+        const hasChartData = submissionsByDay.length > 1;
+
+        console.log('[SubmissionChartCard] Chart rendering:', {
           submissionCount,
           chartSurveyId,
-          validSubmissionsLength: validSubmissions.length,
-          validSubmissions,
+          submissionsByDayLength: submissionsByDay.length,
+          hasChartData,
+          firstItem: submissionsByDay[0],
+          lastItem: submissionsByDay[submissionsByDay.length - 1],
         });
-
-        const hasChartData = validSubmissions.length > 1;
-
-        // Memoize chart data to prevent Nivo from receiving unstable references
-        // during React Strict Mode's double rendering
-        const chartData = useMemo(
-          () => [
-            {
-              data: validSubmissions.map((day) => ({
-                x: day.date,
-                y: day.accumulatedSubmissions,
-              })),
-              id: chartSurveyId,
-            },
-          ],
-          [validSubmissions, chartSurveyId]
-        );
 
         return (
           <ZUICard
@@ -136,7 +116,7 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
             subheader={
               submissionCount
                 ? messages.chart.subheader({
-                    days: validSubmissions.length,
+                    days: submissionsByDay.length,
                   })
                 : undefined
             }
@@ -176,7 +156,16 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
                   }}
                   colors={[theme.palette.primary.main]}
                   curve="basis"
-                  data={chartData}
+                  data={[
+                    {
+                      data:
+                        submissionsByDay?.map((day) => ({
+                          x: day?.date,
+                          y: day?.accumulatedSubmissions,
+                        })) || [],
+                      id: chartSurveyId,
+                    },
+                  ]}
                   defs={[
                     linearGradientDef('gradientA', [
                       { color: 'inherit', offset: 0 },
