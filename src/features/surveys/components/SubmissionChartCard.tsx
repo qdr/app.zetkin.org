@@ -151,7 +151,32 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
             }
           >
             <Box height={400}>
-              {!hasChartData && (
+              {/* TEMPORARILY DISABLED FOR DEBUGGING */}
+              <Box
+                display="flex"
+                flexDirection="column"
+                height="100%"
+                justifyContent="center"
+                width="100%"
+              >
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  marginBottom={2}
+                  width="100%"
+                >
+                  <PlaceholderVisual />
+                </Box>
+                <Typography
+                  sx={{
+                    color: theme.palette.text.disabled,
+                    textAlign: 'center',
+                  }}
+                >
+                  Chart temporarily disabled for debugging
+                </Typography>
+              </Box>
+              {/* {!hasChartData && (
                 <Box
                   display="flex"
                   flexDirection="column"
@@ -248,7 +273,7 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
                     type: 'time',
                   }}
                 />
-              )}
+              )} */}
             </Box>
           </ZUICard>
         );
