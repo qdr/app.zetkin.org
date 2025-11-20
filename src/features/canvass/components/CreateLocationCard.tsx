@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import {
   Autocomplete,
   Box,
@@ -25,8 +25,17 @@ export const CreateLocationCard: FC<CreateLocationCardProps> = ({
 }) => {
   const messages = useMessages(messageIds);
   const [title, setTitle] = useState<string>('');
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const titles = suggestions ?? [];
+
+  if (!isMounted) {
+    return null;
+  }
 
   const { tokenOriginalByLower, tokenCounts, bigramCounts } = useMemo(() => {
     const tokenOriginalByLower = new Map<string, string>();
