@@ -67,7 +67,8 @@ const MoveItemBreadcrumbs = ({
 
   return (
     <ZUIFuture future={viewTreeFuture}>
-      {(viewTree) => {
+      {(treeReturn) => {
+        const viewTree = treeReturn.data;
         const folders = getAllParentFolderIds(viewedFolder, viewTree)
           .map((id) => folderById(id, viewTree))
           .filter((folder): folder is ZetkinViewFolder => !!folder);

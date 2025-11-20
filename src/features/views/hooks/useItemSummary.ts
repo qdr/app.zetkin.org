@@ -5,17 +5,19 @@ export default function useItemSummary(
   orgId: number,
   folderId: number | null
 ): IFuture<{ folders: number; views: number }> {
-  const itemsFuture = useViewTree(orgId);
+  const treeFuture = useViewTree(orgId);
 
-  if (!itemsFuture.data) {
-    return new FutureBase(null, itemsFuture.error, itemsFuture.isLoading);
+  if (!treeFuture.data) {
+    return new FutureBase(null, treeFuture.error, treeFuture.isLoading);
   }
 
+  const { data } = treeFuture.data;
+
   return new ResolvedFuture({
-    folders: itemsFuture.data.folders.filter(
+    folders: data.folders.filter(
       (folder) => folder.parent?.id == folderId
     ).length,
-    views: itemsFuture.data.views.filter((view) => {
+    views: data.views.filter((view) => {
       if (view) {
         return view.folder?.id == folderId;
       }

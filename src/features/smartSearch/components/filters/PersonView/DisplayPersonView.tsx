@@ -19,7 +19,7 @@ const DisplayPersonView = ({ filter }: DisplayPersonViewProps): JSX.Element => {
   const { config } = filter;
   const { orgId } = useNumericRouteParams();
   const viewTree = useViewTree(orgId);
-  const personViews = viewTree.data?.views ?? [];
+  const personViews = viewTree.data?.data.views ?? [];
 
   const view = personViews.find((v) => v.id == config.view);
   const operator = config.operator;

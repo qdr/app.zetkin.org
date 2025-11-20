@@ -43,16 +43,16 @@ export default function useFolder(
   orgId: number,
   folderId?: number | null
 ): UseFolderReturn {
-  const itemsFuture = useViewTree(orgId);
+  const treeFuture = useViewTree(orgId);
   const views = useAppSelector((state) => state.views);
   const apiClient = useApiClient();
   const dispatch = useAppDispatch();
 
-  const folderFuture = itemsFuture.data
+  const folderFuture = treeFuture.data
     ? new ResolvedFuture(
-        itemsFuture.data.folders.find((folder) => folder.id == folderId) || null
+        treeFuture.data.data.folders.find((folder) => folder.id == folderId) || null
       )
-    : new FutureBase(null, itemsFuture.error, itemsFuture.isLoading);
+    : new FutureBase(null, treeFuture.error, treeFuture.isLoading);
 
   const recentlyCreatedFolder = views.recentlyCreatedFolder;
 

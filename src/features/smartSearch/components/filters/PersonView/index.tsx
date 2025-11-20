@@ -38,7 +38,7 @@ const PersonView = ({
 }: PersonViewProps): JSX.Element => {
   const { orgId } = useNumericRouteParams();
   const viewTree = useViewTree(orgId);
-  const personViews = viewTree.data?.views ?? [];
+  const personViews = viewTree.data?.data.views ?? [];
   const personViewsSorted = personViews.sort((pv1, pv2) => {
     return pv1.title.localeCompare(pv2.title);
   });
