@@ -1,7 +1,7 @@
 'use client';
 
 import { Box } from '@mui/material';
-import { FC, ReactNode } from 'react';
+import { FC, ReactNode, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 import { useMessages } from 'core/i18n';
@@ -21,8 +21,18 @@ type Props = {
 //TODO: Remove this whole alert sometime in the beginning of 2026 maybe?
 const NewLandingPageAlert: FC<{ userId: number }> = ({ userId }) => {
   const messages = useMessages(messageIds);
+  const [isMounted, setIsMounted] = useState(false);
   const [hasSeenNewLandingPageAlert, setHasSeenNewLandingPageAlert] =
     useLocalStorage<boolean>(`${userId}-hasSeenNewLandingPageAlert`, false);
+
+  // Ensure component only renders after client-side mount to prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
 
   if (hasSeenNewLandingPageAlert) {
     return null;
