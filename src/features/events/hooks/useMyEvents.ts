@@ -16,31 +16,35 @@ export default function useMyEvents() {
     actionOnSuccess: (data) => userEventsLoaded(data),
     cacheKey: '/api/users/me/events',
     loader: async () => {
+      // Fetch both in parallel instead of sequential waterfall
+      const [bookedEventsRaw, signedUpEventsRaw] = await Promise.all([
+        apiClient.get<ZetkinEvent[]>(
+          `/api/users/me/actions?filter=end_time>=${today}`
+        ),
+        apiClient.get<{ action: ZetkinEvent }[]>(
+          `/api/users/me/action_responses`
+        ),
+      ]);
+
       const bookedEventIds: number[] = [];
 
-      const bookedEvents = await apiClient
-        .get<ZetkinEvent[]>(`/api/users/me/actions?filter=end_time>=${today}`)
-        .then((events) =>
-          events.map<ZetkinEventWithStatus>((event) => {
-            bookedEventIds.push(event.id);
-            return {
-              ...event,
-              status: 'booked',
-            };
-          })
-        );
+      const bookedEvents = bookedEventsRaw.map<ZetkinEventWithStatus>(
+        (event) => {
+          bookedEventIds.push(event.id);
+          return {
+            ...event,
+            status: 'booked',
+          };
+        }
+      );
 
-      const signedUpEvents = await apiClient
-        .get<{ action: ZetkinEvent }[]>(`/api/users/me/action_responses`)
-        .then((events) =>
-          events
-            .map<ZetkinEventWithStatus>((signup) => ({
-              ...signup.action,
-              status: 'signedUp',
-            }))
-            .filter((event) => !bookedEventIds.includes(event.id))
-            .filter(({ end_time }) => end_time >= today)
-        );
+      const signedUpEvents = signedUpEventsRaw
+        .map<ZetkinEventWithStatus>((signup) => ({
+          ...signup.action,
+          status: 'signedUp',
+        }))
+        .filter((event) => !bookedEventIds.includes(event.id))
+        .filter(({ end_time }) => end_time >= today);
 
       return [...bookedEvents, ...signedUpEvents];
     },
