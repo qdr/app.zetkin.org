@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { FormattedDate } from 'react-intl';
 import { linearGradientDef } from '@nivo/core';
 import { ResponsiveLine } from '@nivo/line';
@@ -107,6 +107,21 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
 
         const hasChartData = validSubmissions.length > 1;
 
+        // Memoize chart data to prevent Nivo from receiving unstable references
+        // during React Strict Mode's double rendering
+        const chartData = useMemo(
+          () => [
+            {
+              data: validSubmissions.map((day) => ({
+                x: day.date,
+                y: day.accumulatedSubmissions,
+              })),
+              id: chartSurveyId,
+            },
+          ],
+          [validSubmissions, chartSurveyId]
+        );
+
         return (
           <ZUICard
             header={messages.chart.header()}
@@ -161,15 +176,7 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
                   }}
                   colors={[theme.palette.primary.main]}
                   curve="basis"
-                  data={[
-                    {
-                      data: validSubmissions.map((day) => ({
-                        x: day.date,
-                        y: day.accumulatedSubmissions,
-                      })),
-                      id: chartSurveyId,
-                    },
-                  ]}
+                  data={chartData}
                   defs={[
                     linearGradientDef('gradientA', [
                       { color: 'inherit', offset: 0 },
@@ -193,7 +200,20 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
                     top: 20,
                   }}
                   sliceTooltip={(props) => {
+                    // Defensive: check if points array exists and has items
+                    if (
+                      !props.slice?.points ||
+                      !Array.isArray(props.slice.points) ||
+                      props.slice.points.length === 0
+                    ) {
+                      return null;
+                    }
+
                     const dataPoint = props.slice.points[0];
+                    if (!dataPoint?.data?.xFormatted) {
+                      return null;
+                    }
+
                     const date = new Date(dataPoint.data.xFormatted);
 
                     return (
