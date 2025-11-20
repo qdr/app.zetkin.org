@@ -26,6 +26,19 @@ export default function useRemoteList<
   const promiseKey = hooks.cacheKey || hooks.loader.toString();
   const { cache } = usePromiseCache(promiseKey);
 
+  // Debug logging
+  if (hooks.cacheKey?.includes('publicSubOrgs')) {
+    console.log('[useRemoteList DEBUG]', {
+      cacheKey: hooks.cacheKey,
+      hasRemoteList: !!remoteList,
+      isLoading: remoteList?.isLoading,
+      loaded: remoteList?.loaded,
+      itemsLength: remoteList?.items?.length,
+      loadIsNecessary,
+      shouldLoadResult: shouldLoad(remoteList),
+    });
+  }
+
   if (!remoteList || loadIsNecessary) {
     const promise = Promise.resolve()
       .then(() => {
