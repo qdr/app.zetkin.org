@@ -50,14 +50,20 @@ const TagManager: FC<TagManagerProps> = ({
   return (
     <ZUIFutures futures={{ tagGroups: tagGroupsFuture, tags: tagsFuture }}>
       {({ data: { tagGroups, tags } }) => {
-        const tagsWithoutValueTags = tags.filter(
-          (tag) => tag.value_type == null
-        );
+        const tagsWithoutValueTags = Array.isArray(tags)
+          ? tags.filter((tag) => tag.value_type == null)
+          : [];
         return (
           <TagManagerController
             assignedTags={assignedTags}
-            availableGroups={tagGroups}
-            availableTags={disableValueTags ? tagsWithoutValueTags : tags}
+            availableGroups={Array.isArray(tagGroups) ? tagGroups : []}
+            availableTags={
+              disableValueTags
+                ? tagsWithoutValueTags
+                : Array.isArray(tags)
+                  ? tags
+                  : []
+            }
             disabledTags={disabledTags}
             disableEditTags={disableEditTags}
             groupTags={groupTags}

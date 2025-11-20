@@ -100,47 +100,51 @@ const SurveySubmissionPane: FC<SurveySubmissionPaneProps> = ({ orgId, id }) => {
               }
               title={sub.survey.title}
             />
-            {sub.elements.map((elem) => {
-              if (elem.type == ELEM_TYPE.OPEN_QUESTION) {
-                return (
-                  <Question
-                    key={elem.id}
-                    hidden={elem.hidden}
-                    question={elem.question}
-                  >
-                    <ResponseItem icon={<FormatQuote />}>
-                      {elem.response || '-'}
-                    </ResponseItem>
-                  </Question>
-                );
-              } else if (elem.type == ELEM_TYPE.OPTIONS) {
-                return (
-                  <Question
-                    key={elem.id}
-                    hidden={elem.hidden}
-                    question={elem.question}
-                  >
-                    {elem.selectedOptions.length == 0 && '-'}
-                    {elem.selectedOptions.map((option) => (
-                      <ResponseItem key={option.id} icon={<Check />}>
-                        {option.text}
+            {Array.isArray(sub.elements) &&
+              sub.elements.map((elem) => {
+                if (elem.type == ELEM_TYPE.OPEN_QUESTION) {
+                  return (
+                    <Question
+                      key={elem.id}
+                      hidden={elem.hidden}
+                      question={elem.question}
+                    >
+                      <ResponseItem icon={<FormatQuote />}>
+                        {elem.response || '-'}
                       </ResponseItem>
-                    ))}
-                  </Question>
-                );
-              } else if (elem.type == ELEM_TYPE.TEXT_BLOCK) {
-                return (
-                  <Box key={elem.id} className={styles.element}>
-                    <Typography className={styles.textHeader}>
-                      {elem.header}
-                    </Typography>
-                    <Typography className={styles.textContent}>
-                      {elem.text}
-                    </Typography>
-                  </Box>
-                );
-              }
-            })}
+                    </Question>
+                  );
+                } else if (elem.type == ELEM_TYPE.OPTIONS) {
+                  return (
+                    <Question
+                      key={elem.id}
+                      hidden={elem.hidden}
+                      question={elem.question}
+                    >
+                      {Array.isArray(elem.selectedOptions) &&
+                        elem.selectedOptions.length == 0 &&
+                        '-'}
+                      {Array.isArray(elem.selectedOptions) &&
+                        elem.selectedOptions.map((option) => (
+                          <ResponseItem key={option.id} icon={<Check />}>
+                            {option.text}
+                          </ResponseItem>
+                        ))}
+                    </Question>
+                  );
+                } else if (elem.type == ELEM_TYPE.TEXT_BLOCK) {
+                  return (
+                    <Box key={elem.id} className={styles.element}>
+                      <Typography className={styles.textHeader}>
+                        {elem.header}
+                      </Typography>
+                      <Typography className={styles.textContent}>
+                        {elem.text}
+                      </Typography>
+                    </Box>
+                  );
+                }
+              })}
           </>
         );
       }}

@@ -66,9 +66,9 @@ const SubmissionsPage: PageWithLayout<SubmissionsPageProps> = ({
         <Grid size={{ md: isShared ? 12 : 8, sm: 12, xs: 12 }}>
           <ZUIFuture future={submissionsFuture} ignoreDataWhileLoading>
             {(data) => {
-              let submissions = data;
-              if (showUnlinkedOnly) {
-                submissions = data.filter(
+              let submissions = Array.isArray(data) ? data : [];
+              if (showUnlinkedOnly && submissions.length > 0) {
+                submissions = submissions.filter(
                   (sub) => sub.respondent && !sub.respondent.id
                 );
                 if (submissions.length === 0) {

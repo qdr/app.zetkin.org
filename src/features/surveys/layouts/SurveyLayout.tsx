@@ -217,9 +217,11 @@ const SurveyLayout: React.FC<SurveyLayoutProps> = ({
               }}
             >
               {({ data: { elements, stats } }) => {
-                const questionLength = elements.filter(
-                  (elem) => elem.type == ELEMENT_TYPE.QUESTION
-                ).length;
+                const questionLength = Array.isArray(elements)
+                  ? elements.filter(
+                      (elem) => elem.type == ELEMENT_TYPE.QUESTION
+                    ).length
+                  : 0;
 
                 const labels: ZUIIconLabelProps[] = [];
 
@@ -237,7 +239,7 @@ const SurveyLayout: React.FC<SurveyLayoutProps> = ({
                   });
                 }
 
-                if (stats.submissionCount > 0) {
+                if (stats && stats.submissionCount > 0) {
                   labels.push({
                     icon: <ChatBubbleOutline />,
                     label: (
