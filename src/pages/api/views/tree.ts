@@ -24,9 +24,17 @@ export default async function handle(
       `/api/orgs/${orgId}/people/view_folders`
     );
 
+    // Sort views by creation date (most recent first) and limit to 100
+    const sortedAndLimitedViews = views
+      .sort((a, b) => {
+        // Sort by created date descending (most recent first)
+        return new Date(b.created).getTime() - new Date(a.created).getTime();
+      })
+      .slice(0, 100); // Limit to 100 most recent views
+
     const output: ViewTreeData = {
       folders,
-      views,
+      views: sortedAndLimitedViews,
     };
 
     res.status(200).json({ data: output });
