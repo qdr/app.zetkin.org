@@ -1,5 +1,5 @@
 import dayjs, { Dayjs } from 'dayjs';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { ZetkinEventWithStatus } from 'features/home/types';
 import useUpcomingOrgEvents from './useUpcomingOrgEvents';
@@ -44,10 +44,15 @@ export default function useFilteredOrgEvents(orgId: number) {
   }, [orgEvents]);
 
   const dispatch = useAppDispatch();
+  const setEventTypeLabelsToFilterBy = useCallback(
+    (newArray: string[]) =>
+      dispatch(filtersUpdated({ eventTypesToFilterBy: newArray })),
+    [dispatch]
+  );
+
   const eventTypeFilter = useEventTypeFilter(allEvents, {
     eventTypeLabelsToFilterBy: eventTypesToFilterBy,
-    setEventTypeLabelsToFilterBy: (newArray) =>
-      dispatch(filtersUpdated({ eventTypesToFilterBy: newArray })),
+    setEventTypeLabelsToFilterBy,
   });
 
   const filteredEvents = useMemo(
