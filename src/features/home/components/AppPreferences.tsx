@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { Box } from '@mui/material';
 
 import useUserMutations from '../hooks/useUserMutations';
@@ -34,6 +34,22 @@ const AppPreferences: FC<Props> = ({ user }) => {
     user?.lang as ZetkinUserLanguage
   );
 
+  const languageItems = useMemo(() => {
+    return [
+      {
+        label: messages.settings.appPreferences.lang.auto(),
+        value: 'auto',
+      },
+      ...Object.entries(languageOptions)
+        // TODO: Remove this filter once nl is supported on server
+        .filter((entry) => entry[0] != 'nl')
+        .map(([code, label]) => ({
+          label,
+          value: code,
+        })),
+    ];
+  }, [messages.settings.appPreferences.lang, languageOptions]);
+
   return (
     <Box
       display="flex"
@@ -55,19 +71,7 @@ const AppPreferences: FC<Props> = ({ user }) => {
             >
               <ZUISelect
                 fullWidth
-                items={[
-                  {
-                    label: messages.settings.appPreferences.lang.auto(),
-                    value: 'auto',
-                  },
-                  ...Object.entries(languageOptions)
-                    // TODO: Remove this filter once nl is supported on server
-                    .filter((entry) => entry[0] != 'nl')
-                    .map(([code, label]) => ({
-                      label,
-                      value: code,
-                    })),
-                ]}
+                items={languageItems}
                 label={messages.settings.appPreferences.lang.label()}
                 onChange={(newValue) => {
                   if (newValue == 'auto') {
