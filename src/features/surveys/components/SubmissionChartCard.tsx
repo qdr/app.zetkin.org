@@ -38,6 +38,19 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
           return null;
         }
 
+        // Validate that all items in submissionsByDay have required properties
+        const isValidData = data.submissionsByDay.every(
+          (day) =>
+            day &&
+            typeof day === 'object' &&
+            'date' in day &&
+            'accumulatedSubmissions' in day
+        );
+
+        if (!isValidData) {
+          return null;
+        }
+
         const hasChartData = data.submissionsByDay.length > 1;
 
         return (
