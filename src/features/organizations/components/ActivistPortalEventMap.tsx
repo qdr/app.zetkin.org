@@ -58,6 +58,14 @@ export const ActivistPortalEventMap: FC<
   useMapMarkerClick(map, onMarkerClick);
 
   const env = useEnv();
+
+  // Debug logging
+  console.log("[ActivistPortalEventMap DEBUG]", {
+    eventsLength: events.length,
+    eventsWithLocation: events.filter((e) => e.location).length,
+    mapStyle: env.vars.MAPLIBRE_STYLE,
+    hasMap: !!map,
+  });
   const bounds = useMemo(
     () =>
       pointsToBounds(
@@ -68,6 +76,14 @@ export const ActivistPortalEventMap: FC<
       ) ?? undefined,
     [events]
   );
+
+  // Debug logging
+  console.log("[ActivistPortalEventMap DEBUG]", {
+    eventsLength: events.length,
+    eventsWithLocation: events.filter((e) => e.location).length,
+    mapStyle: env.vars.MAPLIBRE_STYLE,
+    hasMap: !!map,
+  });
 
   const eventCountByLocation = useMemo(
     () =>
