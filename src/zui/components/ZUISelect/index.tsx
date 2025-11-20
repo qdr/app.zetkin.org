@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useEffect, useState } from 'react';
+import { FC } from 'react';
 import {
   FormControl,
   InputLabel,
@@ -84,16 +84,6 @@ const ZUISelect: FC<ZUISelectProps> = ({
   size = 'medium',
   selectedOption,
 }) => {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) {
-    return null;
-  }
-
   return (
     <FormControl
     disabled={disabled}
