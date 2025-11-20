@@ -139,17 +139,17 @@ const ZUISelect: FC<ZUISelectProps> = ({
       }}
       value={selectedOption}
     >
-      {items.map((item) => {
+      {items.flatMap((item, index) => {
         if (isCategoryItem(item)) {
           return [
-            <ListSubheader key={`subheader-${item.title}`}>
+            <ListSubheader key={`subheader-${item.title}-${index}`}>
               {item.title}
             </ListSubheader>,
-            ...item.selectItems.map((item) => (
+            ...item.selectItems.map((selectItem) => (
               <MenuItem
-                key={item.value}
+                key={selectItem.value}
                 sx={{ paddingLeft: '2rem' }}
-                value={item.value}
+                value={selectItem.value}
               >
                 <Typography
                   sx={(theme) => ({
@@ -159,7 +159,7 @@ const ZUISelect: FC<ZUISelectProps> = ({
                     letterSpacing: '3%',
                   })}
                 >
-                  {item.label}
+                  {selectItem.label}
                 </Typography>
               </MenuItem>
             )),
