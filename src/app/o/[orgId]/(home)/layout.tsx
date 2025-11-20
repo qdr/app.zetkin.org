@@ -48,7 +48,9 @@ const OrgLayout: FC<Props> = async ({ children, params }) => {
 
   return (
     <HomeThemeProvider>
-      <PublicOrgLayout org={org}>{children}</PublicOrgLayout>
+      <PublicOrgLayout key={org.id} org={org}>
+        {children}
+      </PublicOrgLayout>
     </HomeThemeProvider>
   );
 };
