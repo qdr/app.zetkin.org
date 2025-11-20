@@ -9,6 +9,7 @@ export interface ViewBrowserFolderItem {
   owner: string;
   data: ZetkinViewFolder;
   folderId: number | null;
+  date?: string; // ISO date string
 }
 
 export interface ViewBrowserViewItem {
@@ -18,6 +19,7 @@ export interface ViewBrowserViewItem {
   owner: string;
   data: ZetkinView;
   folderId: number | null;
+  date: string; // ISO date string
 }
 
 export type ViewBrowserBackItem = {
@@ -92,6 +94,7 @@ export default function useViewBrowserItems(
         owner: view.owner.name,
         title: view.title,
         type: 'view',
+        date: view.created,
       });
     });
 

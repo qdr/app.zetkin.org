@@ -161,6 +161,21 @@ const ViewBrowser: FC<ViewBrowserProps> = ({
       },
     });
 
+    colDefs.push({
+      disableColumnMenu: true,
+      field: 'date',
+      flex: 0.8,
+      headerName: 'Date',
+      renderCell: (params) => {
+        if (params.row.type == 'view' && params.row.date) {
+          // Format as yyyy-mm-dd
+          const date = new Date(params.row.date);
+          return date.toISOString().split('T')[0];
+        }
+        return '';
+      },
+    });
+
     if (enableEllipsisMenu) {
       colDefs.push({
         field: 'menu',
@@ -251,6 +266,9 @@ const ViewBrowser: FC<ViewBrowserProps> = ({
               sort = item0.title.localeCompare(item1.title);
             } else if (column.field == 'owner') {
               sort = item0.owner.localeCompare(item1.owner);
+            } else if (column.field == 'date') {
+              // Folders don't have dates, so they're equal
+              sort = 0;
             }
 
             if (sort != 0) {
