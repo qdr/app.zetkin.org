@@ -12,9 +12,12 @@ export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
-  const { orgId } = req.query;
+  const { orgId, offset, limit } = req.query;
 
   const client = new BackendApiClient(req.headers);
+
+  const offsetNum = offset ? parseInt(offset as string, 10) : 0;
+  const limitNum = limit ? parseInt(limit as string, 10) : 80;
 
   try {
     const views = await client.get<ZetkinView[]>(
@@ -24,20 +27,32 @@ export default async function handle(
       `/api/orgs/${orgId}/people/view_folders`
     );
 
-    // Sort views by creation date (most recent first) and limit to 100
-    const sortedAndLimitedViews = views
-      .sort((a, b) => {
-        // Sort by created date descending (most recent first)
-        return new Date(b.created).getTime() - new Date(a.created).getTime();
-      })
-      .slice(0, 100); // Limit to 100 most recent views
+    // Sort views by creation date (most recent first)
+    const sortedViews = views.sort((a, b) => {
+      // Sort by created date descending (most recent first)
+      return new Date(b.created).getTime() - new Date(a.created).getTime();
+    });
+
+    // Apply pagination
+    const paginatedViews = sortedViews.slice(
+      offsetNum,
+      offsetNum + limitNum
+    );
 
     const output: ViewTreeData = {
       folders,
-      views: sortedAndLimitedViews,
+      views: paginatedViews,
     };
 
-    res.status(200).json({ data: output });
+    res.status(200).json({
+      data: output,
+      meta: {
+        total: sortedViews.length,
+        offset: offsetNum,
+        limit: limitNum,
+        hasMore: offsetNum + limitNum < sortedViews.length,
+      }
+    });
   } catch (err) {
     res.status(500).end();
   }

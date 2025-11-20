@@ -9,7 +9,7 @@ import {
   useGridApiRef,
 } from '@mui/x-data-grid-pro';
 import { FC, MouseEvent, useContext, useEffect, useState } from 'react';
-import { Link, Theme, useMediaQuery } from '@mui/material';
+import { Box, Button, Link, Theme, useMediaQuery } from '@mui/material';
 
 import BrowserDraggableItem from './BrowserDragableItem';
 import BrowserDragLayer from './BrowserDragLayer';
@@ -235,8 +235,9 @@ const ViewBrowser: FC<ViewBrowserProps> = ({
 
   return (
     <ZUIFuture future={itemsFuture}>
-      {(data) => {
-        const rows = data.sort((item0, item1) => {
+      {(browserData) => {
+        const { items, hasMore, loadMore } = browserData;
+        const rows = items.sort((item0, item1) => {
           const typeSort = typeComparator(item0, item1);
           if (typeSort != 0) {
             return typeSort;
@@ -292,6 +293,16 @@ const ViewBrowser: FC<ViewBrowserProps> = ({
               sortingMode="server"
               sx={{ borderWidth: 0 }}
             />
+            {hasMore && (
+              <Box display="flex" justifyContent="center" mt={2} mb={2}>
+                <Button
+                  onClick={loadMore}
+                  variant="outlined"
+                >
+                  Load more
+                </Button>
+              </Box>
+            )}
             {itemToBeMoved && (
               <MoveViewDialog
                 close={() => setItemToBeMoved(null)}

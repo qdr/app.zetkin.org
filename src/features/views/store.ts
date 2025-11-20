@@ -35,7 +35,7 @@ export interface ViewsStoreSlice {
   officialList: RemoteList<ZetkinOfficial>;
   recentlyCreatedFolder: ZetkinViewFolder | null;
   rowsByViewId: Record<number | string, RemoteList<ZetkinViewRow>>;
-  viewList: RemoteList<ZetkinView>;
+  viewList: RemoteList<ZetkinView> & { hasMore?: boolean };
 }
 
 const initialState: ViewsStoreSlice = {
@@ -128,13 +128,23 @@ const viewsSlice = createSlice({
       state.folderList.isLoading = true;
       state.viewList.isLoading = true;
     },
-    allItemsLoaded: (state, action: PayloadAction<ViewTreeData>) => {
-      const { folders, views } = action.payload;
+    allItemsLoaded: (state, action: PayloadAction<ViewTreeData & { hasMore?: boolean }>) => {
+      const { folders, views, hasMore } = action.payload;
       const timestamp = new Date().toISOString();
       state.folderList = remoteList(folders);
       state.folderList.loaded = timestamp;
       state.viewList = remoteList(views);
       state.viewList.loaded = timestamp;
+      state.viewList.hasMore = hasMore;
+    },
+    loadMoreViews: (state, action: PayloadAction<{ views: ZetkinView[]; hasMore: boolean }>) => {
+      const { views, hasMore } = action.payload;
+      // Append new views to existing ones
+      views.forEach((view) => {
+        state.viewList.items.push(remoteItem(view.id, { data: view }));
+      });
+      state.viewList.hasMore = hasMore;
+      state.viewList.isLoading = false;
     },
     cellUpdate: () => {
       // Todo: Do something to indicate loading status?
@@ -622,6 +632,7 @@ export const {
   folderDeleted,
   folderUpdate,
   folderUpdated,
+  loadMoreViews,
   officialsLoad,
   officialsLoaded,
   rowAdded,

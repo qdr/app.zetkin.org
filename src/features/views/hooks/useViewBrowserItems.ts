@@ -1,4 +1,4 @@
-import useViewTree from './useViewTree';
+import useViewTree, { ViewTreeReturn } from './useViewTree';
 import { FutureBase, IFuture, ResolvedFuture } from 'core/caching/futures';
 import { ZetkinView, ZetkinViewFolder } from '../components/types';
 
@@ -32,20 +32,27 @@ export type ViewBrowserItem =
   | ViewBrowserViewItem
   | ViewBrowserBackItem;
 
+export interface ViewBrowserItemsReturn {
+  items: ViewBrowserItem[];
+  hasMore: boolean;
+  loadMore: () => void;
+}
+
 export default function useViewBrowserItems(
   orgId: number,
   folderId: number | null
-): IFuture<ViewBrowserItem[]> {
-  const itemsFuture = useViewTree(orgId);
+): IFuture<ViewBrowserItemsReturn> {
+  const treeFuture = useViewTree(orgId);
 
-  if (!itemsFuture.data) {
-    return new FutureBase(null, itemsFuture.error, itemsFuture.isLoading);
+  if (!treeFuture.data) {
+    return new FutureBase(null, treeFuture.error, treeFuture.isLoading);
   }
 
+  const { data, hasMore, loadMore } = treeFuture.data;
   const items: ViewBrowserItem[] = [];
 
   if (folderId) {
-    const folder = itemsFuture.data.folders.find(
+    const folder = data.folders.find(
       (folder) => folder.id == folderId
     );
     if (folder) {
@@ -58,7 +65,7 @@ export default function useViewBrowserItems(
     }
   }
 
-  itemsFuture.data.folders
+  data.folders
     .filter((folder) => folder.parent?.id == folderId)
     .forEach((folder) => {
       items.push({
@@ -71,7 +78,7 @@ export default function useViewBrowserItems(
       });
     });
 
-  itemsFuture.data.views
+  data.views
     .filter((view) => {
       if (view) {
         return view.folder?.id == folderId;
@@ -88,5 +95,9 @@ export default function useViewBrowserItems(
       });
     });
 
-  return new ResolvedFuture(items);
+  return new ResolvedFuture({
+    items,
+    hasMore,
+    loadMore,
+  });
 }

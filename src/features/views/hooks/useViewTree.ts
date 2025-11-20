@@ -1,6 +1,6 @@
 import shouldLoad from 'core/caching/shouldLoad';
 import { ViewTreeData } from 'pages/api/views/tree';
-import { allItemsLoad, allItemsLoaded } from '../store';
+import { allItemsLoad, allItemsLoaded, loadMoreViews } from '../store';
 import {
   IFuture,
   LoadingFuture,
@@ -9,18 +9,43 @@ import {
 } from 'core/caching/futures';
 import { useApiClient, useAppDispatch, useAppSelector } from 'core/hooks';
 
-export default function useViewTree(orgId: number): IFuture<ViewTreeData> {
+export interface ViewTreeReturn {
+  data: ViewTreeData;
+  hasMore: boolean;
+  loadMore: () => void;
+}
+
+export default function useViewTree(orgId: number): IFuture<ViewTreeReturn> {
   const apiClient = useApiClient();
   const views = useAppSelector((state) => state.views);
   const dispatch = useAppDispatch();
 
+  const currentOffset = views.viewList.items.length;
+
+  const loadMoreItems = () => {
+    dispatch(allItemsLoad());
+    apiClient
+      .get<{ data: ViewTreeData; meta: { hasMore: boolean } }>(
+        `/api/views/tree?orgId=${orgId}&offset=${currentOffset}&limit=80`
+      )
+      .then((response) => {
+        dispatch(loadMoreViews({ views: response.data.views, hasMore: response.meta.hasMore }));
+      });
+  };
+
   if (shouldLoad(views.folderList) || shouldLoad(views.viewList)) {
     dispatch(allItemsLoad());
     const promise = apiClient
-      .get<ViewTreeData>(`/api/views/tree?orgId=${orgId}`)
-      .then((items) => {
-        dispatch(allItemsLoaded(items));
-        return items;
+      .get<{ data: ViewTreeData; meta: { hasMore: boolean } }>(
+        `/api/views/tree?orgId=${orgId}&offset=0&limit=80`
+      )
+      .then((response) => {
+        dispatch(allItemsLoaded({ ...response.data, hasMore: response.meta.hasMore }));
+        return {
+          data: response.data,
+          hasMore: response.meta.hasMore,
+          loadMore: loadMoreItems,
+        };
       });
     return new PromiseFuture(promise);
   } else if (
@@ -29,11 +54,17 @@ export default function useViewTree(orgId: number): IFuture<ViewTreeData> {
   ) {
     return new LoadingFuture();
   } else {
-    return new ResolvedFuture({
+    const data: ViewTreeData = {
       folders: views.folderList.items.map((item) => item.data!),
       views: views.viewList.items
         .filter((item) => !item.deleted)
         .map((item) => item.data!),
+    };
+
+    return new ResolvedFuture({
+      data,
+      hasMore: views.viewList.hasMore ?? false,
+      loadMore: loadMoreItems,
     });
   }
 }
