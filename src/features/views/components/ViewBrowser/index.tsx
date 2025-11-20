@@ -144,6 +144,21 @@ const ViewBrowser: FC<ViewBrowserProps> = ({
   if (!isMobile) {
     colDefs.push({
       disableColumnMenu: true,
+      field: 'date',
+      flex: 0.8,
+      headerName: 'Date',
+      renderCell: (params) => {
+        if (params.row.type == 'view' && params.row.date) {
+          // Format as yyyy-mm-dd
+          const date = new Date(params.row.date);
+          return date.toISOString().split('T')[0];
+        }
+        return '';
+      },
+    });
+
+    colDefs.push({
+      disableColumnMenu: true,
       field: 'owner',
       flex: 1,
       headerName: messages.viewsList.columns.owner(),
@@ -158,21 +173,6 @@ const ViewBrowser: FC<ViewBrowserProps> = ({
         } else {
           return '';
         }
-      },
-    });
-
-    colDefs.push({
-      disableColumnMenu: true,
-      field: 'date',
-      flex: 0.8,
-      headerName: 'Date',
-      renderCell: (params) => {
-        if (params.row.type == 'view' && params.row.date) {
-          // Format as yyyy-mm-dd
-          const date = new Date(params.row.date);
-          return date.toISOString().split('T')[0];
-        }
-        return '';
       },
     });
 

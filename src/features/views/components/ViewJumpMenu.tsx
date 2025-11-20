@@ -39,7 +39,7 @@ const ViewJumpMenu: FunctionComponent = () => {
   const itemsFuture = useViewBrowserItems(orgId, null);
 
   const views: ZetkinView[] =
-    itemsFuture.data
+    itemsFuture.data?.items
       ?.filter((item) => item.type == 'view')
       .map((item: ViewBrowserItem) => (item as ViewBrowserViewItem).data) ?? [];
   const {
