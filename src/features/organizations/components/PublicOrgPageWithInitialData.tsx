@@ -30,7 +30,7 @@ const PublicOrgPageWithInitialData: FC<Props> = ({
     dispatch(userEventsLoaded(userEvents));
   }, [organization, orgEvents, orgId, userEvents, dispatch]);
 
-  return <PublicOrgPage orgId={orgId} />;
+  return <PublicOrgPage organization={organization} orgId={orgId} />;
 };
 
 export default PublicOrgPageWithInitialData;

@@ -20,7 +20,7 @@ import { ZetkinEventWithStatus } from 'features/home/types';
 import useIncrementalDelay from 'features/home/hooks/useIncrementalDelay';
 import ZUIDate from 'zui/ZUIDate';
 import SubOrgEventBlurb from '../components/SubOrgEventBlurb';
-import { ZetkinEvent } from 'utils/types/zetkin';
+import { ZetkinEvent, ZetkinOrganization } from 'utils/types/zetkin';
 import useUser from 'core/hooks/useUser';
 import { Msg, useMessages } from 'core/i18n';
 import messageIds from '../l10n/messageIds';
@@ -35,19 +35,18 @@ import { getContrastColor } from '../../../utils/colorUtils';
 import useFilteredOrgEvents from '../hooks/useFilteredOrgEvents';
 import { useAppDispatch, useAppSelector } from 'core/hooks';
 import { filtersUpdated } from '../store';
-import useOrganization from '../hooks/useOrganization';
 import useIsMobile from 'utils/hooks/useIsMobile';
 
 type Props = {
+  organization: ZetkinOrganization;
   orgId: number;
 };
 
-const PublicOrgPage: FC<Props> = ({ orgId }) => {
+const PublicOrgPage: FC<Props> = ({ organization, orgId }) => {
   const isMobile = useIsMobile();
   const intl = useIntl();
   const messages = useMessages(messageIds);
   const nextDelay = useIncrementalDelay();
-  const organization = useOrganization(orgId).data;
   const user = useUser();
   const dispatch = useAppDispatch();
   const { allEvents, getDateRange, locationEvents, eventTypeFilter } =
