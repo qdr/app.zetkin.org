@@ -104,8 +104,9 @@ function ZUIFuture<DataType>(props: ZUIFutureProps<DataType>): ReturnType<FC> {
   } else if (future.isLoading) {
     return skeleton;
   } else {
-    // TODO: Handle errors somehow?
-    return null;
+    // When there's no data and not loading, show skeleton instead of unmounting
+    // This prevents unmount/remount cycles that break child components
+    return skeleton;
   }
 }
 
