@@ -237,34 +237,35 @@ const ViewBrowser: FC<ViewBrowserProps> = ({
     <ZUIFuture future={itemsFuture}>
       {(browserData) => {
         const { items, hasMore, loadMore } = browserData;
-        const rows = items.sort((item0, item1) => {
-          const typeSort = typeComparator(item0, item1);
-          if (typeSort != 0) {
-            return typeSort;
-          }
 
-          // If we get this far, none of the items will be of the "back"
-          // type, because there is only one 'back' and typeComparator()
-          // always returns non-zero when the two items are of different
-          // type. We still check for "back" here, because TypeScript
-          // doesn't understand the logic described above.
-          if (item0.type != 'back' && item1.type != 'back') {
-            for (const column of sortModel) {
-              let sort = 0;
-              if (column.field == 'title') {
-                sort = item0.title.localeCompare(item1.title);
-              } else if (column.field == 'owner') {
-                sort = item0.owner.localeCompare(item1.owner);
-              }
+        // Separate items by type
+        const backItems = items.filter(item => item.type === 'back');
+        const folderItems = items.filter(item => item.type === 'folder');
+        const viewItems = items.filter(item => item.type === 'view');
 
-              if (sort != 0) {
-                return column.sort == 'asc' ? sort : -sort;
-              }
+        // Sort folders within themselves
+        const sortedFolders = folderItems.sort((item0, item1) => {
+          for (const column of sortModel) {
+            let sort = 0;
+            if (column.field == 'title') {
+              sort = item0.title.localeCompare(item1.title);
+            } else if (column.field == 'owner') {
+              sort = item0.owner.localeCompare(item1.owner);
+            }
+
+            if (sort != 0) {
+              return column.sort == 'asc' ? sort : -sort;
             }
           }
-
           return 0;
         });
+
+        // For views: always preserve server order (sorted by creation date)
+        // This ensures newly loaded items appear at the bottom
+        const sortedViews = viewItems;
+
+        // Combine in correct order: back button, folders, then views in server order
+        const rows = [...backItems, ...sortedFolders, ...sortedViews];
 
         return (
           <>
