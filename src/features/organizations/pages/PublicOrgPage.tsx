@@ -262,7 +262,7 @@ const PublicOrgPage: FC<Props> = ({ orgId }) => {
       }}
     >
       {showNoEventsBlurb && (
-        <Box key="empty">
+        <Box key="empty" suppressHydrationWarning>
           <NoEventsBlurb
             description={
               organization
@@ -282,6 +282,7 @@ const PublicOrgPage: FC<Props> = ({ orgId }) => {
           gap={1}
           maxWidth="100%"
           padding={1}
+          suppressHydrationWarning
           sx={{
             ...(isMobile ? { overflowX: 'auto' } : { flexWrap: 'wrap' }),
           }}
@@ -323,6 +324,7 @@ const PublicOrgPage: FC<Props> = ({ orgId }) => {
           justifyContent="center"
           marginTop={3}
           padding={2}
+          suppressHydrationWarning
         >
           <ZUIText color="secondary">
             <Msg id={messageIds.allEventsList.emptyList.message} />
