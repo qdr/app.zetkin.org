@@ -25,25 +25,25 @@ export default function useViewTree(orgId: number): IFuture<ViewTreeReturn> {
   const loadMoreItems = () => {
     dispatch(allItemsLoad());
     apiClient
-      .get<{ data: ViewTreeData; meta: { hasMore: boolean } }>(
+      .get<ViewTreeData>(
         `/api/views/tree?orgId=${orgId}&offset=${currentOffset}&limit=80`
       )
       .then((response) => {
-        dispatch(loadMoreViews({ views: response.data.views, hasMore: response.meta.hasMore }));
+        dispatch(loadMoreViews({ views: response.views, hasMore: response.hasMore ?? false }));
       });
   };
 
   if (shouldLoad(views.folderList) || shouldLoad(views.viewList)) {
     dispatch(allItemsLoad());
     const promise = apiClient
-      .get<{ data: ViewTreeData; meta: { hasMore: boolean } }>(
+      .get<ViewTreeData>(
         `/api/views/tree?orgId=${orgId}&offset=0&limit=80`
       )
       .then((response) => {
-        dispatch(allItemsLoaded({ ...response.data, hasMore: response.meta.hasMore }));
+        dispatch(allItemsLoaded({ ...response, hasMore: response.hasMore }));
         return {
-          data: response.data,
-          hasMore: response.meta.hasMore,
+          data: response,
+          hasMore: response.hasMore ?? false,
           loadMore: loadMoreItems,
         };
       });

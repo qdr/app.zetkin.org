@@ -6,6 +6,8 @@ import { ZetkinView, ZetkinViewFolder } from 'features/views/components/types';
 export type ViewTreeData = {
   folders: ZetkinViewFolder[];
   views: ZetkinView[];
+  hasMore?: boolean;
+  total?: number;
 };
 
 export default async function handle(
@@ -42,17 +44,11 @@ export default async function handle(
     const output: ViewTreeData = {
       folders,
       views: paginatedViews,
+      hasMore: offsetNum + limitNum < sortedViews.length,
+      total: sortedViews.length,
     };
 
-    res.status(200).json({
-      data: output,
-      meta: {
-        total: sortedViews.length,
-        offset: offsetNum,
-        limit: limitNum,
-        hasMore: offsetNum + limitNum < sortedViews.length,
-      }
-    });
+    res.status(200).json({ data: output });
   } catch (err) {
     res.status(500).end();
   }
