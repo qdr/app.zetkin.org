@@ -27,27 +27,83 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
   return (
     <ZUIFuture future={statsFuture}>
       {(data) => {
+        // DEBUG: Log what we're receiving
+        console.log('[SubmissionChartCard] Data received:', {
+          data,
+          hasData: !!data,
+          dataType: typeof data,
+          hasSubmissionsByDay: data
+            ? 'submissionsByDay' in data
+            : 'data is falsy',
+          submissionsByDayType: data?.submissionsByDay
+            ? typeof data.submissionsByDay
+            : 'undefined',
+          isArray: data?.submissionsByDay
+            ? Array.isArray(data.submissionsByDay)
+            : false,
+          length: data?.submissionsByDay?.length,
+        });
+
+        // Early return if data is completely missing
+        if (!data || typeof data !== 'object') {
+          console.log('[SubmissionChartCard] No valid data, showing placeholder');
+          return (
+            <ZUICard header={messages.chart.header()}>
+              <Box height={400}>
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  height="100%"
+                  justifyContent="center"
+                  width="100%"
+                >
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    marginBottom={2}
+                    width="100%"
+                  >
+                    <PlaceholderVisual />
+                  </Box>
+                  <Typography
+                    sx={{
+                      color: theme.palette.text.disabled,
+                      textAlign: 'center',
+                    }}
+                  >
+                    <Msg id={messageIds.chart.placeholder} />
+                  </Typography>
+                </Box>
+              </Box>
+            </ZUICard>
+          );
+        }
+
         // Defensive: filter out invalid items instead of hiding the entire card
         // This way we show the placeholder when there's no valid data
         const submissionCount =
-          data && typeof data.submissionCount === 'number'
-            ? data.submissionCount
-            : 0;
-        const surveyId = data && typeof data.id === 'number' ? data.id : 0;
+          typeof data.submissionCount === 'number' ? data.submissionCount : 0;
+        const chartSurveyId = typeof data.id === 'number' ? data.id : surveyId;
 
         // Filter submissionsByDay to only include valid items
-        const validSubmissions =
-          data && Array.isArray(data.submissionsByDay)
-            ? data.submissionsByDay.filter(
-                (day) =>
-                  day &&
-                  typeof day === 'object' &&
-                  'date' in day &&
-                  'accumulatedSubmissions' in day &&
-                  typeof day.accumulatedSubmissions === 'number' &&
-                  typeof day.date === 'string'
-              )
-            : [];
+        const validSubmissions = Array.isArray(data.submissionsByDay)
+          ? data.submissionsByDay.filter(
+              (day) =>
+                day &&
+                typeof day === 'object' &&
+                'date' in day &&
+                'accumulatedSubmissions' in day &&
+                typeof day.accumulatedSubmissions === 'number' &&
+                typeof day.date === 'string'
+            )
+          : [];
+
+        console.log('[SubmissionChartCard] Processed data:', {
+          submissionCount,
+          chartSurveyId,
+          validSubmissionsLength: validSubmissions.length,
+          validSubmissions,
+        });
 
         const hasChartData = validSubmissions.length > 1;
 
@@ -111,7 +167,7 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
                         x: day.date,
                         y: day.accumulatedSubmissions,
                       })),
-                      id: surveyId,
+                      id: chartSurveyId,
                     },
                   ]}
                   defs={[
