@@ -102,12 +102,29 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
 
         const hasChartData = validSubmissionsByDay.length > 1;
 
+        // Memoize the chart data to prevent Nivo from receiving unstable references
+        // during React Strict Mode's double rendering
+        const chartData = useMemo(() => {
+          if (!hasChartData) return [];
+
+          return [
+            {
+              data: validSubmissionsByDay.map((day) => ({
+                x: day.date,
+                y: day.accumulatedSubmissions,
+              })),
+              id: chartSurveyId,
+            },
+          ];
+        }, [hasChartData, validSubmissionsByDay, chartSurveyId]);
+
         console.log('[SubmissionChartCard] Chart rendering:', {
           submissionCount,
           chartSurveyId,
           originalLength: submissionsByDay.length,
           validLength: validSubmissionsByDay.length,
           hasChartData,
+          chartDataLength: chartData.length,
           firstItem: validSubmissionsByDay[0],
           lastItem: validSubmissionsByDay[validSubmissionsByDay.length - 1],
         });
@@ -166,15 +183,7 @@ const SubmissionChartCard: FC<SubmissionChartCardProps> = ({
                   }}
                   colors={[theme.palette.primary.main]}
                   curve="basis"
-                  data={[
-                    {
-                      data: validSubmissionsByDay.map((day) => ({
-                        x: day.date,
-                        y: day.accumulatedSubmissions,
-                      })),
-                      id: chartSurveyId,
-                    },
-                  ]}
+                  data={chartData}
                   defs={[
                     linearGradientDef('gradientA', [
                       { color: 'inherit', offset: 0 },
