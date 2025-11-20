@@ -64,6 +64,7 @@ const PublicOrgPage: FC<Props> = ({ orgId }) => {
   const [drawerContent, setDrawerContent] = useState<
     'orgs' | 'calendar' | 'eventTypes' | null
   >(null);
+  const [eventsToShow, setEventsToShow] = useState(20);
 
   const orgs = [
     ...new Map(
@@ -250,6 +251,25 @@ const PublicOrgPage: FC<Props> = ({ orgId }) => {
 
   const showNoEventsBlurb = !allEvents.length;
 
+  // Flatten events for pagination
+  const flatEvents = dates.flatMap((date) =>
+    eventsByDate[date].map((event) => ({ date, event }))
+  );
+  const visibleFlatEvents = flatEvents.slice(0, eventsToShow);
+  const hasMoreEvents = flatEvents.length > eventsToShow;
+
+  // Reconstruct by date for visible events only
+  const visibleEventsByDate = visibleFlatEvents.reduce<
+    Record<string, ZetkinEventWithStatus[]>
+  >((acc, { date, event }) => {
+    if (!acc[date]) {
+      acc[date] = [];
+    }
+    acc[date].push(event);
+    return acc;
+  }, {});
+  const visibleDates = Object.keys(visibleEventsByDate).sort();
+
   return (
     <Box
       sx={{
@@ -348,7 +368,7 @@ const PublicOrgPage: FC<Props> = ({ orgId }) => {
           )}
         </Box>
       )}
-      {dates.map((date, index) => (
+      {visibleDates.map((date, index) => (
         <Box key={date} paddingX={1}>
           <Fade appear in mountOnEnter style={{ transitionDelay: nextDelay() }}>
             <Box sx={{ mb: 2, mt: 3 }}>
@@ -359,7 +379,7 @@ const PublicOrgPage: FC<Props> = ({ orgId }) => {
           </Fade>
           <Fade appear in mountOnEnter style={{ transitionDelay: nextDelay() }}>
             <Box display="flex" flexDirection="column" gap={1}>
-              {eventsByDate[date].map((event) => (
+              {visibleEventsByDate[date].map((event) => (
                 <EventListItem
                   key={event.id}
                   event={event}
@@ -395,6 +415,15 @@ const PublicOrgPage: FC<Props> = ({ orgId }) => {
           )}
         </Box>
       ))}
+      {hasMoreEvents && (
+        <Box display="flex" justifyContent="center" mt={2} px={1}>
+          <ZUIButton
+            label={messages.allEventsList.loadMore?.() || 'Load More'}
+            onClick={() => setEventsToShow((prev) => prev + 20)}
+            variant="secondary"
+          />
+        </Box>
+      )}
       <ZUIDrawerModal
         onClose={() => setDrawerContent(null)}
         open={drawerContent == 'calendar'}
