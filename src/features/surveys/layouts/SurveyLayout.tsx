@@ -138,6 +138,9 @@ const SurveyLayout: React.FC<SurveyLayoutProps> = ({
     [apiClient, orgId, surveyId, router.push, surveyFuture.data]
   );
 
+  // Construct baseHref from route params to avoid empty string during initial render
+  const baseHref = `/organize/${orgId}/projects/${campId}/surveys/${surveyId}`;
+
   return (
     <TabbedLayout
       actionButtons={
@@ -163,7 +166,7 @@ const SurveyLayout: React.FC<SurveyLayoutProps> = ({
         isShared && roleAdmin ? messages.alert.goOriginal() : undefined
       }
       alertMsg={getAlertMsg()}
-      baseHref={getSurveyUrl(surveyFuture.data, parsedOrg)}
+      baseHref={baseHref}
       belowActionButtons={
         <ZUIDateRangePicker
           endDate={surveyFuture.data?.expires || null}
