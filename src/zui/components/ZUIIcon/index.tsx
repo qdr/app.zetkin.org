@@ -42,7 +42,8 @@ const ZUIIcon: FC<ZUIIconProps> = ({
 }) => {
   const theme = useTheme();
   const iconColors: Record<IconColor, string> = {
-    data: theme.palette.data.main,
+    // @ts-ignore - data palette may not exist in old theme
+    data: theme.palette.data?.main || theme.palette.primary.main,
     error: theme.palette.error.main,
     info: theme.palette.info.main,
     primary: theme.palette.text.primary,

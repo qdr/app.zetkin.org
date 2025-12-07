@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(cd:*)",
+      "Bash(for file in calls/page.tsx surveys/page.tsx canvassings/page.tsx emails/page.tsx)",
+      "Bash(do sed -i 's/Icon={/icon={/g; s/size=\"\"xl\"\"/size=\"\"large\"\"/g' \"$file\")",
+      "Bash(done)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(for file in src/app/organize_new/[orgId]/projects/[projectId]/calls/page.tsx src/app/organize_new/[orgId]/projects/[projectId]/surveys/page.tsx src/app/organize_new/[orgId]/projects/[projectId]/canvassings/page.tsx src/app/organize_new/[orgId]/projects/[projectId]/emails/page.tsx)",
+      "Bash(do sed -i 's/<ZUIIcon.*\\/>/<\\/>/g; s/icon={[^}]*}//g; s/size=\"\"[^\"\"]*\"\"//g; s/color=\"\"[^\"\"]*\"\"//g' \"$file\")",
+      "Bash(curl:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

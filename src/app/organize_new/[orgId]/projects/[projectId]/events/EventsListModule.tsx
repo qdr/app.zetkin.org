@@ -12,20 +12,13 @@ import { ZetkinEvent } from 'utils/types/zetkin';
 import ZUIText from 'zui/components/ZUIText';
 import ZUIIconLabel from 'zui/components/ZUIIconLabel';
 
-interface EventsListProps {
+interface EventsListModuleProps {
   events: ZetkinEvent[];
-  orgId: number;
+  orgId: string;
+  projectId: string;
 }
 
-const EventsList: FC<EventsListProps> = ({ events, orgId }) => {
-  if (events.length === 0) {
-    return (
-      <Box sx={{ py: 8, textAlign: 'center' }}>
-        <p>No upcoming events</p>
-      </Box>
-    );
-  }
-
+const EventsListModule: FC<EventsListModuleProps> = ({ events, orgId, projectId }) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('en-US', {
@@ -44,8 +37,17 @@ const EventsList: FC<EventsListProps> = ({ events, orgId }) => {
     }).format(date);
   };
 
+  if (events.length === 0) {
+    return (
+      <Box sx={{ py: 8, textAlign: 'center' }}>
+        <p>No events in this project</p>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      {/* Events List */}
       {events.map((event) => (
         <Card
           key={event.id}
@@ -66,13 +68,12 @@ const EventsList: FC<EventsListProps> = ({ events, orgId }) => {
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
                 {/* Event Details */}
-                <Box sx={{ flex: 1 }}>
-                  <ZUIText variant="headingSm" gutterBottom>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <ZUIText variant="bodyMdSemiBold" gutterBottom noWrap>
                     {event.activity?.title || event.title || 'Untitled Event'}
                   </ZUIText>
 
-                  <Stack direction="row" spacing={2} sx={{ mt: 1, flexWrap: 'wrap' }}>
-                    {/* Date & Time */}
+                  <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 1 }}>
                     <ZUIIconLabel
                       icon={AccessTime}
                       label={`${formatDate(event.start_time)} • ${formatTime(event.start_time)}`}
@@ -81,17 +82,15 @@ const EventsList: FC<EventsListProps> = ({ events, orgId }) => {
                     />
 
 
-                    {/* Participants */}
-                    {event.num_participants_available > 0 && (
+                    {event.num_participants_available !== undefined && (
                       <ZUIIconLabel
                         icon={People}
-                        label={`${event.num_participants_available}/${event.num_participants_required}`}
+                        label={`${event.num_participants_available}`}
                         size="small"
                         color="secondary"
                       />
                     )}
 
-                    {/* Location */}
                     {event.location?.title && (
                       <ZUIIconLabel
                         icon={LocationOn}
@@ -101,23 +100,6 @@ const EventsList: FC<EventsListProps> = ({ events, orgId }) => {
                       />
                     )}
                   </Stack>
-
-                  {/* Info Text */}
-                  {event.info_text && (
-                    <Box
-                      sx={{
-                        mt: 1,
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      <ZUIText variant="bodySmRegular" color="secondary">
-                        {event.info_text}
-                      </ZUIText>
-                    </Box>
-                  )}
                 </Box>
 
               </Box>
@@ -129,4 +111,4 @@ const EventsList: FC<EventsListProps> = ({ events, orgId }) => {
   );
 };
 
-export default EventsList;
+export default EventsListModule;

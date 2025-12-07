@@ -7,6 +7,7 @@ import ZUILogoLoadingIndicator from 'zui/ZUILogoLoadingIndicator';
 import AppPreferences from '../components/AppPreferences';
 import useCurrentUser from 'features/user/hooks/useCurrentUser';
 import AccountSettings from '../components/AccountSettings';
+import MyMemberships from '../components/MyMemberships';
 
 const AllEventsPage: FC = () => {
   const user = useCurrentUser();
@@ -27,6 +28,7 @@ const AllEventsPage: FC = () => {
     >
       {user && (
         <>
+          <MyMemberships />
           <AppPreferences user={user} />
           <AccountSettings user={user} />
         </>

@@ -1,7 +1,14 @@
 'use client';
 
 import { FC, useState } from 'react';
-import { Box, List, ListItemButton, ListItemIcon, ListItemText, Collapse } from '@mui/material';
+import {
+  Box,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Collapse,
+} from '@mui/material';
 import {
   Home,
   People,
@@ -18,6 +25,7 @@ import {
   Inbox,
   ExpandLess,
   ExpandMore,
+  Settings,
 } from '@mui/icons-material';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -53,21 +61,56 @@ const OrganizeSidebar: FC<OrganizeSidebarProps> = ({
   const [projectsModalOpen, setProjectsModalOpen] = useState(false);
 
   const organizationNavItems: NavItem[] = [
-    { label: 'Home', icon: Home, href: `/organize_new/${org.id}` },
-    { label: 'People', icon: People, href: `/organize_new/${org.id}/people` },
-    { label: 'Paths', icon: Timeline, href: `/organize_new/${org.id}/paths` },
-    { label: 'Places', icon: Place, href: `/organize_new/${org.id}/places` },
-    { label: 'Tags', icon: Label, href: `/organize_new/${org.id}/tags` },
+    { label: 'Dashboard', icon: Dashboard, href: `/organize_new/${org.id}` },
+    { label: 'Lists', icon: People, href: `/organize_new/${org.id}/lists` },
+    {
+      label: 'Organization',
+      icon: Home,
+      href: `/organize_new/${org.id}/projects/1`,
+    },
+    {
+      label: 'Settings',
+      icon: Settings,
+      href: `/organize_new/${org.id}/settings`,
+    },
   ];
 
   const workspaceNavItems: NavItem[] = [
-    { label: 'Overview', icon: Dashboard, href: `/organize_new/${org.id}/projects` },
-    { label: 'Events', icon: Event, href: `/organize_new/${org.id}/events`, badge: 1 },
-    { label: 'Calls', icon: Phone, href: `/organize_new/${org.id}/calls`, badge: 1 },
-    { label: 'Surveys', icon: Assignment, href: `/organize_new/${org.id}/surveys`, badge: 1 },
-    { label: 'Tasks', icon: CheckCircle, href: `/organize_new/${org.id}/tasks`, badge: 1 },
-    { label: 'Canvassings', icon: Campaign, href: `/organize_new/${org.id}/canvassings`, badge: 1 },
-    { label: 'Emails', icon: Email, href: `/organize_new/${org.id}/emails`, badge: 1 },
+    {
+      label: 'Overview',
+      icon: Home,
+      href: `/organize_new/${org.id}/projects/1/overview`,
+    },
+    {
+      label: 'Events',
+      icon: Event,
+      href: `/organize_new/${org.id}/projects/1/events`,
+      badge: 1,
+    },
+    {
+      label: 'Calls',
+      icon: Phone,
+      href: `/organize_new/${org.id}/projects/1/calls`,
+      badge: 1,
+    },
+    {
+      label: 'Surveys',
+      icon: Assignment,
+      href: `/organize_new/${org.id}/projects/1/surveys`,
+      badge: 1,
+    },
+    {
+      label: 'Canvassings',
+      icon: Campaign,
+      href: `/organize_new/${org.id}/projects/1/canvassings`,
+      badge: 1,
+    },
+    {
+      label: 'Emails',
+      icon: Email,
+      href: `/organize_new/${org.id}/projects/1/emails`,
+      badge: 1,
+    },
   ];
 
   return (
@@ -127,7 +170,9 @@ const OrganizeSidebar: FC<OrganizeSidebarProps> = ({
                   sx={{
                     pl: 4,
                     py: 1,
-                    backgroundColor: isActive ? 'rgba(0, 0, 0, 0.04)' : 'transparent',
+                    backgroundColor: isActive
+                      ? 'rgba(0, 0, 0, 0.04)'
+                      : 'transparent',
                     '&:hover': {
                       backgroundColor: 'rgba(0, 0, 0, 0.04)',
                     },
@@ -155,7 +200,10 @@ const OrganizeSidebar: FC<OrganizeSidebarProps> = ({
         </Collapse>
 
         {/* Workspace Section - Opens Modal */}
-        <ListItemButton onClick={() => setProjectsModalOpen(true)} sx={{ pl: 2, mt: 2 }}>
+        <ListItemButton
+          onClick={() => setProjectsModalOpen(true)}
+          sx={{ pl: 2, mt: 2 }}
+        >
           <ListItemIcon sx={{ minWidth: 40 }}>
             <Dashboard sx={{ fontSize: '1.25rem' }} />
           </ListItemIcon>
@@ -181,7 +229,9 @@ const OrganizeSidebar: FC<OrganizeSidebarProps> = ({
                 sx={{
                   pl: 4,
                   py: 1,
-                  backgroundColor: isActive ? 'rgba(0, 0, 0, 0.04)' : 'transparent',
+                  backgroundColor: isActive
+                    ? 'rgba(0, 0, 0, 0.04)'
+                    : 'transparent',
                   '&:hover': {
                     backgroundColor: 'rgba(0, 0, 0, 0.04)',
                   },

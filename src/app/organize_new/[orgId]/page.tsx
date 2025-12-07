@@ -1,9 +1,11 @@
 import { FC } from 'react';
-import { Box, Container, Typography, AppBar, Toolbar } from '@mui/material';
+import { Box, Container } from '@mui/material';
 import { headers } from 'next/headers';
 
 import BackendApiClient from 'core/api/client/BackendApiClient';
 import { ZetkinOrganization } from 'utils/types/zetkin';
+import ZUIText from 'zui/components/ZUIText';
+import ZUILink from 'zui/components/ZUILink';
 
 type Props = {
   params: {
@@ -22,57 +24,104 @@ const OrganizeHomePage: FC<Props> = async ({ params }) => {
     `/api/orgs/${params.orgId}`
   );
 
+  const quickLinks = [
+    { label: 'People', href: `/organize_new/${org.id}/people` },
+    { label: 'Events', href: `/organize_new/${org.id}/events` },
+    { label: 'Calls', href: `/organize_new/${org.id}/calls` },
+    { label: 'Projects', href: `/organize_new/${org.id}/projects` },
+  ];
+
   return (
     <Box>
-      <AppBar position="static" color="default" elevation={0} sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
-        <Toolbar>
-          <Typography variant="h6" component="h1">
-            {org.title}
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Typography variant="h5" gutterBottom>
-          Welcome to {org.title}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          This is the new organize interface prototype. Navigate using the sidebar to explore different sections.
-        </Typography>
+      {/* Header */}
+      <Box
+        sx={{
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          px: 3,
+          py: 2,
+        }}
+      >
+        <ZUIText variant="headingMd" component="h1">
+          {org.title}
+        </ZUIText>
+      </Box>
 
+      {/* Content */}
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <ZUIText variant="headingLg" gutterBottom>
+          Welcome to {org.title}
+        </ZUIText>
+
+        <ZUIText variant="bodyMdRegular" color="secondary" sx={{ mb: 4 }}>
+          This is the new organize interface prototype. Navigate using the sidebar to explore different sections.
+        </ZUIText>
+
+        {/* Quick Links Section */}
         <Box sx={{ mt: 4 }}>
-          <Typography variant="h6" gutterBottom>
+          <ZUIText variant="headingSm" gutterBottom>
             Quick Links
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-            {[
-              { label: 'People', href: `/organize_new/${org.id}/people` },
-              { label: 'Events', href: `/organize_new/${org.id}/events` },
-              { label: 'Calls', href: `/organize_new/${org.id}/calls` },
-              { label: 'Projects', href: `/organize_new/${org.id}/projects` },
-            ].map((link) => (
+          </ZUIText>
+
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+              gap: 2,
+              mt: 2,
+            }}
+          >
+            {quickLinks.map((link) => (
               <Box
                 key={link.href}
                 component="a"
                 href={link.href}
-                sx={{
+                sx={(theme) => ({
                   p: 3,
                   borderRadius: 2,
                   border: '1px solid',
-                  borderColor: 'divider',
+                  borderColor: theme.palette.divider,
                   textDecoration: 'none',
-                  color: 'text.primary',
                   transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: theme.palette.background.paper,
                   '&:hover': {
-                    borderColor: 'primary.main',
-                    backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                    borderColor: theme.palette.primary.main,
+                    backgroundColor: theme.palette.action.hover,
+                    transform: 'translateY(-2px)',
+                    boxShadow: theme.shadows[2],
                   },
-                }}
+                })}
               >
-                <Typography variant="body1" fontWeight={600}>
+                <ZUIText variant="bodyMdSemiBold" color="primary">
                   {link.label}
-                </Typography>
+                </ZUIText>
               </Box>
             ))}
+          </Box>
+        </Box>
+
+        {/* Recent Activity Placeholder */}
+        <Box sx={{ mt: 6 }}>
+          <ZUIText variant="headingSm" gutterBottom>
+            Recent Activity
+          </ZUIText>
+
+          <Box
+            sx={(theme) => ({
+              mt: 2,
+              p: 4,
+              borderRadius: 2,
+              border: '1px dashed',
+              borderColor: theme.palette.divider,
+              textAlign: 'center',
+            })}
+          >
+            <ZUIText variant="bodyMdRegular" color="secondary">
+              Recent activity will appear here
+            </ZUIText>
           </Box>
         </Box>
       </Container>

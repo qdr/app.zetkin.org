@@ -1,10 +1,11 @@
 import { FC } from 'react';
-import { Box, Container, Typography, AppBar, Toolbar, Button } from '@mui/material';
+import { Box, Container, Button } from '@mui/material';
 import { headers } from 'next/headers';
 import { Add } from '@mui/icons-material';
 
 import BackendApiClient from 'core/api/client/BackendApiClient';
 import { ZetkinEvent } from 'utils/types/zetkin';
+import ZUIText from 'zui/components/ZUIText';
 import EventsList from './EventsList';
 
 type Props = {
@@ -34,17 +35,28 @@ const EventsPage: FC<Props> = async ({ params }) => {
 
   return (
     <Box>
-      <AppBar position="static" color="default" elevation={0} sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
-        <Toolbar sx={{ justifyContent: 'space-between' }}>
-          <Typography variant="h6" component="h1">
-            Events
-          </Typography>
-          <Button variant="contained" startIcon={<Add />}>
-            Create Event
-          </Button>
-        </Toolbar>
-      </AppBar>
+      {/* Header */}
+      <Box
+        sx={{
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          px: 3,
+          py: 2,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <ZUIText variant="headingMd" component="h1">
+          Events
+        </ZUIText>
 
+        <Button variant="contained" startIcon={<Add />}>
+          Create Event
+        </Button>
+      </Box>
+
+      {/* Content */}
       <Container maxWidth="lg" sx={{ py: 3 }}>
         <EventsList events={events} orgId={params.orgId} />
       </Container>
