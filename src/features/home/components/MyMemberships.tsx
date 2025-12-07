@@ -15,26 +15,24 @@ import Link from 'next/link';
 import ZUISection from 'zui/components/ZUISection';
 import ZUIText from 'zui/components/ZUIText';
 import useUserMemberships from '../hooks/useUserMemberships';
-
-type MockProject = {
-  id: number;
-  title: string;
-  orgId: number;
-};
-
-// Mock project data - replace with real API call later
-const mockProjects: MockProject[] = [
-  { id: 5, title: 'Coders & Organizers demo', orgId: 1 },
-  { id: 7, title: 'Summer Campaign 2025', orgId: 1 },
-  { id: 12, title: 'Voter Outreach', orgId: 2 },
-];
+import useCampaigns from 'features/campaigns/hooks/useCampaigns';
+import useCurrentUser from 'features/user/hooks/useCurrentUser';
 
 const OrganizationItem: FC<{
   orgId: number;
   orgTitle: string;
   role: string | null;
-}> = ({ orgId, orgTitle, role }) => {
-  const orgProjects = mockProjects.filter((p) => p.orgId === orgId);
+  currentUserId: number | undefined;
+}> = ({ orgId, orgTitle, role, currentUserId }) => {
+  const campaignsFuture = useCampaigns(orgId);
+  const allCampaigns = campaignsFuture.data || [];
+
+  // Filter to show only campaigns where the current user is the manager
+  const campaigns = currentUserId
+    ? allCampaigns.filter(
+        (campaign) => campaign.manager?.id === currentUserId
+      )
+    : [];
 
   return (
     <>
@@ -42,7 +40,7 @@ const OrganizationItem: FC<{
       <ListItem disablePadding>
         <ListItemButton
           component={Link}
-          href={`/organize_new/${orgId}`}
+          href={`/o/${orgId}`}
           sx={{
             py: 1.5,
             '&:hover': {
@@ -76,14 +74,14 @@ const OrganizationItem: FC<{
         </ListItemButton>
       </ListItem>
 
-      {/* Projects under this organization */}
-      {orgProjects.length > 0 && (
+      {/* Campaigns/Projects under this organization */}
+      {campaigns.length > 0 && (
         <Box sx={{ pl: 4, backgroundColor: 'rgba(0, 0, 0, 0.02)' }}>
-          {orgProjects.map((project) => (
-            <ListItem key={project.id} disablePadding>
+          {campaigns.map((campaign) => (
+            <ListItem key={campaign.id} disablePadding>
               <ListItemButton
                 component={Link}
-                href={`/organize_new/${orgId}/projects/${project.id}`}
+                href={`/organize_new/${orgId}/projects/${campaign.id}`}
                 sx={{
                   py: 1,
                   '&:hover': {
@@ -106,7 +104,7 @@ const OrganizationItem: FC<{
                     }}
                   />
                   <Box sx={{ flex: 1 }}>
-                    <ZUIText variant="bodyMdRegular">{project.title}</ZUIText>
+                    <ZUIText variant="bodyMdRegular">{campaign.title}</ZUIText>
                   </Box>
                   <ChevronRight
                     sx={{
@@ -126,8 +124,7 @@ const OrganizationItem: FC<{
 
 const MyMemberships: FC = () => {
   const memberships = useUserMemberships();
-
-  console.log('MyMemberships - memberships:', memberships);
+  const currentUser = useCurrentUser();
 
   return (
     <Box mt={2}>
@@ -148,6 +145,7 @@ const MyMemberships: FC = () => {
                       orgId={membership.organization.id}
                       orgTitle={membership.organization.title}
                       role={membership.role}
+                      currentUserId={currentUser?.id}
                     />
                   </Box>
                 ))}

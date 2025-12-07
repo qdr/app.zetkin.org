@@ -46,6 +46,11 @@ const PublicOrgLayout: FC<Props> = ({ children, org }) => {
       label: messages.home.tabs.calendar(),
       value: 'home',
     },
+    {
+      href: `/o/${org.id}/projects`,
+      label: 'Projects',
+      value: 'projects',
+    },
   ];
 
   if (showSuborgsTab) {
