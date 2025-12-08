@@ -95,7 +95,6 @@ const AllEventsList: FC = () => {
   };
 
   const filteredEvents = allEvents
-    .filter((event) => !event.status) // Only show events user CAN attend
     .filter((event) => {
       // If user has manually filtered by orgs, use that
       if (orgIdsToFilterBy.length > 0) {

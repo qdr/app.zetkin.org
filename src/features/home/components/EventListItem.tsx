@@ -1,5 +1,5 @@
 import { useIntl } from 'react-intl';
-import { FC, MouseEvent } from 'react';
+import { FC } from 'react';
 import {
   GroupWorkOutlined,
   LocationOnOutlined,
@@ -12,26 +12,19 @@ import messageIds from '../l10n/messageIds';
 import { ZetkinEventWithStatus } from '../types';
 import { removeOffset } from 'utils/dateUtils';
 import { timeSpanToString } from 'zui/utils/timeSpanString';
-import { EventSignupButton } from './EventSignupButton';
 import ZUILink from 'zui/components/ZUILink';
 
 type Props = {
   event: ZetkinEventWithStatus;
   href?: string;
-  onClickSignUp?: (ev: MouseEvent) => void;
 };
 
-const EventListItem: FC<Props> = ({ event, href, onClickSignUp }) => {
+const EventListItem: FC<Props> = ({ event, href }) => {
   const intl = useIntl();
   const messages = useMessages(messageIds);
 
-  const actions = [
-    <EventSignupButton
-      key="signup"
-      event={event}
-      onClickSignUp={onClickSignUp}
-    />,
-  ];
+  // Signup button removed from list view - only show on detail page
+  const actions: JSX.Element[] = [];
 
   const orgProjectLabels = [
     <ZUILink

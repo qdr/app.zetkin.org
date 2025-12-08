@@ -1,10 +1,8 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { GroupWorkOutlined, WatchLaterOutlined } from '@mui/icons-material';
 import { useIntl } from 'react-intl';
 
-import { ZetkinAreaAssignment } from 'features/areaAssignments/types';
-import useOrganization from 'features/organizations/hooks/useOrganization';
-import useCampaign from 'features/campaigns/hooks/useCampaign';
+import { ZetkinCallAssignment } from 'utils/types/zetkin';
 import MyActivityListItem from './MyActivityListItem';
 import ZUIButton from 'zui/components/ZUIButton';
 import { useMessages } from 'core/i18n';
@@ -13,24 +11,21 @@ import { removeOffset } from 'utils/dateUtils';
 import { timeSpanToString } from 'zui/utils/timeSpanString';
 
 type Props = {
-  assignment: ZetkinAreaAssignment;
+  callAssignment: ZetkinCallAssignment;
   href?: string;
 };
 
-const AreaAssignmentListItem: FC<Props> = ({ assignment, href }) => {
+const CallListItem: FC<Props> = ({ callAssignment, href }) => {
   const intl = useIntl();
-  const campaign = useCampaign(
-    assignment.organization_id,
-    assignment.project_id
-  );
-  const organization = useOrganization(assignment.organization_id);
   const messages = useMessages(messageIds);
 
   // Format date range for display
-  const timeInfo = assignment.start_date
+  const timeInfo = callAssignment.start_date
     ? timeSpanToString(
-        new Date(removeOffset(assignment.start_date)),
-        assignment.end_date ? new Date(removeOffset(assignment.end_date)) : undefined,
+        new Date(removeOffset(callAssignment.start_date)),
+        callAssignment.end_date
+          ? new Date(removeOffset(callAssignment.end_date))
+          : undefined,
         intl
       )
     : null;
@@ -38,10 +33,12 @@ const AreaAssignmentListItem: FC<Props> = ({ assignment, href }) => {
   const infoItems = [
     {
       Icon: GroupWorkOutlined,
-      labels: [
-        campaign.campaignFuture.data?.title,
-        organization.data?.title,
-      ].filter((label) => !!label) as string[],
+      labels: callAssignment.campaign
+        ? [
+            callAssignment.campaign.title,
+            callAssignment.organization.title,
+          ]
+        : [callAssignment.organization.title],
     },
   ];
 
@@ -58,15 +55,16 @@ const AreaAssignmentListItem: FC<Props> = ({ assignment, href }) => {
         <ZUIButton
           key="mainAction"
           href={href}
-          label={messages.activityList.actions.areaAssignment()}
+          label={messages.activityList.actions.call()}
           size="large"
           variant="secondary"
         />,
       ]}
+      href={href}
       info={infoItems}
-      title={assignment.title || messages.defaultTitles.areaAssignment()}
+      title={callAssignment.title || messages.defaultTitles.callAssignment()}
     />
   );
 };
 
-export default AreaAssignmentListItem;
+export default CallListItem;

@@ -14,6 +14,7 @@ import ZUIButton from 'zui/components/ZUIButton';
 import ZUIText from 'zui/components/ZUIText';
 import ZUIFilterButton from 'zui/components/ZUIFilterButton';
 import AreaAssignmentListItem from './AreaAssignmentListItem';
+import CallListItem from './CallListItem';
 
 const MyActivitiesList: FC = () => {
   const activities = useMyActivities();
@@ -87,38 +88,11 @@ const MyActivitiesList: FC = () => {
       )}
       {filteredActivities.map((activity) => {
         let elem, href;
-
         if (activity.kind == 'call') {
-          href = `/call/${activity.data.id}`;
-          elem = (
-            <MyActivityListItem
-              actions={[
-                <ZUIButton
-                  key="mainAction"
-                  href={href}
-                  label={messages.activityList.actions.call()}
-                  size="large"
-                  variant="secondary"
-                />,
-              ]}
-              info={[
-                {
-                  Icon: GroupWorkOutlined,
-                  labels: activity.data.campaign
-                    ? [
-                        activity.data.campaign.title,
-                        activity.data.organization.title,
-                      ]
-                    : [activity.data.organization.title],
-                },
-              ]}
-              title={
-                activity.data.title || messages.defaultTitles.callAssignment()
-              }
-            />
-          );
+          href = `/o/${activity.data.organization.id}/calls/${activity.data.id}`;
+          elem = <CallListItem callAssignment={activity.data} href={href} />;
         } else if (activity.kind == 'canvass') {
-          href = `/canvass/${activity.data.id}`;
+          href = `/o/${activity.data.organization_id}/canvass/${activity.data.id}`;
           elem = (
             <AreaAssignmentListItem assignment={activity.data} href={href} />
           );

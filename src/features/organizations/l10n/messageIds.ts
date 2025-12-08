@@ -40,6 +40,14 @@ export default makeMessages('feat.organizations', {
     ),
     today: m('Today'),
   },
+  callPage: {
+    callAssignment: m('Phone call assignment'),
+    instructions: m('Instructions'),
+  },
+  canvassPage: {
+    areaAssignment: m('Door-to-door canvassing assignment'),
+    instructions: m('Instructions'),
+  },
   gen3: {
     description: m(
       'This is the new (generation 3) organizer web app. If you are used to the old one, you will find lots of new features and an improved user interface here. But if you want, you can still use the old organizer app for a while longer.'
