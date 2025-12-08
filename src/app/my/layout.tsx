@@ -19,10 +19,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
   let pageTitle = '';
 
-  if (lastSegment === 'feed') {
+  if (lastSegment === 'home') {
     pageTitle = messages.tabs.feed();
-  } else if (lastSegment === 'home') {
-    pageTitle = messages.tabs.home();
+  } else if (lastSegment === 'activities') {
+    pageTitle = messages.tabs.activities();
+  } else if (lastSegment === 'groups') {
+    pageTitle = messages.tabs.myGroups();
   } else if (lastSegment === 'settings') {
     pageTitle = messages.tabs.settings();
   }

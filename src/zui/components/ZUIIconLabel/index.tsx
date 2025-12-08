@@ -28,7 +28,7 @@ export type ZUIIconLabelProps = {
   /**
    * The label
    */
-  label: string | string[];
+  label: ReactNode | ReactNode[];
 
   /**
    * If true, the text will not overflow and end with an ellipsis.

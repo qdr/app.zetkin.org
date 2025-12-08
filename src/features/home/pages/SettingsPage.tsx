@@ -7,9 +7,8 @@ import ZUILogoLoadingIndicator from 'zui/ZUILogoLoadingIndicator';
 import AppPreferences from '../components/AppPreferences';
 import useCurrentUser from 'features/user/hooks/useCurrentUser';
 import AccountSettings from '../components/AccountSettings';
-import MyMemberships from '../components/MyMemberships';
 
-const AllEventsPage: FC = () => {
+const SettingsPage: FC = () => {
   const user = useCurrentUser();
 
   return (
@@ -28,7 +27,6 @@ const AllEventsPage: FC = () => {
     >
       {user && (
         <>
-          <MyMemberships />
           <AppPreferences user={user} />
           <AccountSettings user={user} />
         </>
@@ -37,4 +35,4 @@ const AllEventsPage: FC = () => {
   );
 };
 
-export default AllEventsPage;
+export default SettingsPage;

@@ -1,8 +1,8 @@
 import redirectIfLoginNeeded from 'core/utils/redirectIfLoginNeeded';
-import AllEventsPage from 'features/home/pages/AllEventsPage';
+import HomePage from 'features/home/pages/HomePage';
 
 export default async function Page() {
   await redirectIfLoginNeeded();
 
-  return <AllEventsPage />;
+  return <HomePage />;
 }

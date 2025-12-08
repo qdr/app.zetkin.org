@@ -30,11 +30,13 @@ import ZUIButton from 'zui/components/ZUIButton';
 import ZUIText from 'zui/components/ZUIText';
 import ZUIDrawerModal from 'zui/components/ZUIDrawerModal';
 import { useEventTypeFilter } from 'features/events/hooks/useEventTypeFilter';
+import useFollowedOrgIds from 'features/organizations/hooks/useFollowedOrgIds';
 
 const AllEventsList: FC = () => {
   const intl = useIntl();
   const messages = useMessages(messageIds);
   const allEvents = useAllEvents();
+  const followedOrgIds = useFollowedOrgIds();
   const nextDelay = useIncrementalDelay();
 
   const [drawerContent, setDrawerContent] = useState<
@@ -94,10 +96,12 @@ const AllEventsList: FC = () => {
 
   const filteredEvents = allEvents
     .filter((event) => {
-      if (orgIdsToFilterBy.length == 0) {
-        return true;
+      // If user has manually filtered by orgs, use that
+      if (orgIdsToFilterBy.length > 0) {
+        return orgIdsToFilterBy.includes(event.organization.id);
       }
-      return orgIdsToFilterBy.includes(event.organization.id);
+      // Otherwise, only show events from followed organizations
+      return followedOrgIds.includes(event.organization.id);
     })
     .filter((event) => {
       if (

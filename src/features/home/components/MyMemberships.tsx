@@ -1,15 +1,24 @@
 'use client';
 
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import {
   Box,
+  Checkbox,
+  Collapse,
   Divider,
+  FormControlLabel,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
   Avatar,
 } from '@mui/material';
-import { ChevronRight, AccountTree } from '@mui/icons-material';
+import {
+  ChevronRight,
+  AccountTree,
+  ExpandMore,
+  ExpandLess,
+} from '@mui/icons-material';
 import Link from 'next/link';
 
 import ZUISection from 'zui/components/ZUISection';
@@ -17,13 +26,20 @@ import ZUIText from 'zui/components/ZUIText';
 import useUserMemberships from '../hooks/useUserMemberships';
 import useCampaigns from 'features/campaigns/hooks/useCampaigns';
 import useCurrentUser from 'features/user/hooks/useCurrentUser';
+import useUpdateMembership from 'features/organizations/hooks/useUpdateMembership';
+import { ZetkinMembership } from 'utils/types/zetkin';
 
 const OrganizationItem: FC<{
-  orgId: number;
-  orgTitle: string;
-  role: string | null;
+  membership: ZetkinMembership;
   currentUserId: number | undefined;
-}> = ({ orgId, orgTitle, role, currentUserId }) => {
+}> = ({ membership, currentUserId }) => {
+  const [expanded, setExpanded] = useState(false);
+  const updateMembership = useUpdateMembership();
+  const { orgId, orgTitle, role } = {
+    orgId: membership.organization.id,
+    orgTitle: membership.organization.title,
+    role: membership.role,
+  };
   const campaignsFuture = useCampaigns(orgId);
   const allCampaigns = campaignsFuture.data || [];
 
@@ -34,44 +50,94 @@ const OrganizationItem: FC<{
       )
     : [];
 
+  const handleFollowChange = async (checked: boolean) => {
+    await updateMembership(orgId, { follow: checked });
+  };
+
   return (
     <>
       {/* Organization Item */}
-      <ListItem disablePadding>
-        <ListItemButton
-          component={Link}
-          href={`/o/${orgId}`}
-          sx={{
-            py: 1.5,
-            '&:hover': {
-              backgroundColor: 'rgba(0, 0, 0, 0.04)',
-            },
-          }}
-        >
-          <Box
+      <ListItem disablePadding sx={{ flexDirection: 'column', alignItems: 'stretch' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+          <ListItemButton
+            component={Link}
+            href={`/o/${orgId}`}
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1.5,
-              width: '100%',
+              py: 1.5,
+              flex: 1,
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.04)',
+              },
             }}
           >
-            <Avatar
-              src={`/api/orgs/${orgId}/avatar`}
-              alt={orgTitle}
-              sx={{ width: 32, height: 32 }}
-            />
-            <Box sx={{ flex: 1 }}>
-              <ZUIText variant="bodyMdSemiBold">{orgTitle}</ZUIText>
-              {role && (
-                <ZUIText variant="bodySmRegular" color="secondary">
-                  {role}
-                </ZUIText>
-              )}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.5,
+                width: '100%',
+              }}
+            >
+              <Avatar
+                src={`/api/orgs/${orgId}/avatar`}
+                alt={orgTitle}
+                sx={{ width: 32, height: 32 }}
+              />
+              <Box sx={{ flex: 1 }}>
+                <ZUIText variant="bodyMdSemiBold">{orgTitle}</ZUIText>
+                {role && (
+                  <ZUIText variant="bodySmRegular" color="secondary">
+                    {role}
+                  </ZUIText>
+                )}
+              </Box>
             </Box>
-            <ChevronRight sx={{ color: 'text.secondary' }} />
+          </ListItemButton>
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              setExpanded(!expanded);
+            }}
+            sx={{ mr: 1 }}
+          >
+            {expanded ? <ExpandLess /> : <ExpandMore />}
+          </IconButton>
+        </Box>
+
+        {/* Expandable settings section */}
+        <Collapse in={expanded}>
+          <Box sx={{ pl: 6, pr: 2, pb: 2, pt: 1 }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={membership.follow !== false}
+                  onChange={(e) => handleFollowChange(e.target.checked)}
+                  size="small"
+                />
+              }
+              label={
+                <ZUIText variant="bodySmRegular">
+                  Show events in Feed
+                </ZUIText>
+              }
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={false}
+                  disabled
+                  size="small"
+                />
+              }
+              label={
+                <ZUIText variant="bodySmRegular" color="secondary">
+                  Receive emails (coming soon)
+                </ZUIText>
+              }
+            />
           </Box>
-        </ListItemButton>
+        </Collapse>
       </ListItem>
 
       {/* Campaigns/Projects under this organization */}
@@ -142,9 +208,7 @@ const MyMemberships: FC = () => {
                   <Box key={membership.organization.id}>
                     {index > 0 && <Divider />}
                     <OrganizationItem
-                      orgId={membership.organization.id}
-                      orgTitle={membership.organization.title}
-                      role={membership.role}
+                      membership={membership}
                       currentUserId={currentUser?.id}
                     />
                   </Box>

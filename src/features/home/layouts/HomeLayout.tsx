@@ -62,13 +62,18 @@ const HomeLayout: FC<Props> = ({ children, title }) => {
         tabs={[
           {
             href: `/my/home`,
-            label: messages.tabs.home(),
+            label: messages.tabs.feed(),
             value: 'home',
           },
           {
-            href: `/my/feed`,
-            label: messages.tabs.feed(),
-            value: 'feed',
+            href: `/my/activities`,
+            label: messages.tabs.activities(),
+            value: 'activities',
+          },
+          {
+            href: `/my/groups`,
+            label: messages.tabs.myGroups(),
+            value: 'groups',
           },
           {
             href: `/my/settings`,
@@ -78,7 +83,7 @@ const HomeLayout: FC<Props> = ({ children, title }) => {
         ]}
         topLeftComponent={
           <NextLink
-            href={'/my'}
+            href={'/my/home'}
             style={{
               textDecoration: 'none',
             }}

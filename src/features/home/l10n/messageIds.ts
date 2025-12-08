@@ -81,8 +81,9 @@ export default makeMessages('feat.home', {
     },
   },
   tabs: {
-    feed: m('All events'),
-    home: m('My activities'),
+    activities: m('My activities'),
+    feed: m('Feed'),
+    myGroups: m('My Groups'),
     settings: m('Settings'),
   },
   title: m('My Zetkin'),

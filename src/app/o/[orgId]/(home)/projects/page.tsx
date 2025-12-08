@@ -1,6 +1,6 @@
 'use client';
 
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
   Box,
   Card,
@@ -25,9 +25,44 @@ const ProjectsPage: FC<Props> = ({ params }) => {
   const router = useRouter();
   const campaignsFuture = useCampaigns(params.orgId);
   const campaigns = campaignsFuture.data || [];
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration errors by only rendering after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Show all campaigns (no filter for now - all campaigns are visible)
   const publicCampaigns = campaigns;
+
+  // Don't render until mounted on client to avoid hydration errors
+  if (!mounted) {
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Box sx={{ mb: 4 }}>
+          <ZUIText variant="headingLg" gutterBottom>
+            Projects
+          </ZUIText>
+        </Box>
+      </Container>
+    );
+  }
+
+  // Show loading state
+  if (campaignsFuture.isLoading) {
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Box sx={{ mb: 4 }}>
+          <ZUIText variant="headingLg" gutterBottom>
+            Projects
+          </ZUIText>
+          <ZUIText variant="bodyMdRegular" color="secondary">
+            Loading projects...
+          </ZUIText>
+        </Box>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -64,7 +99,7 @@ const ProjectsPage: FC<Props> = ({ params }) => {
       ) : (
         <Grid container spacing={3}>
           {publicCampaigns.map((campaign) => (
-            <Grid item xs={12} sm={6} md={4} key={campaign.id}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={campaign.id}>
               <Card
                 elevation={0}
                 sx={{
@@ -118,9 +153,7 @@ const ProjectsPage: FC<Props> = ({ params }) => {
                       </Box>
                     </Box>
                     {campaign.info_text && (
-                      <ZUIText
-                        variant="bodySmRegular"
-                        color="secondary"
+                      <Box
                         sx={{
                           display: '-webkit-box',
                           WebkitLineClamp: 3,
@@ -128,8 +161,10 @@ const ProjectsPage: FC<Props> = ({ params }) => {
                           overflow: 'hidden',
                         }}
                       >
-                        {campaign.info_text}
-                      </ZUIText>
+                        <ZUIText variant="bodySmRegular" color="secondary">
+                          {campaign.info_text}
+                        </ZUIText>
+                      </Box>
                     )}
                   </CardContent>
                 </CardActionArea>

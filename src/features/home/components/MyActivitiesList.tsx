@@ -23,7 +23,19 @@ const MyActivitiesList: FC = () => {
 
   const kinds = Array.from(
     new Set(activities.map((activity) => activity.kind))
-  );
+  ).sort((a, b) => {
+    // Custom sort: event first, canvass second, then others alphabetically
+    const order = ['event', 'canvass'];
+    const aIndex = order.indexOf(a);
+    const bIndex = order.indexOf(b);
+
+    if (aIndex !== -1 && bIndex !== -1) {
+      return aIndex - bIndex;
+    }
+    if (aIndex !== -1) return -1;
+    if (bIndex !== -1) return 1;
+    return a.localeCompare(b);
+  });
 
   const filteredActivities = activities.filter((activity) => {
     const notFiltering = filteredKinds.length == 0;
