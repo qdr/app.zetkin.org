@@ -24,6 +24,11 @@ export default makeMessages('feat.home', {
       canvass: m('Areas'),
       event: m('Events'),
     },
+    types: {
+      call: m('Call'),
+      canvass: m('Canvass'),
+      event: m('Event'),
+    },
   },
   allEventsList: {
     emptyList: {
@@ -38,6 +43,9 @@ export default makeMessages('feat.home', {
       today: m('Today'),
       tomorrow: m('Tomorrow'),
     },
+  },
+  currentActivities: {
+    title: m('Current activities'),
   },
   defaultTitles: {
     areaAssignment: m('Untitled area assignment'),

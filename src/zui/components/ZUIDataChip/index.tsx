@@ -16,9 +16,9 @@ type ZUIDataChipProps = {
   color?: 'grey' | 'main' | 'mid1' | 'mid2' | 'mid3' | 'final';
 
   /**
-   * The number value to be displayed in the chip.
+   * The value to be displayed in the chip (number or string).
    */
-  value: number;
+  value: number | string;
 };
 
 const ZUIDataChip: FC<ZUIDataChipProps> = ({ color = 'grey', value }) => (

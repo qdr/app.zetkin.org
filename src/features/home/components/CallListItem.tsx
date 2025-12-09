@@ -13,22 +13,40 @@ import { timeSpanToString } from 'zui/utils/timeSpanString';
 type Props = {
   callAssignment: ZetkinCallAssignment;
   href?: string;
+  showDate?: boolean;
 };
 
-const CallListItem: FC<Props> = ({ callAssignment, href }) => {
+const CallListItem: FC<Props> = ({ callAssignment, href, showDate = false }) => {
   const intl = useIntl();
   const messages = useMessages(messageIds);
 
-  // Format date range for display
-  const timeInfo = callAssignment.start_date
-    ? timeSpanToString(
-        new Date(removeOffset(callAssignment.start_date)),
-        callAssignment.end_date
-          ? new Date(removeOffset(callAssignment.end_date))
-          : undefined,
-        intl
-      )
-    : null;
+  // Show only time (date is in the list header) unless showDate is true
+  let timeInfo = 'All day';
+  if (callAssignment.start_date && callAssignment.end_date) {
+    const startDate = removeOffset(callAssignment.start_date);
+    const endDate = removeOffset(callAssignment.end_date);
+
+    if (startDate && endDate) {
+      const startDateTime = new Date(startDate);
+      const endDateTime = new Date(endDate);
+
+      // Check if there are specific times (not just dates)
+      const hasSpecificTime =
+        startDateTime.getUTCHours() !== 0 ||
+        startDateTime.getUTCMinutes() !== 0 ||
+        endDateTime.getUTCHours() !== 0 ||
+        endDateTime.getUTCMinutes() !== 0;
+
+      if (hasSpecificTime) {
+        const timeRange = `${intl.formatTime(startDateTime)} - ${intl.formatTime(endDateTime)}`;
+        timeInfo = showDate
+          ? `${intl.formatDate(startDateTime, { month: 'short', day: 'numeric' })} ${timeRange}`
+          : timeRange;
+      } else if (showDate) {
+        timeInfo = intl.formatDate(startDateTime, { month: 'short', day: 'numeric' });
+      }
+    }
+  }
 
   const infoItems = [
     {
@@ -42,12 +60,10 @@ const CallListItem: FC<Props> = ({ callAssignment, href }) => {
     },
   ];
 
-  if (timeInfo) {
-    infoItems.push({
-      Icon: WatchLaterOutlined,
-      labels: [timeInfo],
-    });
-  }
+  infoItems.push({
+    Icon: WatchLaterOutlined,
+    labels: [timeInfo],
+  });
 
   return (
     <MyActivityListItem
@@ -60,8 +76,11 @@ const CallListItem: FC<Props> = ({ callAssignment, href }) => {
           variant="secondary"
         />,
       ]}
+      activityType="call"
+      activityTypeLabel={messages.activityList.types.call()}
       href={href}
       info={infoItems}
+      showDate={showDate}
       title={callAssignment.title || messages.defaultTitles.callAssignment()}
     />
   );

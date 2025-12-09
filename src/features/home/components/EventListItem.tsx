@@ -17,9 +17,10 @@ import ZUILink from 'zui/components/ZUILink';
 type Props = {
   event: ZetkinEventWithStatus;
   href?: string;
+  showDate?: boolean;
 };
 
-const EventListItem: FC<Props> = ({ event, href }) => {
+const EventListItem: FC<Props> = ({ event, href, showDate = false }) => {
   const intl = useIntl();
   const messages = useMessages(messageIds);
 
@@ -41,9 +42,18 @@ const EventListItem: FC<Props> = ({ event, href }) => {
     ),
   ].filter((label) => !!label);
 
+  const startDateTime = new Date(removeOffset(event.start_time));
+  const endDateTime = new Date(removeOffset(event.end_time));
+
+  const timeLabel = showDate
+    ? `${intl.formatDate(startDateTime, { month: 'short', day: 'numeric' })} ${intl.formatTime(startDateTime)} - ${intl.formatTime(endDateTime)}`
+    : `${intl.formatTime(startDateTime)} - ${intl.formatTime(endDateTime)}`;
+
   return (
     <MyActivityListItem
       actions={actions}
+      activityType="event"
+      activityTypeLabel={messages.activityList.types.event()}
       href={href}
       image={event.cover_file?.url}
       info={[
@@ -53,13 +63,7 @@ const EventListItem: FC<Props> = ({ event, href }) => {
         },
         {
           Icon: WatchLaterOutlined,
-          labels: [
-            timeSpanToString(
-              new Date(removeOffset(event.start_time)),
-              new Date(removeOffset(event.end_time)),
-              intl
-            ),
-          ],
+          labels: [timeLabel],
         },
         {
           Icon: LocationOnOutlined,
@@ -68,6 +72,7 @@ const EventListItem: FC<Props> = ({ event, href }) => {
           ],
         },
       ]}
+      showDate={showDate}
       title={
         event.title || event.activity?.title || messages.defaultTitles.event()
       }

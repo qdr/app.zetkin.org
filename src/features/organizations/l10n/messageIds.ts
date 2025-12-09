@@ -40,6 +40,12 @@ export default makeMessages('feat.organizations', {
     ),
     today: m('Today'),
   },
+  activityList: {
+    actions: {
+      areaAssignment: m('Start canvassing'),
+      call: m('Start calling'),
+    },
+  },
   callPage: {
     callAssignment: m('Phone call assignment'),
     instructions: m('Instructions'),

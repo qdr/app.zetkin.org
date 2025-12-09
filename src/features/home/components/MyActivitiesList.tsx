@@ -90,15 +90,15 @@ const MyActivitiesList: FC = () => {
         let elem, href;
         if (activity.kind == 'call') {
           href = `/o/${activity.data.organization.id}/calls/${activity.data.id}`;
-          elem = <CallListItem callAssignment={activity.data} href={href} />;
+          elem = <CallListItem callAssignment={activity.data} href={href} showDate />;
         } else if (activity.kind == 'canvass') {
           href = `/o/${activity.data.organization_id}/canvass/${activity.data.id}`;
           elem = (
-            <AreaAssignmentListItem assignment={activity.data} href={href} />
+            <AreaAssignmentListItem assignment={activity.data} href={href} showDate />
           );
         } else if (activity.kind == 'event') {
           href = `/o/${activity.data.organization.id}/events/${activity.data.id}`;
-          elem = <EventListItem event={activity.data} href={href} />;
+          elem = <EventListItem event={activity.data} href={href} showDate />;
         }
 
         return (

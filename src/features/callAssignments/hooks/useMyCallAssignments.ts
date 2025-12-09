@@ -17,12 +17,22 @@ export default function useMyCallAssignments() {
   });
 
   const now = new Date();
+  // Subtract 120 days for testing purposes
+  now.setDate(now.getDate() - 120);
   const today = now.toISOString().slice(0, 10);
 
-  return assignments.filter(
-    ({ end_date, start_date }) =>
-      start_date &&
-      start_date <= today &&
-      (end_date == null || end_date >= today)
+  console.log('[useMyCallAssignments] Today:', today);
+  console.log('[useMyCallAssignments] All assignments:', assignments);
+
+  const filtered = assignments.filter(
+    ({ end_date, start_date }) => {
+      const include = start_date && (end_date == null || end_date >= today);
+      console.log('[useMyCallAssignments] Assignment:', { start_date, end_date, include });
+      return include;
+    }
   );
+
+  console.log('[useMyCallAssignments] Filtered:', filtered);
+
+  return filtered;
 }

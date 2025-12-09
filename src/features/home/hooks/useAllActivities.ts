@@ -11,6 +11,15 @@ export default function useAllActivities() {
   const callAssignments = useMyCallAssignments();
   const areaAssignments = useMyAreaAssignments();
 
+  console.log('[useAllActivities] Raw data:', {
+    allEvents: allEvents.length,
+    callAssignments: callAssignments.length,
+    areaAssignments: areaAssignments.length,
+  });
+
+  console.log('[useAllActivities] Call assignments:', callAssignments);
+  console.log('[useAllActivities] Area assignments:', areaAssignments);
+
   // Filter events to only show those without a status (available to attend)
   const availableEvents = allEvents.filter((event) => !event.status);
 
@@ -31,6 +40,8 @@ export default function useAllActivities() {
       start: new Date(data.start_date || 0),
     })),
   ];
+
+  console.log('[useAllActivities] Total activities:', activities.length);
 
   return activities.sort((a, b) => a.start.getTime() - b.start.getTime());
 }

@@ -51,6 +51,8 @@ export const PublicCanvassPage: FC<Props> = ({ canvassId, orgId }) => {
           })
         : null;
 
+  const hasInstructions = !!areaAssignment?.instructions;
+
   return (
     <Suspense>
       {areaAssignment && (
@@ -75,10 +77,31 @@ export const PublicCanvassPage: FC<Props> = ({ canvassId, orgId }) => {
             <Box
               sx={{
                 display: 'flex',
-                flexDirection: 'row',
+                flexDirection: isMobile ? 'column' : 'row',
                 gap: 2,
               }}
             >
+              {hasInstructions && (
+                <Box
+                  bgcolor="white"
+                  borderRadius={2}
+                  minHeight={isFullScreen ? 400 : ''}
+                  padding={2}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2,
+                    width: isFullScreen ? '60%' : '100%',
+                  }}
+                >
+                  <Box display="flex" flexDirection="column" gap={1}>
+                    <ZUIText variant="bodyMdSemiBold">
+                      <Msg id={messageIds.canvassPage.instructions} />
+                    </ZUIText>
+                    <ZUIText>{areaAssignment.instructions}</ZUIText>
+                  </Box>
+                </Box>
+              )}
               <Box
                 bgcolor="white"
                 borderRadius={2}
@@ -87,12 +110,21 @@ export const PublicCanvassPage: FC<Props> = ({ canvassId, orgId }) => {
                 gap={2}
                 minHeight={isFullScreen ? 400 : ''}
                 padding={2}
-                width="100%"
+                width={isFullScreen && hasInstructions ? '40%' : '100%'}
               >
                 <Box display="flex" flexDirection="column" gap={1}>
                   <ZUIText variant="headingLg">
                     {areaAssignment.title || messages.defaultTitles.areaAssignment()}
                   </ZUIText>
+                </Box>
+
+                <Box display="flex" flexDirection="column" gap={1}>
+                  <ZUIButton
+                    href={`/canvass/${canvassId}`}
+                    label={messages.activityList.actions.areaAssignment()}
+                    size="large"
+                    variant="primary"
+                  />
                 </Box>
 
                 <Box display="flex" flexDirection="column" gap={isMobile ? 1 : 2}>
@@ -127,33 +159,6 @@ export const PublicCanvassPage: FC<Props> = ({ canvassId, orgId }) => {
                     </ZUIText>
                   </Box>
                 </Box>
-
-                <Box display="flex" flexDirection="column" gap={1}>
-                  <ZUIButton
-                    href={`/canvass/${canvassId}`}
-                    label={messages.activityList.actions.areaAssignment()}
-                    size="large"
-                    variant="primary"
-                  />
-                </Box>
-
-                {areaAssignment.instructions && (
-                  <Box
-                    display="flex"
-                    flexDirection="column"
-                    gap={1}
-                    sx={{
-                      borderTop: '1px solid',
-                      borderColor: 'divider',
-                      paddingTop: 2,
-                    }}
-                  >
-                    <ZUIText variant="bodyMdSemiBold">
-                      <Msg id={messageIds.canvassPage.instructions} />
-                    </ZUIText>
-                    <ZUIText>{areaAssignment.instructions}</ZUIText>
-                  </Box>
-                )}
               </Box>
             </Box>
             <ZUIPublicFooter />
