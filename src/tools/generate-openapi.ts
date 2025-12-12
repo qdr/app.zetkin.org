@@ -30,6 +30,7 @@ class OpenApiGenerator {
   private rpcEndpoints: RpcEndpoint[] = [];
   private program: ts.Program;
   private schemaGenerator: TJS.SchemaGenerator | null = null;
+  private typeFiles: string[] = [];
 
   constructor(private rootDir: string) {
     const configPath = ts.findConfigFile(
@@ -59,16 +60,31 @@ class OpenApiGenerator {
 
     this.program = ts.createProgram(files, compilerOptions);
 
+    console.log('Loading type definitions...');
+    this.typeFiles = [
+      path.join(rootDir, 'src/utils/types/zetkin.ts'),
+      ...glob.sync('src/features/**/types.ts', {
+        cwd: rootDir,
+        absolute: true,
+      }),
+    ];
+
+    console.log(`Found ${this.typeFiles.length} type definition files`);
+
     try {
       const config: TJS.Config = {
         path: path.join(rootDir, 'src/utils/types/zetkin.ts'),
+        tsconfig: path.join(rootDir, 'tsconfig.json'),
         skipTypeCheck: true,
         expose: 'export',
         topRef: false,
       };
       this.schemaGenerator = TJS.createGenerator(config);
+      console.log(
+        `  Loaded type definitions (will resolve imports automatically)`
+      );
     } catch (e) {
-      console.error('Failed to create schema generator:', e);
+      console.error('  Failed to load type definitions:', e);
     }
   }
 
@@ -77,12 +93,28 @@ class OpenApiGenerator {
       .getSourceFiles()
       .filter((sf) => !sf.fileName.includes('node_modules'));
 
-    console.log(`Parsing ${sourceFiles.length} source files...`);
+    console.log(
+      `\nParsing ${sourceFiles.length} source files for API endpoints...`
+    );
+
+    let processedFiles = 0;
+    const totalFiles = sourceFiles.length;
+    const startTime = Date.now();
 
     for (const sourceFile of sourceFiles) {
       this.visitNode(sourceFile, sourceFile);
+      processedFiles++;
+
+      if (processedFiles % 100 === 0 || processedFiles === totalFiles) {
+        const percent = Math.round((processedFiles / totalFiles) * 100);
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+        process.stdout.write(
+          `\r  Progress: ${processedFiles}/${totalFiles} files (${percent}%) - ${elapsed}s`
+        );
+      }
     }
 
+    console.log('\n');
     console.log(`Found ${this.getTotalEndpoints()} REST endpoints`);
     console.log(`Found ${this.rpcEndpoints.length} RPC endpoints`);
   }
@@ -541,11 +573,16 @@ class OpenApiGenerator {
         if (schema && typeof schema === 'object') {
           const mainSchema: any = schema.definitions?.[typeName] || schema;
           if (mainSchema && mainSchema.type === 'object') {
-            if (!mainSchema.description) {
-              mainSchema.description = `(src/utils/types/zetkin.ts)`;
-            } else {
-              mainSchema.description += ` (src/utils/types/zetkin.ts)`;
+            const typeFile = this.findTypeFile(typeName);
+            if (typeFile) {
+              const relativePath = path.relative(this.rootDir, typeFile);
+              if (!mainSchema.description) {
+                mainSchema.description = `(${relativePath})`;
+              } else {
+                mainSchema.description += ` (${relativePath})`;
+              }
             }
+
             this.fixNullableTypes(mainSchema);
             this.addDateFormats(mainSchema);
             return mainSchema;
@@ -571,6 +608,21 @@ class OpenApiGenerator {
       type: 'object',
       description: `${typeLabel}: ${typeName}`,
     };
+  }
+
+  private findTypeFile(typeName: string): string | null {
+    for (const typeFile of this.typeFiles) {
+      try {
+        const content = fs.readFileSync(typeFile, 'utf-8');
+        const typeRegex = new RegExp(
+          `(export\\s+)?(type|interface)\\s+${typeName}\\s*[=<{]`
+        );
+        if (typeRegex.test(content)) {
+          return typeFile;
+        }
+      } catch (e) {}
+    }
+    return null;
   }
 
   private fixNullableTypes(schema: any): any {
@@ -673,13 +725,24 @@ class OpenApiGenerator {
   }
 
   public generateOpenApi(): object {
+    console.log('\nGenerating OpenAPI specification...');
     const paths: Record<string, any> = {};
 
     const sortedPaths = Array.from(this.endpoints.entries()).sort((a, b) =>
       a[0].localeCompare(b[0])
     );
 
+    console.log(`Building ${sortedPaths.length} API path definitions...`);
+    let processedPaths = 0;
+
     for (const [pathKey, endpoints] of sortedPaths) {
+      processedPaths++;
+      if (processedPaths % 20 === 0 || processedPaths === sortedPaths.length) {
+        const percent = Math.round((processedPaths / sortedPaths.length) * 100);
+        process.stdout.write(
+          `\r  Progress: ${processedPaths}/${sortedPaths.length} paths (${percent}%)`
+        );
+      }
       const pathItem: any = {};
 
       const methodGroups = new Map<string, ApiEndpoint[]>();
@@ -731,14 +794,37 @@ class OpenApiGenerator {
 
         for (const param of Array.from(allQueryParams).sort()) {
           if (!addedParams.has(param)) {
+            const paramType = this.guessParamType(param);
+            const schema: any = {
+              type: paramType,
+              example: this.getExampleValue(param),
+            };
+
+            const paramLower = param.toLowerCase();
+            if (paramLower === 'recursive') {
+              schema.default = false;
+            }
+            if (paramLower === 'filter') {
+              schema.default = '';
+            }
+            if (paramLower === 'page') {
+              schema.default = 1;
+            }
+            if (paramLower === 'size') {
+              schema.default = 50;
+            }
+            if (paramLower === 'offset') {
+              schema.default = 0;
+            }
+            if (paramLower === 'limit') {
+              schema.default = 50;
+            }
+
             const paramObj: any = {
               name: param,
               in: 'query',
               required: false,
-              schema: {
-                type: this.guessParamType(param),
-                example: this.getExampleValue(param),
-              },
+              schema: schema,
             };
 
             const description = this.getParamDescription(
@@ -831,7 +917,10 @@ class OpenApiGenerator {
       paths[pathKey] = pathItem;
     }
 
+    console.log('\n');
+
     if (this.rpcEndpoints.length > 0) {
+      console.log(`Processing ${this.rpcEndpoints.length} RPC endpoints...`);
       const sortedRpcEndpoints = [...this.rpcEndpoints].sort((a, b) =>
         a.name.localeCompare(b.name)
       );
@@ -962,7 +1051,71 @@ class OpenApiGenerator {
       tags: this.generateTags(),
     };
 
+    console.log('Flattening schema definitions...');
+    this.hoistDefinitions(openapi);
+
     return openapi;
+  }
+
+  private hoistDefinitions(openapi: any): void {
+    const allDefinitions: Record<string, any> = {};
+
+    const collectDefinitions = (obj: any, parentPath: string = '') => {
+      if (!obj || typeof obj !== 'object') {
+        return;
+      }
+
+      if (obj.definitions && typeof obj.definitions === 'object') {
+        for (const [defName, defSchema] of Object.entries(obj.definitions)) {
+          if (!allDefinitions[defName]) {
+            allDefinitions[defName] = defSchema;
+          }
+        }
+        delete obj.definitions;
+      }
+
+      for (const key in obj) {
+        if (obj.hasOwnProperty(key) && key !== 'definitions') {
+          collectDefinitions(obj[key], `${parentPath}.${key}`);
+        }
+      }
+    };
+
+    collectDefinitions(openapi.paths);
+
+    if (Object.keys(allDefinitions).length > 0) {
+      openapi.components.schemas = {
+        ...openapi.components.schemas,
+        ...allDefinitions,
+      };
+      console.log(
+        `  Hoisted ${
+          Object.keys(allDefinitions).length
+        } type definitions to root level`
+      );
+    }
+
+    const updateRefs = (obj: any) => {
+      if (!obj || typeof obj !== 'object') {
+        return;
+      }
+
+      if (obj.$ref && typeof obj.$ref === 'string') {
+        if (obj.$ref.startsWith('#/definitions/')) {
+          const defName = obj.$ref.replace('#/definitions/', '');
+          obj.$ref = `#/components/schemas/${defName}`;
+        }
+      }
+
+      for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          updateRefs(obj[key]);
+        }
+      }
+    };
+
+    updateRefs(openapi.paths);
+    updateRefs(openapi.components.schemas);
   }
 
   private generateSummary(endpoint: ApiEndpoint): string {
@@ -1076,13 +1229,25 @@ class OpenApiGenerator {
       return 'Filter expression to query events. Format: field>=value or field<=value. Example: start_time>=2025-12-11T10:00:00 filters events starting after that time.';
     }
     if (lower === 'recursive' && path.includes('actions')) {
-      return 'Include events from sub-organizations. Set to any value (e.g., "1") or omit parameter entirely. Presence of parameter = recursive, absence = non-recursive.';
+      return 'Include events from sub-organizations. Set to true to include sub-org events, false (default) for current org only.';
+    }
+    if (lower === 'page') {
+      return 'Page number for pagination (1-based). Use with "size" parameter to paginate through results.';
+    }
+    if (lower === 'size') {
+      return 'Number of items per page. Common values: 10, 50, 100. Use with "page" parameter to paginate through results.';
+    }
+    if (lower === 'offset') {
+      return 'Number of items to skip before starting to return results. Alternative to page-based pagination.';
+    }
+    if (lower === 'limit') {
+      return 'Maximum number of items to return. Alternative to size parameter.';
     }
 
     return undefined;
   }
 
-  private getExampleValue(paramName: string): string | number {
+  private getExampleValue(paramName: string): string | number | boolean {
     const lowerParam = paramName.toLowerCase();
 
     const today = new Date();
@@ -1112,7 +1277,19 @@ class OpenApiGenerator {
       return `start_time>=${dateStr}T00:00:00`;
     }
     if (lowerParam === 'recursive') {
+      return true;
+    }
+    if (lowerParam === 'page') {
       return 1;
+    }
+    if (lowerParam === 'size') {
+      return 50;
+    }
+    if (lowerParam === 'offset') {
+      return 0;
+    }
+    if (lowerParam === 'limit') {
+      return 50;
     }
 
     const exampleValues: Record<string, string | number> = {

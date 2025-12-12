@@ -80,8 +80,9 @@ export default function useEmail(
     if (email) {
       dispatch(emailUpdate([emailId, ['target']]));
 
+      const queryId = email.target.id;
       const target = await apiClient.patch<ZetkinQuery>(
-        `/api/orgs/${orgId}/people/queries/${email.target.id}`,
+        `/api/orgs/${orgId}/people/queries/${queryId}`,
         query
       );
 

@@ -5,24 +5,24 @@ import { eventResponseAdded, eventResponseRemoved } from '../store';
 export default function useEventCallActions(
   orgId: number,
   eventId: number,
-  participantId: number
+  personId: number
 ) {
   const apiClient = useApiClient();
   const dispatch = useAppDispatch();
 
   return {
     async signUp() {
-      if (participantId) {
+      if (personId) {
         await apiClient.put<{ action: ZetkinEvent }>(
-          `/api/orgs/${orgId}/actions/${eventId}/responses/${participantId}`
+          `/api/orgs/${orgId}/actions/${eventId}/responses/${personId}`
         );
         dispatch(eventResponseAdded(eventId));
       }
     },
     async undoSignup() {
-      if (participantId) {
+      if (personId) {
         await apiClient.delete(
-          `/api/orgs/${orgId}/actions/${eventId}/responses/${participantId}`
+          `/api/orgs/${orgId}/actions/${eventId}/responses/${personId}`
         );
       }
       dispatch(eventResponseRemoved(eventId));

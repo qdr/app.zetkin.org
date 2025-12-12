@@ -46,11 +46,11 @@ export default function useEventParticipantsMutations(
     dispatch(participantAdded([eventId, participant]));
   };
 
-  const deleteParticipant = async (participantId: number) => {
+  const deleteParticipant = async (personId: number) => {
     await apiClient.delete(
-      `/api/orgs/${orgId}/actions/${eventId}/participants/${participantId}`
+      `/api/orgs/${orgId}/actions/${eventId}/participants/${personId}`
     );
-    dispatch(participantDeleted([eventId, participantId]));
+    dispatch(participantDeleted([eventId, personId]));
   };
 
   const updateParticipant = (

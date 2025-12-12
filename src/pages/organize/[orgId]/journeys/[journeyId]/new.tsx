@@ -86,13 +86,13 @@ const NewJourneyPage: PageWithLayout<NewJourneyPageProps> = ({
 
   // Maybe in the future we can support multiple subjects added using
   // the link, but for now a single subject (the first) is enough.
-  const subjectId = inputSubjectIds[0];
+  const personId = inputSubjectIds[0];
   const apiClient = useApiClient();
   useEffect(() => {
     async function loadSubject() {
-      if (subjectId) {
+      if (personId) {
         const person = await apiClient.get<ZetkinPerson>(
-          `/api/orgs/${orgId}/people/${subjectId}`
+          `/api/orgs/${orgId}/people/${personId}`
         );
         setSubjects([...subjects, person]);
       }

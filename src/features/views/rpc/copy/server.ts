@@ -68,9 +68,10 @@ async function handle(params: Params, apiClient: IApiClient): Promise<Result> {
       `/api/orgs/${orgId}/people/views/${oldView.id}/rows`
     );
     if (rows.length != 0) {
-      for await (const person of rows) {
+      for await (const row of rows) {
+        const personId = row.id;
         await apiClient.put(
-          `/api/orgs/${orgId}/people/views/${newView.id}/rows/${person.id}`
+          `/api/orgs/${orgId}/people/views/${newView.id}/rows/${personId}`
         );
       }
     }
