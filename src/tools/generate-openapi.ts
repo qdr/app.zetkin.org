@@ -1,12 +1,23 @@
 #!/usr/bin/env ts-node
 
-import * as ts from 'typescript';
+import ts from 'typescript';
 import * as fs from 'fs';
 import * as path from 'path';
 import { glob } from 'glob';
 import * as TJS from 'ts-json-schema-generator';
+import { OpenAPIV3 } from 'openapi-types';
+import OpenAPIObject = OpenAPIV3.Document;
+import PathsObject = OpenAPIV3.PathsObject;
+import PathItemObject = OpenAPIV3.PathItemObject;
+import OperationObject = OpenAPIV3.OperationObject;
+import ParameterObject = OpenAPIV3.ParameterObject;
+import SchemaObject = OpenAPIV3.SchemaObject;
+import ReferenceObject = OpenAPIV3.ReferenceObject;
+import ExampleObject = OpenAPIV3.ExampleObject;
+import HttpMethods = OpenAPIV3.HttpMethods;
+import NonArraySchemaObjectType = OpenAPIV3.NonArraySchemaObjectType;
 
-interface ApiEndpoint {
+export interface ApiEndpoint {
   method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
   path: string;
   responseType?: string;
@@ -17,30 +28,27 @@ interface ApiEndpoint {
   queryParams: string[];
 }
 
-interface RpcEndpoint {
+export interface RpcEndpoint {
   name: string;
-  paramsSchema?: any;
+  paramsSchema?: SchemaObject;
   resultType?: string;
   fileLocation: string;
   lineNumber: number;
 }
 
-class OpenApiGenerator {
+export class OpenApiGenerator {
+  private readonly VALID_API_PREFIXES = ['/api', '/api2', '/beta'];
   private endpoints: Map<string, ApiEndpoint[]> = new Map();
   private rpcEndpoints: RpcEndpoint[] = [];
   private program: ts.Program;
   private schemaGenerator: TJS.SchemaGenerator | null = null;
   private typeFiles: string[] = [];
 
-  constructor(private rootDir: string) {
-    const configPath = ts.findConfigFile(
-      rootDir,
-      ts.sys.fileExists,
-      'tsconfig.json'
-    );
-    const configFile = configPath
-      ? ts.readConfigFile(configPath, ts.sys.readFile)
-      : undefined;
+  constructor(
+    private rootDir: string,
+    private debug: (...data: unknown[]) => void
+  ) {
+    this.debug('Initializing TypeScript compiler...');
 
     const compilerOptions: ts.CompilerOptions = {
       target: ts.ScriptTarget.ES2020,
@@ -60,7 +68,8 @@ class OpenApiGenerator {
 
     this.program = ts.createProgram(files, compilerOptions);
 
-    console.log('Loading type definitions...');
+    // Find all type files
+    this.debug('Loading type definitions...');
     this.typeFiles = [
       path.join(rootDir, 'src/utils/types/zetkin.ts'),
       ...glob.sync('src/features/**/types.ts', {
@@ -69,8 +78,9 @@ class OpenApiGenerator {
       }),
     ];
 
-    console.log(`Found ${this.typeFiles.length} type definition files`);
+    this.debug(`Found ${this.typeFiles.length} type definition files`);
 
+    // Create a single schema generator with the primary types file
     try {
       const config: TJS.Config = {
         path: path.join(rootDir, 'src/utils/types/zetkin.ts'),
@@ -80,11 +90,9 @@ class OpenApiGenerator {
         topRef: false,
       };
       this.schemaGenerator = TJS.createGenerator(config);
-      console.log(
-        `  Loaded type definitions (will resolve imports automatically)`
-      );
+      this.debug(`  ✓ Loaded type definitions (will resolve imports automatically)`);
     } catch (e) {
-      console.error('  Failed to load type definitions:', e);
+      console.error('  ✗ Failed to load type definitions:', e);
     }
   }
 
@@ -93,9 +101,7 @@ class OpenApiGenerator {
       .getSourceFiles()
       .filter((sf) => !sf.fileName.includes('node_modules'));
 
-    console.log(
-      `\nParsing ${sourceFiles.length} source files for API endpoints...`
-    );
+    this.debug(`\nParsing ${sourceFiles.length} source files for API endpoints...`);
 
     let processedFiles = 0;
     const totalFiles = sourceFiles.length;
@@ -105,6 +111,7 @@ class OpenApiGenerator {
       this.visitNode(sourceFile, sourceFile);
       processedFiles++;
 
+      // Show progress every 100 files
       if (processedFiles % 100 === 0 || processedFiles === totalFiles) {
         const percent = Math.round((processedFiles / totalFiles) * 100);
         const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
@@ -114,9 +121,38 @@ class OpenApiGenerator {
       }
     }
 
-    console.log('\n');
-    console.log(`Found ${this.getTotalEndpoints()} REST endpoints`);
-    console.log(`Found ${this.rpcEndpoints.length} RPC endpoints`);
+    this.debug('\n');
+    this.debug(`Found ${this.getTotalEndpoints()} REST endpoints`);
+    this.debug(`Found ${this.rpcEndpoints.length} RPC endpoints`);
+  }
+
+  public printStats(): void {
+    this.debug('\n=== OpenAPI Generation Statistics ===');
+    this.debug(`Total REST endpoints: ${this.getTotalEndpoints()}`);
+    this.debug(`Unique paths: ${this.endpoints.size}`);
+    this.debug(`RPC endpoints: ${this.rpcEndpoints.length}`);
+
+    const methodCounts: Record<string, number> = {};
+    for (const endpoints of this.endpoints.values()) {
+      for (const endpoint of endpoints) {
+        methodCounts[endpoint.method] =
+          (methodCounts[endpoint.method] || 0) + 1;
+      }
+    }
+
+    this.debug('\nEndpoints by HTTP method:');
+    for (const [method, count] of Object.entries(methodCounts).sort()) {
+      this.debug(`  ${method}: ${count}`);
+    }
+
+    this.debug('\nTop 10 most used paths:');
+    const sortedPaths = Array.from(this.endpoints.entries())
+      .sort((a, b) => b[1].length - a[1].length)
+      .slice(0, 10);
+
+    for (const [path, endpoints] of sortedPaths) {
+      this.debug(`  ${path}: ${endpoints.length} calls`);
+    }
   }
 
   private visitNode(node: ts.Node, sourceFile: ts.SourceFile): void {
@@ -223,8 +259,8 @@ class OpenApiGenerator {
 
     const rpcName = name.replace('Def', '');
 
-    let paramsSchema: any = undefined;
-    let resultType: string | undefined = undefined;
+    let paramsSchema: SchemaObject | undefined = undefined;
+    const resultType: string | undefined = undefined;
 
     if (node.initializer && ts.isObjectLiteralExpression(node.initializer)) {
       const properties = node.initializer.properties;
@@ -257,89 +293,6 @@ class OpenApiGenerator {
       });
     }
   }
-
-  private extractZodSchema(node: ts.Node, sourceFile: ts.SourceFile): any {
-    if (ts.isIdentifier(node)) {
-      const schemaName = node.text;
-      const foundSchema = this.findSchemaDefinition(schemaName, sourceFile);
-      if (foundSchema) {
-        return foundSchema;
-      }
-    }
-
-    const text = node.getText(sourceFile);
-
-    if (text.includes('z.object')) {
-      const properties: Record<string, any> = {};
-      const required: string[] = [];
-
-      const objectMatch = text.match(/z\.object\(\{([\s\S]+?)\}\)/);
-      if (objectMatch) {
-        const propsText = objectMatch[1];
-        const propRegex = /(\w+):\s*z\.(\w+)\([^)]*\)/g;
-        let match;
-
-        while ((match = propRegex.exec(propsText)) !== null) {
-          const [, propName, zodType] = match;
-          const openApiType = this.zodTypeToOpenApi(zodType);
-          properties[propName] = openApiType;
-          required.push(propName);
-        }
-      }
-
-      return {
-        type: 'object',
-        properties,
-        required: required.length > 0 ? required : undefined,
-      };
-    }
-
-    return undefined;
-  }
-
-  private findSchemaDefinition(
-    schemaName: string,
-    sourceFile: ts.SourceFile
-  ): any {
-    let foundSchema: any = undefined;
-
-    const visit = (node: ts.Node) => {
-      if (ts.isVariableStatement(node)) {
-        for (const declaration of node.declarationList.declarations) {
-          if (
-            ts.isIdentifier(declaration.name) &&
-            declaration.name.text === schemaName &&
-            declaration.initializer
-          ) {
-            foundSchema = this.extractZodSchema(
-              declaration.initializer,
-              sourceFile
-            );
-            return;
-          }
-        }
-      }
-      ts.forEachChild(node, visit);
-    };
-
-    visit(sourceFile);
-    return foundSchema;
-  }
-
-  private zodTypeToOpenApi(zodType: string): any {
-    const typeMap: Record<string, any> = {
-      string: { type: 'string' },
-      number: { type: 'number' },
-      boolean: { type: 'boolean' },
-      date: { type: 'string', format: 'date-time' },
-      array: { type: 'array', items: { type: 'string' } },
-      object: { type: 'object' },
-    };
-
-    return typeMap[zodType] || { type: 'object' };
-  }
-
-  private readonly VALID_API_PREFIXES = ['/api', '/api2', '/beta'];
 
   private extractPathString(node: ts.Node): string | null {
     let path: string | null = null;
@@ -400,7 +353,7 @@ class OpenApiGenerator {
       return 'orgId';
     }
     if (lower.includes('campaign')) {
-      return 'campId';
+      return 'projId';
     }
     if (lower.includes('event') || lower.includes('action')) {
       return 'eventId';
@@ -445,7 +398,7 @@ class OpenApiGenerator {
             const prevSegment = i > 0 ? pathSegments[i - 1] : '';
 
             if (prevSegment === 'orgs') return 'orgId';
-            if (prevSegment === 'campaigns') return 'campId';
+            if (prevSegment === 'campaigns') return 'projId';
             if (prevSegment === 'actions' || prevSegment === 'events')
               return 'eventId';
             if (prevSegment === 'people') return 'personId';
@@ -545,7 +498,7 @@ class OpenApiGenerator {
     return type.getText(sourceFile);
   }
 
-  private typeToSchema(typeName: string): any {
+  private typeToSchema(typeName: string): SchemaObject {
     if (typeName.endsWith('[]')) {
       const itemType = typeName.slice(0, -2);
       return {
@@ -554,25 +507,27 @@ class OpenApiGenerator {
       };
     }
 
-    const primitiveMap: Record<string, string> = {
+    const primitiveMap: Record<string, NonArraySchemaObjectType | undefined> = {
       string: 'string',
       number: 'number',
       boolean: 'boolean',
       any: 'object',
       unknown: 'object',
-      void: 'null',
+      void: undefined,
     };
 
     if (primitiveMap[typeName]) {
       return { type: primitiveMap[typeName] };
     }
 
+    // Try to generate schema from the unified generator
     if (this.schemaGenerator) {
       try {
         const schema = this.schemaGenerator.createSchema(typeName);
         if (schema && typeof schema === 'object') {
           const mainSchema: any = schema.definitions?.[typeName] || schema;
           if (mainSchema && mainSchema.type === 'object') {
+            // Try to find which type file defines this type
             const typeFile = this.findTypeFile(typeName);
             if (typeFile) {
               const relativePath = path.relative(this.rootDir, typeFile);
@@ -588,7 +543,9 @@ class OpenApiGenerator {
             return mainSchema;
           }
         }
-      } catch (e) {}
+      } catch (e) {
+        // Type not found, continue to fallback
+      }
     }
 
     let typeLabel = 'Type';
@@ -611,16 +568,20 @@ class OpenApiGenerator {
   }
 
   private findTypeFile(typeName: string): string | null {
+    // Search through type files to find where the type is defined
     for (const typeFile of this.typeFiles) {
       try {
         const content = fs.readFileSync(typeFile, 'utf-8');
+        // Look for type or interface declarations
         const typeRegex = new RegExp(
           `(export\\s+)?(type|interface)\\s+${typeName}\\s*[=<{]`
         );
         if (typeRegex.test(content)) {
           return typeFile;
         }
-      } catch (e) {}
+      } catch (e) {
+        // Continue searching
+      }
     }
     return null;
   }
@@ -716,6 +677,89 @@ class OpenApiGenerator {
     return schema;
   }
 
+  private extractZodSchema(
+    node: ts.Node,
+    sourceFile: ts.SourceFile
+  ): SchemaObject | undefined {
+    if (ts.isIdentifier(node)) {
+      const schemaName = node.text;
+      const foundSchema = this.findSchemaDefinition(schemaName, sourceFile);
+      if (foundSchema) {
+        return foundSchema;
+      }
+    }
+
+    const text = node.getText(sourceFile);
+
+    if (text.includes('z.object')) {
+      const properties: Record<string, SchemaObject | ReferenceObject> = {};
+      const required: string[] = [];
+
+      const objectMatch = text.match(/z\.object\(\{([\s\S]+?)\}\)/);
+      if (objectMatch) {
+        const propsText = objectMatch[1];
+        const propRegex = /(\w+):\s*z\.(\w+)\([^)]*\)/g;
+        let match;
+
+        while ((match = propRegex.exec(propsText)) !== null) {
+          const [, propName, zodType] = match;
+          properties[propName] = this.zodTypeToOpenApi(zodType);
+          required.push(propName);
+        }
+      }
+
+      return {
+        type: 'object',
+        properties,
+        required: required.length > 0 ? required : undefined,
+      };
+    }
+
+    return undefined;
+  }
+
+  private findSchemaDefinition(
+    schemaName: string,
+    sourceFile: ts.SourceFile
+  ): SchemaObject | undefined {
+    let foundSchema: SchemaObject | undefined = undefined;
+
+    const visit = (node: ts.Node) => {
+      if (ts.isVariableStatement(node)) {
+        for (const declaration of node.declarationList.declarations) {
+          if (
+            ts.isIdentifier(declaration.name) &&
+            declaration.name.text === schemaName &&
+            declaration.initializer
+          ) {
+            foundSchema = this.extractZodSchema(
+              declaration.initializer,
+              sourceFile
+            );
+            return;
+          }
+        }
+      }
+      ts.forEachChild(node, visit);
+    };
+
+    visit(sourceFile);
+    return foundSchema;
+  }
+
+  private zodTypeToOpenApi(zodType: string): SchemaObject | ReferenceObject {
+    const typeMap: Record<string, SchemaObject | ReferenceObject> = {
+      string: { type: 'string' },
+      number: { type: 'number' },
+      boolean: { type: 'boolean' },
+      date: { type: 'string', format: 'date-time' },
+      array: { type: 'array', items: { type: 'string' } },
+      object: { type: 'object' },
+    };
+
+    return typeMap[zodType] || { type: 'object' };
+  }
+
   private getTotalEndpoints(): number {
     let total = 0;
     for (const endpoints of this.endpoints.values()) {
@@ -724,15 +768,15 @@ class OpenApiGenerator {
     return total;
   }
 
-  public generateOpenApi(): object {
-    console.log('\nGenerating OpenAPI specification...');
-    const paths: Record<string, any> = {};
+  public generateOpenApi(): OpenAPIObject {
+    this.debug('\nGenerating OpenAPI specification...');
+    const paths: PathsObject = {};
 
     const sortedPaths = Array.from(this.endpoints.entries()).sort((a, b) =>
       a[0].localeCompare(b[0])
     );
 
-    console.log(`Building ${sortedPaths.length} API path definitions...`);
+    this.debug(`Building ${sortedPaths.length} API path definitions...`);
     let processedPaths = 0;
 
     for (const [pathKey, endpoints] of sortedPaths) {
@@ -743,7 +787,8 @@ class OpenApiGenerator {
           `\r  Progress: ${processedPaths}/${sortedPaths.length} paths (${percent}%)`
         );
       }
-      const pathItem: any = {};
+
+      const pathItem: PathItemObject = {};
 
       const methodGroups = new Map<string, ApiEndpoint[]>();
       for (const endpoint of endpoints) {
@@ -768,13 +813,14 @@ class OpenApiGenerator {
             '\n\nExample: `GET /api/breadcrumbs?pathname=/organize/[orgId]/projects&orgId=2`';
         }
 
-        const operation: any = {
+        const operation: OperationObject = {
           summary: this.generateSummary(canonicalEndpoint),
           description,
           tags: this.extractTags(canonicalEndpoint.path),
+          responses: {},
         };
 
-        const parameters: any[] = [];
+        const parameters: ParameterObject[] = [];
         const addedParams = new Set<string>();
 
         for (const param of canonicalEndpoint.pathParams) {
@@ -800,6 +846,7 @@ class OpenApiGenerator {
               example: this.getExampleValue(param),
             };
 
+            // Add default value for specific parameters
             const paramLower = param.toLowerCase();
             if (paramLower === 'recursive') {
               schema.default = false;
@@ -820,7 +867,7 @@ class OpenApiGenerator {
               schema.default = 50;
             }
 
-            const paramObj: any = {
+            const paramObj: ParameterObject = {
               name: param,
               in: 'query',
               required: false,
@@ -911,30 +958,33 @@ class OpenApiGenerator {
           },
         };
 
-        pathItem[method.toLowerCase()] = operation;
+        pathItem[method.toLowerCase() as HttpMethods] = operation;
       }
 
       paths[pathKey] = pathItem;
     }
 
-    console.log('\n');
+    this.debug('\n');
 
     if (this.rpcEndpoints.length > 0) {
-      console.log(`Processing ${this.rpcEndpoints.length} RPC endpoints...`);
+      this.debug(`Processing ${this.rpcEndpoints.length} RPC endpoints...`);
       const sortedRpcEndpoints = [...this.rpcEndpoints].sort((a, b) =>
         a.name.localeCompare(b.name)
       );
 
       const allFuncNames = sortedRpcEndpoints.map((rpc) => rpc.name);
 
-      const examples: Record<string, any> = {};
+      const examples: Record<string, ReferenceObject | ExampleObject> = {};
       for (const rpc of sortedRpcEndpoints) {
-        const exampleParams: any = {};
+        const exampleParams: Record<string, unknown> = {};
         if (rpc.paramsSchema?.properties) {
-          for (const [key, value] of Object.entries(
+          for (const [key, propSchema] of Object.entries(
             rpc.paramsSchema.properties
           )) {
-            const propSchema = value as any;
+            if (!('type' in propSchema)) {
+              continue;
+            }
+
             if (propSchema.type === 'string') {
               exampleParams[key] = 'string';
             } else if (propSchema.type === 'number') {
@@ -970,11 +1020,12 @@ class OpenApiGenerator {
               'application/json': {
                 schema: {
                   type: 'object',
+                  required: ['func', 'params'],
                   properties: {
                     func: {
                       type: 'string',
-                      enum: allFuncNames,
                       description: 'RPC function name to execute',
+                      enum: allFuncNames,
                     },
                     params: {
                       type: 'object',
@@ -982,7 +1033,6 @@ class OpenApiGenerator {
                         'Function parameters (see examples for each function)',
                     },
                   },
-                  required: ['func', 'params'],
                 },
                 examples,
               },
@@ -995,6 +1045,7 @@ class OpenApiGenerator {
                 'application/json': {
                   schema: {
                     type: 'object',
+                    required: ['result'],
                     properties: {
                       result: {
                         type: 'object',
@@ -1002,7 +1053,6 @@ class OpenApiGenerator {
                           'Result object (structure varies by function)',
                       },
                     },
-                    required: ['result'],
                   },
                 },
               },
@@ -1018,7 +1068,7 @@ class OpenApiGenerator {
       };
     }
 
-    const openapi = {
+    const openapi: OpenAPIObject = {
       openapi: '3.0.0',
       info: {
         title: 'Zetkin APIs',
@@ -1051,7 +1101,8 @@ class OpenApiGenerator {
       tags: this.generateTags(),
     };
 
-    console.log('Flattening schema definitions...');
+    // Hoist all nested definitions to root level
+    this.debug('Flattening schema definitions...');
     this.hoistDefinitions(openapi);
 
     return openapi;
@@ -1060,20 +1111,24 @@ class OpenApiGenerator {
   private hoistDefinitions(openapi: any): void {
     const allDefinitions: Record<string, any> = {};
 
+    // Recursively find and collect all definitions
     const collectDefinitions = (obj: any, parentPath: string = '') => {
       if (!obj || typeof obj !== 'object') {
         return;
       }
 
+      // If this object has a definitions property, merge them
       if (obj.definitions && typeof obj.definitions === 'object') {
         for (const [defName, defSchema] of Object.entries(obj.definitions)) {
           if (!allDefinitions[defName]) {
             allDefinitions[defName] = defSchema;
           }
         }
+        // Remove the definitions from the nested location
         delete obj.definitions;
       }
 
+      // Recursively process all properties
       for (const key in obj) {
         if (obj.hasOwnProperty(key) && key !== 'definitions') {
           collectDefinitions(obj[key], `${parentPath}.${key}`);
@@ -1081,32 +1136,35 @@ class OpenApiGenerator {
       }
     };
 
+    // Start collection from paths
     collectDefinitions(openapi.paths);
 
+    // Add all collected definitions to components.schemas
     if (Object.keys(allDefinitions).length > 0) {
       openapi.components.schemas = {
         ...openapi.components.schemas,
         ...allDefinitions,
       };
-      console.log(
-        `  Hoisted ${
-          Object.keys(allDefinitions).length
-        } type definitions to root level`
+      this.debug(
+        `  ✓ Hoisted ${Object.keys(allDefinitions).length} type definitions to root level`
       );
     }
 
+    // Now update all $refs to point to the root level
     const updateRefs = (obj: any) => {
       if (!obj || typeof obj !== 'object') {
         return;
       }
 
       if (obj.$ref && typeof obj.$ref === 'string') {
+        // Convert local definition refs to component schema refs
         if (obj.$ref.startsWith('#/definitions/')) {
           const defName = obj.$ref.replace('#/definitions/', '');
           obj.$ref = `#/components/schemas/${defName}`;
         }
       }
 
+      // Recursively update all properties
       for (const key in obj) {
         if (obj.hasOwnProperty(key)) {
           updateRefs(obj[key]);
@@ -1150,7 +1208,6 @@ class OpenApiGenerator {
 
   private extractTags(path: string): string[] {
     const cleanPath = this.normalizePath(path);
-    const parts = cleanPath.split('/').filter((p) => p && !p.startsWith('{'));
 
     let apiTag = '';
     if (cleanPath.startsWith('/api2/')) {
@@ -1191,9 +1248,15 @@ class OpenApiGenerator {
       const aIndex = order.indexOf(a);
       const bIndex = order.indexOf(b);
 
-      if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
-      if (aIndex !== -1) return -1;
-      if (bIndex !== -1) return 1;
+      if (aIndex !== -1 && bIndex !== -1) {
+        return aIndex - bIndex;
+      }
+      if (aIndex !== -1) {
+        return -1;
+      }
+      if (bIndex !== -1) {
+        return 1;
+      }
       return a.localeCompare(b);
     });
 
@@ -1231,6 +1294,7 @@ class OpenApiGenerator {
     if (lower === 'recursive' && path.includes('actions')) {
       return 'Include events from sub-organizations. Set to true to include sub-org events, false (default) for current org only.';
     }
+    // Pagination parameters
     if (lower === 'page') {
       return 'Page number for pagination (1-based). Use with "size" parameter to paginate through results.';
     }
@@ -1279,6 +1343,7 @@ class OpenApiGenerator {
     if (lowerParam === 'recursive') {
       return true;
     }
+    // Pagination parameters
     if (lowerParam === 'page') {
       return 1;
     }
@@ -1296,7 +1361,6 @@ class OpenApiGenerator {
       orgId: 2,
       personId: 2,
       userId: 2,
-      campId: 281,
       projId: 281,
       campaignId: 281,
       projectId: 281,
@@ -1339,49 +1403,21 @@ class OpenApiGenerator {
     return 'example';
   }
 
-  private capitalizeFirst(str: string): string {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
-
   public saveToFile(outputPath: string): void {
     const spec = this.generateOpenApi();
     const content = JSON.stringify(spec, null, 2);
 
+    const dir = path.dirname(outputPath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
     fs.writeFileSync(outputPath, content, 'utf-8');
-    console.log(`\nOpenAPI specification saved to: ${outputPath}`);
-  }
-
-  public printStats(): void {
-    console.log('\n=== OpenAPI Generation Statistics ===');
-    console.log(`Total REST endpoints: ${this.getTotalEndpoints()}`);
-    console.log(`Unique paths: ${this.endpoints.size}`);
-    console.log(`RPC endpoints: ${this.rpcEndpoints.length}`);
-
-    const methodCounts: Record<string, number> = {};
-    for (const endpoints of this.endpoints.values()) {
-      for (const endpoint of endpoints) {
-        methodCounts[endpoint.method] =
-          (methodCounts[endpoint.method] || 0) + 1;
-      }
-    }
-
-    console.log('\nEndpoints by HTTP method:');
-    for (const [method, count] of Object.entries(methodCounts).sort()) {
-      console.log(`  ${method}: ${count}`);
-    }
-
-    console.log('\nTop 10 most used paths:');
-    const sortedPaths = Array.from(this.endpoints.entries())
-      .sort((a, b) => b[1].length - a[1].length)
-      .slice(0, 10);
-
-    for (const [path, endpoints] of sortedPaths) {
-      console.log(`  ${path}: ${endpoints.length} calls`);
-    }
+    this.debug(`\nOpenAPI specification saved to: ${outputPath}`);
   }
 }
 
-async function main() {
+async function main(debug: (...data: unknown[]) => void) {
   const args = process.argv.slice(2);
   const outputIndex = args.indexOf('--output');
   const outputPath =
@@ -1389,20 +1425,23 @@ async function main() {
       ? args[outputIndex + 1]
       : path.join(process.cwd(), 'public/openapi/openapi.json');
 
-  console.log('Zetkin OpenAPI Generator\n');
-  console.log(`Root directory: ${process.cwd()}`);
-  console.log(`Output file: ${outputPath}\n`);
+  debug('Zetkin OpenAPI Generator\n');
+  debug(`Root directory: ${process.cwd()}`);
+  debug(`Output file: ${outputPath}\n`);
 
-  const generator = new OpenApiGenerator(process.cwd());
+  const generator = new OpenApiGenerator(process.cwd(), debug);
 
   await generator.parse();
   generator.printStats();
   generator.saveToFile(outputPath);
 
-  console.log('\n Done! You can now:');
-  console.log('  1. View the spec in Swagger UI: https://editor.swagger.io/');
-  console.log('  2. Import into Postman');
-  console.log('  3. Generate client SDKs using openapi-generator');
+  debug('\n Done! You can now:');
+  debug('  1. View the spec in Swagger UI: https://editor.swagger.io/');
+  debug('  2. Import into Postman');
+  debug('  3. Generate client SDKs using openapi-generator');
 }
 
-main().catch(console.error);
+if (require.main === module) {
+  // eslint-disable-next-line no-console
+  main(console.log).catch(console.error);
+}
