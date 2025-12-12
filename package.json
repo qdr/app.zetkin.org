@@ -167,6 +167,7 @@
     "prettier": "^2.5.1",
     "storybook": "^8.1.10",
     "ts-jest": "^29.4.5",
+    "ts-json-schema-generator": "^2.4.0",
     "ts-loader": "^9.2.6",
     "ts-mockito": "^2.6.1",
     "ts-node": "^10.9.1",

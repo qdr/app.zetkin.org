@@ -4,6 +4,7 @@ import * as ts from 'typescript';
 import * as fs from 'fs';
 import * as path from 'path';
 import { glob } from 'glob';
+import * as TJS from 'ts-json-schema-generator';
 
 interface ApiEndpoint {
   method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
@@ -28,6 +29,7 @@ class OpenApiGenerator {
   private endpoints: Map<string, ApiEndpoint[]> = new Map();
   private rpcEndpoints: RpcEndpoint[] = [];
   private program: ts.Program;
+  private schemaGenerator: TJS.SchemaGenerator | null = null;
 
   constructor(private rootDir: string) {
     const configPath = ts.findConfigFile(
@@ -56,6 +58,18 @@ class OpenApiGenerator {
     });
 
     this.program = ts.createProgram(files, compilerOptions);
+
+    try {
+      const config: TJS.Config = {
+        path: path.join(rootDir, 'src/utils/types/zetkin.ts'),
+        skipTypeCheck: true,
+        expose: 'export',
+        topRef: false,
+      };
+      this.schemaGenerator = TJS.createGenerator(config);
+    } catch (e) {
+      console.error('Failed to create schema generator:', e);
+    }
   }
 
   public async parse(): Promise<void> {
@@ -521,10 +535,133 @@ class OpenApiGenerator {
       return { type: primitiveMap[typeName] };
     }
 
+    if (this.schemaGenerator) {
+      try {
+        const schema = this.schemaGenerator.createSchema(typeName);
+        if (schema && typeof schema === 'object') {
+          const mainSchema: any = schema.definitions?.[typeName] || schema;
+          if (mainSchema && mainSchema.type === 'object') {
+            if (!mainSchema.description) {
+              mainSchema.description = `(src/utils/types/zetkin.ts)`;
+            } else {
+              mainSchema.description += ` (src/utils/types/zetkin.ts)`;
+            }
+            this.fixNullableTypes(mainSchema);
+            this.addDateFormats(mainSchema);
+            return mainSchema;
+          }
+        }
+      } catch (e) {}
+    }
+
+    let typeLabel = 'Type';
+    if (typeName.includes('<')) {
+      typeLabel = 'Generic Type';
+    } else if (
+      typeName.includes('Partial<') ||
+      typeName.includes('Omit<') ||
+      typeName.includes('Pick<')
+    ) {
+      typeLabel = 'Complex Type';
+    } else if (typeName.startsWith('{')) {
+      typeLabel = 'Inline Type';
+    }
+
     return {
       type: 'object',
-      description: `Type: ${typeName}`,
+      description: `${typeLabel}: ${typeName}`,
     };
+  }
+
+  private fixNullableTypes(schema: any): any {
+    if (!schema || typeof schema !== 'object') {
+      return schema;
+    }
+
+    if (schema.properties) {
+      for (const [propName, propSchema] of Object.entries(schema.properties)) {
+        if (typeof propSchema === 'object' && propSchema !== null) {
+          const ps = propSchema as any;
+
+          if (Array.isArray(ps.type)) {
+            const types = ps.type.filter((t: string) => t !== 'null');
+            if (ps.type.includes('null')) {
+              ps.nullable = true;
+              if (types.length === 1) {
+                ps.type = types[0];
+              } else if (types.length > 1) {
+                ps.type = types;
+              }
+            }
+          }
+
+          this.fixNullableTypes(propSchema);
+        }
+      }
+    }
+
+    if (schema.definitions) {
+      for (const defSchema of Object.values(schema.definitions)) {
+        this.fixNullableTypes(defSchema);
+      }
+    }
+
+    return schema;
+  }
+
+  private addDateFormats(schema: any): any {
+    if (!schema || typeof schema !== 'object') {
+      return schema;
+    }
+
+    const dateFieldNames = [
+      'published',
+      'expires',
+      'start_time',
+      'end_time',
+      'created',
+      'updated',
+      'cancelled',
+      'attended',
+      'noshow',
+      'reminder_sent',
+      'response_date',
+      'uploaded',
+      'timestamp',
+      'date',
+      'datetime',
+      'booked',
+      'completed',
+    ];
+
+    if (schema.properties) {
+      for (const [propName, propSchema] of Object.entries(schema.properties)) {
+        const lowerName = propName.toLowerCase();
+
+        if (dateFieldNames.some((field) => lowerName.includes(field))) {
+          if (typeof propSchema === 'object' && propSchema !== null) {
+            const ps = propSchema as any;
+            if (ps.type === 'string') {
+              ps.format = 'date-time';
+            } else if (Array.isArray(ps.type) && ps.type.includes('string')) {
+              ps.format = 'date-time';
+            }
+          }
+        }
+
+        if (typeof propSchema === 'object') {
+          this.addDateFormats(propSchema);
+        }
+      }
+    }
+
+    if (schema.definitions) {
+      for (const defSchema of Object.values(schema.definitions)) {
+        this.addDateFormats(defSchema);
+      }
+    }
+
+    return schema;
   }
 
   private getTotalEndpoints(): number {
@@ -917,6 +1054,9 @@ class OpenApiGenerator {
     if (paramName.toLowerCase().includes('id')) {
       return 'integer';
     }
+    if (paramName.toLowerCase() === 'recursive') {
+      return 'boolean';
+    }
     return 'string';
   }
 
@@ -979,8 +1119,8 @@ class OpenApiGenerator {
       orgId: 2,
       personId: 2,
       userId: 2,
-      campId: 1,
-      projId: 1,
+      campId: 281,
+      projId: 281,
       campaignId: 281,
       projectId: 281,
       eventId: 544,
@@ -994,7 +1134,7 @@ class OpenApiGenerator {
       callAssId: 145,
       canvassAssId: 1,
       areaId: 1,
-      areaAssId: 1,
+      areaAssId: 73,
       locationId: 1,
       householdId: 1,
       submissionId: 1,
